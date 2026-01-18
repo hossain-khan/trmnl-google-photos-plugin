@@ -1,24 +1,53 @@
 /**
  * Photo Fetcher Service
  * Handles fetching photos from Google Photos shared albums
+ * Includes optional KV caching for performance optimization
  */
 
 import * as GooglePhotosAlbum from 'google-photos-album-image-url-fetch';
 import type { GooglePhoto, PhotoData } from '../types';
+import {
+  getCachedAlbum,
+  setCachedAlbum,
+  extractAlbumId,
+} from './cache-service';
 
 /**
  * Fetch photos from a Google Photos shared album
  * 
  * @param albumUrl - The shared album URL
+ * @param kv - Optional Cloudflare KV namespace for caching
  * @returns Array of photos from the album
  * @throws Error if fetching fails or album is inaccessible
  */
-export async function fetchAlbumPhotos(albumUrl: string): Promise<GooglePhoto[]> {
+export async function fetchAlbumPhotos(
+  albumUrl: string,
+  kv?: KVNamespace
+): Promise<GooglePhoto[]> {
+  const albumId = extractAlbumId(albumUrl);
+  
+  // Try to get from cache first (if KV is configured)
+  if (kv) {
+    const cached = await getCachedAlbum(kv, albumId);
+    if (cached && cached.photos) {
+      console.log(`Using cached photos for album ${albumId} (${cached.photo_count} photos)`);
+      return cached.photos;
+    }
+  }
+  
+  // Cache miss or not configured - fetch from Google Photos API
+  console.log(`Fetching photos from Google Photos API for album ${albumId}`);
+  
   try {
     const photos = await GooglePhotosAlbum.fetchImageUrls(albumUrl);
     
     if (!photos || photos.length === 0) {
       throw new Error('No photos found in album. Ensure the album is publicly shared and contains photos (not videos).');
+    }
+    
+    // Store in cache for future requests (if KV is configured)
+    if (kv) {
+      await setCachedAlbum(kv, albumId, photos);
     }
     
     return photos;
@@ -104,12 +133,16 @@ export function convertToPhotoData(
  * Main function to fetch a random photo from an album
  * 
  * @param albumUrl - The shared album URL
+ * @param kv - Optional Cloudflare KV namespace for caching
  * @returns PhotoData object ready for template rendering
  * @throws Error if fetching or processing fails
  */
-export async function fetchRandomPhoto(albumUrl: string): Promise<PhotoData> {
-  // Fetch all photos from the album
-  const photos = await fetchAlbumPhotos(albumUrl);
+export async function fetchRandomPhoto(
+  albumUrl: string,
+  kv?: KVNamespace
+): Promise<PhotoData> {
+  // Fetch all photos from the album (may use cache)
+  const photos = await fetchAlbumPhotos(albumUrl, kv);
   
   // Select a random photo
   const selectedPhoto = selectRandomPhoto(photos);

@@ -15,7 +15,8 @@ import type { TRMNLRequest, TemplateContext } from './types';
 // Type definitions for Cloudflare Workers environment
 type Bindings = {
   ENVIRONMENT?: string;
-  // Add other bindings here when needed (KV, Analytics, etc.)
+  PHOTOS_CACHE?: KVNamespace; // Optional KV namespace for caching album data
+  // Add other bindings here when needed (Analytics, etc.)
 };
 
 // Create Hono app with type safety
@@ -146,10 +147,10 @@ app.post('/markup', async (c) => {
 
     console.log(`Using layout: ${layout}`);
 
-    // Fetch random photo from album
+    // Fetch random photo from album (with optional caching)
     let photoData;
     try {
-      photoData = await fetchRandomPhoto(urlValidation.url);
+      photoData = await fetchRandomPhoto(urlValidation.url, c.env.PHOTOS_CACHE);
       console.log('Photo fetched:', {
         uid: photoData.metadata?.uid,
         count: photoData.photo_count,
