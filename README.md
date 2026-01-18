@@ -20,7 +20,12 @@ Display random photos from your Google Photos shared albums on TRMNL e-ink displ
   - Created proof-of-concept implementation
   - Documented approach in `docs/GOOGLE_PHOTOS_API.md`
   - Validated with comprehensive tests
-- [ ] URL parser for Google Photos shared albums
+- [x] ✅ **URL parser for Google Photos shared albums** (Issue 3 - Complete!)
+  - Implemented Zod schema validation
+  - Support for short URLs (`photos.app.goo.gl`) and full URLs
+  - Album ID extraction from all URL formats
+  - 42 comprehensive test cases covering all scenarios
+  - User-friendly error messages
 - [ ] DynamoDB schema and S3 caching
 - [ ] Settings page UI (Next.js)
 - [ ] Preview functionality
@@ -75,13 +80,21 @@ This plugin is built following the [NEW_RECIPE_GUIDE.md](docs/NEW_RECIPE_GUIDE.m
 trmnl-google-photos-plugin/
 ├── api/                          # API endpoints (GitHub Pages)
 │   └── photo.json               # Current photo data
+├── lib/                          # Core library modules
+│   └── url-parser.js            # URL parser & validator
+├── scripts/                      # Build and automation scripts
+│   ├── fetch-photos.js          # Photo fetching script
+│   ├── investigate-api.js       # API investigation tool
+│   ├── test-fetch.js            # Fetch tests
+│   └── test-url-parser.js       # URL parser tests (42 cases)
 ├── assets/                       # Design assets
 │   ├── icon/                    # Plugin icons
 │   ├── demo/                    # Demo screenshots
 │   └── raw/                     # Source files
 ├── docs/                         # Documentation
 │   ├── NEW_RECIPE_GUIDE.md      # TRMNL recipe guide
-│   └── PRD_Full_Technical.md    # Full technical PRD
+│   ├── PRD_Full_Technical.md    # Full technical PRD
+│   └── GOOGLE_PHOTOS_API.md     # API investigation docs
 ├── templates/                    # Liquid templates
 │   ├── full.liquid              # Full-screen layout
 │   ├── half_horizontal.liquid   # Half horizontal layout
@@ -94,6 +107,39 @@ trmnl-google-photos-plugin/
 ├── settings.yml                  # TRMNL plugin configuration
 └── data.json                     # Sample data for testing
 ```
+
+### URL Parser Usage
+
+The URL parser validates and extracts album IDs from Google Photos shared album URLs:
+
+```javascript
+import { parseAlbumUrl, isValidAlbumUrl, extractAlbumId } from './lib/url-parser.js';
+
+// Validate and parse a URL
+const result = parseAlbumUrl('https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5');
+console.log(result);
+// {
+//   valid: true,
+//   url: 'https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5',
+//   albumId: 'QKGRYqfdS15bj8Kr5',
+//   urlType: 'short'
+// }
+
+// Quick validation check
+isValidAlbumUrl('https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5'); // true
+isValidAlbumUrl('https://invalid-url.com'); // false
+
+// Extract album ID
+extractAlbumId('https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF'); 
+// Returns: 'AF1QipMZNuJ5JH6n3yF'
+```
+
+**Supported URL Formats**:
+- Short URLs: `https://photos.app.goo.gl/{shortcode}`
+- Full URLs: `https://photos.google.com/share/{albumId}`
+- Full URLs with query params: `https://photos.google.com/share/{albumId}?key=value`
+
+Run tests with: `npm test`
 
 ### Preview
 
