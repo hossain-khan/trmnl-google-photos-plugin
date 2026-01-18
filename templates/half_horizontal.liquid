@@ -1,19 +1,19 @@
 <div class="layout p--2">
-  {% if photo.photo_url and photo.photo_url != '' %}
+  {% if photo_url and photo_url != '' %}
   <div class="flex flex--row gap--medium portrait:flex--col flex--center-y h--full">
     <!-- Photo Display -->
     <div class="flex flex--center-x flex--center-y h--full">
-      <img src="{{ photo.photo_url }}" 
-           alt="{{ photo.caption }}" 
+      <img src="{{ photo_url }}" 
+           alt="{{ caption }}" 
            class="image image--contain">
     </div>
     
     <!-- Caption (if available) -->
-    {% if photo.caption %}
+    {% if caption %}
     <div class="flex flex--col gap--xsmall w--40">
-      <span class="description" data-clamp="4">{{ photo.caption }}</span>
-      {% if photo.photo_count > 0 %}
-      <span class="label label--small">{{ photo.photo_count }} photos in album</span>
+      <span class="description" data-clamp="4">{{ caption }}</span>
+      {% if photo_count and photo_count > 0 %}
+      <span class="label label--small">{{ photo_count }} photos in album</span>
       {% endif %}
     </div>
     {% endif %}

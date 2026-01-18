@@ -1,10 +1,10 @@
 <div class="layout p--1">
-  {% if photo.photo_url and photo.photo_url != '' %}
+  {% if photo_url and photo_url != '' %}
   <div class="flex flex--col gap--xsmall h--full">
     <!-- Photo Display Area (most of the space) -->
     <div class="flex flex--center-x flex--center-y h--full">
-      <img src="{{ photo.photo_url }}" 
-           alt="{{ photo.caption }}" 
+      <img src="{{ photo_url }}" 
+           alt="{{ caption }}" 
            class="image image--contain">
     </div>
   </div>
