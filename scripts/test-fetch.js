@@ -142,10 +142,8 @@ console.log(`    - photo_url: ${outputData.photo_url.substring(0, 60)}...`);
 console.log(`    - photo_count: ${outputData.photo_count}`);
 console.log(`    - timestamp: ${outputData.timestamp}`);
 
-// Save mock output
-const API_OUTPUT_FILE = resolve(process.cwd(), 'api/photo.json');
-await writeFile(API_OUTPUT_FILE, JSON.stringify(outputData, null, 2), 'utf8');
-console.log(`  ✓ Saved mock output to: ${API_OUTPUT_FILE}`);
+// Note: We no longer save static JSON files - data is fetched dynamically by the Cloudflare Worker
+console.log('  ✓ Output data structure validated (not saved - worker fetches dynamically)');
 
 console.log('\n✅ All tests passed!');
 console.log('\nNote: This is a mock test. To test with real albums, run:');
