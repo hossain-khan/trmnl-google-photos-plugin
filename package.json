@@ -1,0 +1,27 @@
+{
+  "name": "trmnl-google-photos-plugin",
+  "version": "0.1.0",
+  "description": "TRMNL plugin for displaying random photos from Google Photos shared albums",
+  "main": "scripts/fetch-photos.js",
+  "type": "module",
+  "scripts": {
+    "fetch": "node scripts/fetch-photos.js",
+    "investigate": "node scripts/investigate-api.js",
+    "test": "node --test scripts/test-*.js"
+  },
+  "keywords": [
+    "trmnl",
+    "google-photos",
+    "e-ink"
+  ],
+  "author": "Hossain Khan",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.5",
+    "cheerio": "^1.0.0-rc.12",
+    "google-photos-album-image-url-fetch": "^3.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
