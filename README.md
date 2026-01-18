@@ -175,7 +175,7 @@ console.log(result);
 // }
 
 // Quick validation check
-isValidAlbumUrl('https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5'); // true
+isValidAlbumUrl('https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8'); // true
 isValidAlbumUrl('https://invalid-url.com'); // false
 
 // Extract album ID

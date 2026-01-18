@@ -13,7 +13,7 @@ import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
 
 // Test data
-const VALID_ALBUM_URL = 'https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5';
+const VALID_ALBUM_URL = 'https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8';
 const INVALID_ALBUM_URL = 'https://invalid-url.com';
 
 /**
