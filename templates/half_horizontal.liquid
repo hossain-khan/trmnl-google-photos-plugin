@@ -1,5 +1,5 @@
 <div class="layout p--2">
-  {% if photo.photo_url %}
+  {% if photo.photo_url and photo.photo_url != '' %}
   <div class="flex flex--row gap--medium portrait:flex--col flex--center-y h--full">
     <!-- Photo Display -->
     <div class="flex flex--center-x flex--center-y" style="flex: 1;">

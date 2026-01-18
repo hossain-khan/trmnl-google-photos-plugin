@@ -6,7 +6,7 @@
 
 export const TEMPLATES = {
   full: `<div class="layout p--2">
-  {% if photo.photo_url %}
+  {% if photo.photo_url and photo.photo_url != '' %}
   <div class="flex flex--col gap--small h--full">
     <!-- Photo Display Area -->
     <div class="flex flex--center-x flex--center-y" style="flex: 1;">
@@ -43,7 +43,7 @@ export const TEMPLATES = {
 </div>`,
 
   half_horizontal: `<div class="layout p--2">
-  {% if photo.photo_url %}
+  {% if photo.photo_url and photo.photo_url != '' %}
   <div class="flex flex--row gap--medium portrait:flex--col flex--center-y h--full">
     <!-- Photo Display -->
     <div class="flex flex--center-x flex--center-y" style="flex: 1;">
@@ -80,7 +80,7 @@ export const TEMPLATES = {
 </div>`,
 
   half_vertical: `<div class="layout p--2">
-  {% if photo.photo_url %}
+  {% if photo.photo_url and photo.photo_url != '' %}
   <div class="flex flex--col gap--small h--full">
     <!-- Photo Display Area -->
     <div class="flex flex--center-x flex--center-y" style="flex: 1;">
@@ -114,7 +114,7 @@ export const TEMPLATES = {
 </div>`,
 
   quadrant: `<div class="layout p--1">
-  {% if photo.photo_url %}
+  {% if photo.photo_url and photo.photo_url != '' %}
   <div class="flex flex--col gap--xsmall h--full">
     <!-- Photo Display Area (most of the space) -->
     <div class="flex flex--center-x flex--center-y" style="flex: 1;">
