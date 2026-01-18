@@ -7,7 +7,9 @@
   "scripts": {
     "fetch": "node scripts/fetch-photos.js",
     "investigate": "node scripts/investigate-api.js",
-    "test": "node --test scripts/test-*.js",
+    "test": "node --test scripts/test-bundle-size.js scripts/test-cache-service.js scripts/test-fetch.js scripts/test-integration.js scripts/test-markup.js scripts/test-url-parser.js scripts/test-performance.js",
+    "test:load": "node scripts/test-load.js",
+    "test:all": "node --test scripts/test-*.js",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "deploy:dev": "wrangler deploy --env development",

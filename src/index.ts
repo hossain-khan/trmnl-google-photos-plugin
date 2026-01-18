@@ -99,8 +99,24 @@ app.get('/health', (c) => {
  */
 app.post('/markup', async (c) => {
   const startTime = Date.now();
+  const requestId = crypto.randomUUID().substring(0, 8);
+
+  // Structured logging function
+  const log = (level: string, message: string, data?: any) => {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      requestId,
+      level,
+      message,
+      duration: Date.now() - startTime,
+      ...data,
+    };
+    console.log(JSON.stringify(logEntry));
+  };
 
   try {
+    log('info', 'Request received');
+
     // Parse request body
     const body = await c.req.json<TRMNLRequest>();
 
@@ -111,7 +127,7 @@ app.post('/markup', async (c) => {
       layout: requestedLayout,
     } = body.trmnl;
 
-    console.log('Markup request:', {
+    log('info', 'Request parsed', {
       instance_name,
       album_url: shared_album_url?.substring(0, 50) + '...',
       screen,
@@ -120,24 +136,31 @@ app.post('/markup', async (c) => {
 
     // Validate album URL
     if (!shared_album_url || shared_album_url.trim() === '') {
-      console.warn('No album URL provided');
+      log('warn', 'No album URL provided');
       const html = await renderErrorTemplate(
         'No album URL configured. Please add your Google Photos shared album link in the plugin settings.',
         instance_name,
         requestedLayout || LAYOUTS.FULL
       );
+      log('info', 'Returned error template for missing URL', { duration: Date.now() - startTime });
       return c.html(html);
     }
 
     // Parse and validate album URL
+    const parseStartTime = Date.now();
     const urlValidation = parseAlbumUrl(shared_album_url);
+    const parseDuration = Date.now() - parseStartTime;
+    
+    log('debug', 'URL parsing completed', { parseDuration, valid: urlValidation.valid });
+    
     if (!urlValidation.valid || !urlValidation.url) {
-      console.warn('Invalid album URL:', urlValidation.error);
+      log('warn', 'Invalid album URL', { error: urlValidation.error });
       const html = await renderErrorTemplate(
         `Invalid album URL: ${urlValidation.error}`,
         instance_name,
         requestedLayout || LAYOUTS.FULL
       );
+      log('info', 'Returned error template for invalid URL', { duration: Date.now() - startTime });
       return c.html(html, 400);
     }
 
@@ -145,26 +168,34 @@ app.post('/markup', async (c) => {
     const layout =
       requestedLayout || getDefaultLayout(screen?.width, screen?.height);
 
-    console.log(`Using layout: ${layout}`);
+    log('debug', 'Layout selected', { layout, requested: requestedLayout });
 
     // Fetch random photo from album (with optional caching)
     let photoData;
+    const fetchStartTime = Date.now();
     try {
       photoData = await fetchRandomPhoto(urlValidation.url, c.env.PHOTOS_CACHE);
-      console.log('Photo fetched:', {
+      const fetchDuration = Date.now() - fetchStartTime;
+      
+      log('info', 'Photo fetched successfully', {
         uid: photoData.metadata?.uid,
         count: photoData.photo_count,
+        fetchDuration,
+        cached: fetchDuration < 500, // Likely cached if <500ms
       });
     } catch (error) {
+      const fetchDuration = Date.now() - fetchStartTime;
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to fetch photos';
-      console.error('Photo fetch error:', errorMessage);
+      
+      log('error', 'Photo fetch failed', { error: errorMessage, fetchDuration });
       
       const html = await renderErrorTemplate(
         `Failed to fetch photos: ${errorMessage}`,
         instance_name,
         layout
       );
+      log('info', 'Returned error template for fetch failure', { duration: Date.now() - startTime });
       return c.html(html, 500);
     }
 
@@ -175,29 +206,45 @@ app.post('/markup', async (c) => {
     };
 
     // Render template
+    const renderStartTime = Date.now();
     try {
       const html = await renderTemplate(layout, context);
+      const renderDuration = Date.now() - renderStartTime;
+      const totalDuration = Date.now() - startTime;
       
-      const duration = Date.now() - startTime;
-      console.log(`Markup rendered successfully in ${duration}ms`);
+      log('info', 'Markup rendered successfully', {
+        renderDuration,
+        totalDuration,
+        htmlSize: html.length,
+        layout,
+      });
 
       return c.html(html);
     } catch (error) {
+      const renderDuration = Date.now() - renderStartTime;
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to render template';
-      console.error('Template rendering error:', errorMessage);
+      
+      log('error', 'Template rendering failed', { error: errorMessage, renderDuration });
       
       const html = await renderErrorTemplate(
         `Failed to render template: ${errorMessage}`,
         instance_name,
         layout
       );
+      log('info', 'Returned error template for render failure', { duration: Date.now() - startTime });
       return c.html(html, 500);
     }
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
-    console.error('Markup endpoint error:', errorMessage, error);
+    const totalDuration = Date.now() - startTime;
+    
+    log('error', 'Unhandled error in markup endpoint', {
+      error: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+      totalDuration,
+    });
 
     // Return minimal error HTML
     return c.html(
@@ -206,6 +253,7 @@ app.post('/markup', async (c) => {
         <div style="font-size: 48px; margin-bottom: 20px;">❌</div>
         <h2 style="font-size: 24px; margin-bottom: 10px;">Server Error</h2>
         <p style="font-size: 16px; color: #666;">${errorMessage}</p>
+        <p style="font-size: 12px; color: #999; margin-top: 10px;">Request ID: ${requestId}</p>
       </div>
     `,
       500
