@@ -97,7 +97,7 @@ curl -X POST http://localhost:8787/markup \
     "trmnl": {
       "plugin_settings": {
         "instance_name": "My Photos",
-        "shared_album_url": "https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5"
+        "shared_album_url": "https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
       },
       "layout": "full"
     }
