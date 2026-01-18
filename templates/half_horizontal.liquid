@@ -2,16 +2,15 @@
   {% if photo.photo_url and photo.photo_url != '' %}
   <div class="flex flex--row gap--medium portrait:flex--col flex--center-y h--full">
     <!-- Photo Display -->
-    <div class="flex flex--center-x flex--center-y" style="flex: 1;">
+    <div class="flex flex--center-x flex--center-y h--full">
       <img src="{{ photo.photo_url }}" 
            alt="{{ photo.caption }}" 
-           class="image image--contain"
-           style="max-width: 100%; max-height: 100%; object-fit: contain;">
+           class="image image--contain">
     </div>
     
     <!-- Caption (if available) -->
     {% if photo.caption %}
-    <div class="flex flex--col gap--xsmall" style="max-width: 200px;">
+    <div class="flex flex--col gap--xsmall w--40">
       <span class="description" data-clamp="4">{{ photo.caption }}</span>
       {% if photo.photo_count > 0 %}
       <span class="label label--small">{{ photo.photo_count }} photos in album</span>
@@ -24,7 +23,7 @@
   <div class="flex flex--col flex--center-x flex--center-y gap--small h--full">
     <div class="value value--medium">📷</div>
     <div class="title title--small text--center">No Photos</div>
-    <div class="description text--center" style="max-width: 300px;">
+    <div class="description text--center">
       Configure your shared album URL in settings
     </div>
   </div>
