@@ -140,7 +140,6 @@ function estimateBundleSize() {
   // These are bundled and tree-shaken, so actual size is smaller
   const dependencies = {
     hono: 50 * 1024, // ~50KB
-    liquidjs: 100 * 1024, // ~100KB
     zod: 50 * 1024, // ~50KB (tree-shaken)
     'google-photos-album-image-url-fetch': 30 * 1024, // ~30KB
   };

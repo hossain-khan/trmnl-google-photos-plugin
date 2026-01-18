@@ -7,7 +7,7 @@
   "scripts": {
     "fetch": "node scripts/fetch-photos.js",
     "investigate": "node scripts/investigate-api.js",
-    "test": "node --test scripts/test-bundle-size.js scripts/test-cache-service.js scripts/test-fetch.js scripts/test-integration.js scripts/test-markup.js scripts/test-url-parser.js scripts/test-performance.js",
+    "test": "node --test scripts/test-bundle-size.js scripts/test-cache-service.js scripts/test-fetch.js scripts/test-url-parser.js scripts/test-performance.js",
     "test:load": "node scripts/test-load.js",
     "test:all": "node --test scripts/test-*.js",
     "dev": "wrangler dev",
@@ -28,7 +28,6 @@
     "cheerio": "^1.0.0-rc.12",
     "google-photos-album-image-url-fetch": "^3.2.0",
     "hono": "^4.11.4",
-    "liquidjs": "^10.24.0",
     "zod": "^4.3.5"
   },
   "engines": {

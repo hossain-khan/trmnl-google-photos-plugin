@@ -2,15 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { parseAlbumUrl } from '../lib/url-parser.js';
 import { fetchRandomPhoto } from './services/photo-fetcher';
-import {
-  renderTemplate,
-  renderErrorTemplate,
-  preloadTemplate,
-  LAYOUTS,
-  getDefaultLayout,
-} from './services/template-renderer';
-import { TEMPLATES } from './templates';
-import type { TRMNLRequest, TemplateContext } from './types';
+import type { TRMNLRequest } from './types';
 
 // Type definitions for Cloudflare Workers environment
 type Bindings = {
@@ -30,15 +22,10 @@ app.use('/*', cors({
     'http://localhost:8787',
     'http://localhost:3000'
   ],
-  allowMethods: ['GET', 'POST', 'OPTIONS'],
+  allowMethods: ['GET', 'OPTIONS'],
   allowHeaders: ['Content-Type'],
   maxAge: 86400, // 24 hours
 }));
-
-// Preload all templates on Worker initialization
-Object.entries(TEMPLATES).forEach(([layout, content]) => {
-  preloadTemplate(layout, content);
-});
 
 /**
  * Health check endpoint - returns basic service status
@@ -71,33 +58,32 @@ app.get('/health', (c) => {
 });
 
 /**
- * POST /markup - Main TRMNL endpoint
+ * GET /api/photo - TRMNL Polling Endpoint (JSON API)
  * 
- * Receives requests from TRMNL devices, fetches a random photo from the
- * configured Google Photos shared album, and returns rendered HTML.
+ * Returns random photo data as JSON for TRMNL's Polling strategy.
+ * TRMNL platform will merge this JSON into Liquid templates stored in Markup Editor.
  * 
- * Request body structure:
+ * Query Parameters:
+ * - album_url: Google Photos shared album URL (required)
+ * 
+ * Example:
+ * GET /api/photo?album_url=https://photos.app.goo.gl/...
+ * 
+ * Response (200 OK):
  * {
- *   trmnl: {
- *     plugin_settings: {
- *       instance_name: "My Photos",
- *       shared_album_url: "https://photos.app.goo.gl/..."
- *     },
- *     screen: {
- *       width: 800,
- *       height: 480,
- *       bit_depth: 1
- *     },
- *     layout: "full"
- *   }
+ *   "photo_url": "https://lh3.googleusercontent.com/...",
+ *   "caption": null,
+ *   "album_name": "Google Photos Shared Album",
+ *   "photo_count": 142,
+ *   "timestamp": "2026-01-18T20:00:00.000Z"
  * }
  * 
- * Response:
- * - 200: HTML markup for the photo display
- * - 400: Invalid request (missing URL, invalid format)
- * - 500: Server error (photo fetch failed, rendering failed)
+ * Error Responses:
+ * - 400: Missing or invalid album_url parameter
+ * - 404: Album not found or inaccessible
+ * - 500: Server error during photo fetch
  */
-app.post('/markup', async (c) => {
+app.get('/api/photo', async (c) => {
   const startTime = Date.now();
   const requestId = crypto.randomUUID().substring(0, 8);
 
@@ -115,60 +101,52 @@ app.post('/markup', async (c) => {
   };
 
   try {
-    log('info', 'Request received');
+    log('info', 'GET /api/photo request received');
 
-    // Parse request body
-    const body = await c.req.json<TRMNLRequest>();
+    // Extract album_url from query parameters
+    const album_url = c.req.query('album_url');
 
-    // Extract configuration
-    const {
-      plugin_settings: { instance_name, shared_album_url },
-      screen,
-      layout: requestedLayout,
-    } = body.trmnl;
-
-    log('info', 'Request parsed', {
-      instance_name,
-      album_url: shared_album_url?.substring(0, 50) + '...',
-      screen,
-      layout: requestedLayout,
-    });
-
-    // Validate album URL
-    if (!shared_album_url || shared_album_url.trim() === '') {
-      log('warn', 'No album URL provided');
-      const html = await renderErrorTemplate(
-        'No album URL configured. Please add your Google Photos shared album link in the plugin settings.',
-        instance_name,
-        requestedLayout || LAYOUTS.FULL
+    // Validate album URL parameter
+    if (!album_url || album_url.trim() === '') {
+      log('warn', 'Missing album_url parameter');
+      return c.json(
+        {
+          error: 'Bad Request',
+          message: 'Missing required parameter: album_url',
+          example: '/api/photo?album_url=https://photos.app.goo.gl/...',
+        },
+        400
       );
-      log('info', 'Returned error template for missing URL', { duration: Date.now() - startTime });
-      return c.html(html);
     }
+
+    log('info', 'Album URL provided', {
+      album_url_preview: album_url.substring(0, 50) + '...',
+    });
 
     // Parse and validate album URL
     const parseStartTime = Date.now();
-    const urlValidation = parseAlbumUrl(shared_album_url);
+    const urlValidation = parseAlbumUrl(album_url);
     const parseDuration = Date.now() - parseStartTime;
-    
-    log('debug', 'URL parsing completed', { parseDuration, valid: urlValidation.valid });
-    
+
+    log('debug', 'URL parsing completed', {
+      parseDuration,
+      valid: urlValidation.valid,
+    });
+
     if (!urlValidation.valid || !urlValidation.url) {
-      log('warn', 'Invalid album URL', { error: urlValidation.error });
-      const html = await renderErrorTemplate(
-        `Invalid album URL: ${urlValidation.error}`,
-        instance_name,
-        requestedLayout || LAYOUTS.FULL
+      log('warn', 'Invalid album URL format', { error: urlValidation.error });
+      return c.json(
+        {
+          error: 'Bad Request',
+          message: `Invalid album URL: ${urlValidation.error}`,
+          validFormats: [
+            'https://photos.app.goo.gl/...',
+            'https://photos.google.com/share/...',
+          ],
+        },
+        400
       );
-      log('info', 'Returned error template for invalid URL', { duration: Date.now() - startTime });
-      return c.html(html, 400);
     }
-
-    // Determine layout (use requested layout or default based on screen size)
-    const layout =
-      requestedLayout || getDefaultLayout(screen?.width, screen?.height);
-
-    log('debug', 'Layout selected', { layout, requested: requestedLayout });
 
     // Fetch random photo from album (with optional caching)
     let photoData;
@@ -176,7 +154,7 @@ app.post('/markup', async (c) => {
     try {
       photoData = await fetchRandomPhoto(urlValidation.url, c.env.PHOTOS_CACHE);
       const fetchDuration = Date.now() - fetchStartTime;
-      
+
       log('info', 'Photo fetched successfully', {
         uid: photoData.metadata?.uid,
         count: photoData.photo_count,
@@ -187,78 +165,88 @@ app.post('/markup', async (c) => {
       const fetchDuration = Date.now() - fetchStartTime;
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to fetch photos';
-      
-      log('error', 'Photo fetch failed', { error: errorMessage, fetchDuration });
-      
-      const html = await renderErrorTemplate(
-        `Failed to fetch photos: ${errorMessage}`,
-        instance_name,
-        layout
-      );
-      log('info', 'Returned error template for fetch failure', { duration: Date.now() - startTime });
-      return c.html(html, 500);
-    }
 
-    // Create template context
-    const context: TemplateContext = {
-      photo: photoData,
-      trmnl: body.trmnl,
-    };
-
-    // Render template
-    const renderStartTime = Date.now();
-    try {
-      const html = await renderTemplate(layout, context);
-      const renderDuration = Date.now() - renderStartTime;
-      const totalDuration = Date.now() - startTime;
-      
-      log('info', 'Markup rendered successfully', {
-        renderDuration,
-        totalDuration,
-        htmlSize: html.length,
-        layout,
+      log('error', 'Photo fetch failed', {
+        error: errorMessage,
+        fetchDuration,
       });
 
-      return c.html(html);
-    } catch (error) {
-      const renderDuration = Date.now() - renderStartTime;
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to render template';
-      
-      log('error', 'Template rendering failed', { error: errorMessage, renderDuration });
-      
-      const html = await renderErrorTemplate(
-        `Failed to render template: ${errorMessage}`,
-        instance_name,
-        layout
+      // Return appropriate status code based on error
+      const statusCode = errorMessage.includes('not found') ? 404 : 500;
+
+      return c.json(
+        {
+          error: statusCode === 404 ? 'Not Found' : 'Internal Server Error',
+          message: errorMessage,
+          timestamp: new Date().toISOString(),
+        },
+        statusCode
       );
-      log('info', 'Returned error template for render failure', { duration: Date.now() - startTime });
-      return c.html(html, 500);
     }
+
+    // Return JSON response (flat structure for TRMNL Liquid templates)
+    // TRMNL templates access these directly: {{ photo_url }}, {{ caption }}
+    const response = {
+      photo_url: photoData.photo_url,
+      thumbnail_url: photoData.thumbnail_url,
+      caption: photoData.caption,
+      timestamp: photoData.timestamp,
+      album_name: photoData.album_name,
+      photo_count: photoData.photo_count,
+    };
+
+    const totalDuration = Date.now() - startTime;
+    log('info', 'JSON response sent successfully', {
+      totalDuration,
+      responseSize: JSON.stringify(response).length,
+    });
+
+    return c.json(response);
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
     const totalDuration = Date.now() - startTime;
-    
-    log('error', 'Unhandled error in markup endpoint', {
+
+    log('error', 'Unhandled error in /api/photo endpoint', {
       error: errorMessage,
       stack: error instanceof Error ? error.stack : undefined,
       totalDuration,
     });
 
-    // Return minimal error HTML
-    return c.html(
-      `
-      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center;">
-        <div style="font-size: 48px; margin-bottom: 20px;">❌</div>
-        <h2 style="font-size: 24px; margin-bottom: 10px;">Server Error</h2>
-        <p style="font-size: 16px; color: #666;">${errorMessage}</p>
-        <p style="font-size: 12px; color: #999; margin-top: 10px;">Request ID: ${requestId}</p>
-      </div>
-    `,
+    return c.json(
+      {
+        error: 'Internal Server Error',
+        message: errorMessage,
+        requestId,
+        timestamp: new Date().toISOString(),
+      },
       500
     );
   }
+});
+
+/**
+ * POST /markup - DEPRECATED
+ * 
+ * This endpoint has been replaced by GET /api/photo (Polling strategy).
+ * TRMNL now renders templates on their platform, not in the Worker.
+ * 
+ * Please use GET /api/photo?album_url=... instead.
+ */
+app.post('/markup', async (c) => {
+  return c.json(
+    {
+      error: 'Endpoint Deprecated',
+      message: 'POST /markup has been replaced by GET /api/photo',
+      migration: {
+        old: 'POST /markup with JSON body',
+        new: 'GET /api/photo?album_url=...',
+        reason: 'TRMNL Polling strategy - templates rendered on TRMNL platform',
+      },
+      documentation: 'https://github.com/hossain-khan/trmnl-google-photos-plugin',
+    },
+    410 // Gone
+  );
 });
 
 /**
@@ -269,7 +257,12 @@ app.notFound((c) => {
     {
       error: 'Not Found',
       message: 'The requested endpoint does not exist',
-      availableEndpoints: ['/', '/health', 'POST /markup'],
+      availableEndpoints: [
+        'GET /',
+        'GET /health',
+        'GET /api/photo?album_url=...',
+        'POST /markup (deprecated - use GET /api/photo)',
+      ],
     },
     404
   );

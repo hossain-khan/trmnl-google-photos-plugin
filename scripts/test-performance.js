@@ -87,71 +87,6 @@ async function testUrlParsing() {
 }
 
 /**
- * Test template rendering performance
- */
-async function testTemplateRendering() {
-  console.log('   Loading LiquidJS...');
-  const { Liquid } = await import('liquidjs');
-  
-  const liquid = new Liquid({
-    cache: true,
-    strictFilters: true,
-    strictVariables: false,
-  });
-
-  // Load templates
-  const layouts = ['full', 'half_horizontal', 'half_vertical', 'quadrant'];
-  const results = [];
-
-  // Mock photo data
-  const mockContext = {
-    photo: {
-      photo_url: 'https://lh3.googleusercontent.com/example=w800-h480',
-      thumbnail_url: 'https://lh3.googleusercontent.com/example=w400-h300',
-      caption: null,
-      timestamp: new Date().toISOString(),
-      album_name: 'Test Album',
-      photo_count: 10,
-      metadata: {
-        uid: 'test123',
-        original_width: 800,
-        original_height: 480,
-        image_update_date: new Date().toISOString(),
-        album_add_date: new Date().toISOString(),
-      },
-    },
-    trmnl: {
-      plugin_settings: {
-        instance_name: 'Performance Test',
-        shared_album_url: 'https://photos.app.goo.gl/test',
-      },
-      screen: {
-        width: 800,
-        height: 480,
-        bit_depth: 1,
-      },
-      layout: 'full',
-    },
-  };
-
-  for (const layout of layouts) {
-    const templatePath = join(projectRoot, 'templates', `${layout}.liquid`);
-    const templateContent = readFileSync(templatePath, 'utf-8');
-
-    const result = await measureTime(`Render: ${layout}`, async () => {
-      return await liquid.parseAndRender(templateContent, mockContext);
-    });
-
-    results.push({
-      ...result,
-      htmlSize: result.result?.length || 0,
-    });
-  }
-
-  return results;
-}
-
-/**
  * Test data transformation performance
  */
 async function testDataTransformation() {
@@ -259,7 +194,6 @@ function evaluatePerformance(allResults) {
 
   // Calculate average times by category
   const urlParseAvg = allResults.urlParse.reduce((sum, r) => sum + r.duration, 0) / allResults.urlParse.length;
-  const templateRenderAvg = allResults.templateRender.reduce((sum, r) => sum + r.duration, 0) / allResults.templateRender.length;
   const dataTransformAvg = allResults.dataTransform.reduce((sum, r) => sum + r.duration, 0) / allResults.dataTransform.length;
 
   const checks = [
@@ -268,13 +202,6 @@ function evaluatePerformance(allResults) {
       value: urlParseAvg.toFixed(2),
       target: TARGETS.urlParse,
       pass: urlParseAvg < TARGETS.urlParse,
-      unit: 'ms',
-    },
-    {
-      name: 'Template rendering',
-      value: templateRenderAvg.toFixed(2),
-      target: TARGETS.templateRender,
-      pass: templateRenderAvg < TARGETS.templateRender,
       unit: 'ms',
     },
     {
@@ -295,10 +222,10 @@ function evaluatePerformance(allResults) {
   console.log(`   URL parsing:          ~${urlParseAvg.toFixed(0)}ms`);
   console.log(`   Photo fetching:       ~200-2000ms (network dependent)`);
   console.log(`   Data transformation:  ~${dataTransformAvg.toFixed(0)}ms`);
-  console.log(`   Template rendering:   ~${templateRenderAvg.toFixed(0)}ms`);
+  console.log(`   JSON serialization:   ~1-2ms`);
   console.log('   ────────────────────────────────');
-  console.log(`   Total (excl. network): ~${(urlParseAvg + dataTransformAvg + templateRenderAvg).toFixed(0)}ms`);
-  console.log(`   Total (with network):  ~${(urlParseAvg + dataTransformAvg + templateRenderAvg + 500).toFixed(0)}-${(urlParseAvg + dataTransformAvg + templateRenderAvg + 2000).toFixed(0)}ms`);
+  console.log(`   Total (excl. network): ~${(urlParseAvg + dataTransformAvg + 2).toFixed(0)}ms`);
+  console.log(`   Total (with network):  ~${(urlParseAvg + dataTransformAvg + 2 + 200).toFixed(0)}-${(urlParseAvg + dataTransformAvg + 2 + 2000).toFixed(0)}ms`);
 
   const allPassed = checks.every(c => c.pass);
 
@@ -324,21 +251,16 @@ async function main() {
     console.log('1️⃣  Testing URL parsing...');
     const urlParseResults = await testUrlParsing();
 
-    console.log('2️⃣  Testing template rendering...');
-    const templateRenderResults = await testTemplateRendering();
-
-    console.log('3️⃣  Testing data transformation...');
+    console.log('2️⃣  Testing data transformation...');
     const dataTransformResults = await testDataTransformation();
 
     // Display results
     displayResults('📝 URL Parsing Performance', urlParseResults);
-    displayResults('🎨 Template Rendering Performance', templateRenderResults);
     displayResults('🔄 Data Transformation Performance', dataTransformResults);
 
     // Evaluate overall performance
     const allResults = {
       urlParse: urlParseResults,
-      templateRender: templateRenderResults,
       dataTransform: dataTransformResults,
     };
 
@@ -346,10 +268,10 @@ async function main() {
 
     // Provide recommendations
     console.log('\n💡 Optimization Tips:\n');
-    console.log('   - Enable template caching (already done)');
-    console.log('   - Use KV caching for album data (optional)');
+    console.log('   - Use KV caching for album data (already implemented)');
     console.log('   - Minimize external API calls');
-    console.log('   - Keep templates simple and focused');
+    console.log('   - JSON API is faster than HTML rendering');
+    console.log('   - TRMNL handles template rendering on their platform');
 
     process.exit(passed ? 0 : 1);
 
