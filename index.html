@@ -158,6 +158,21 @@
             border-radius: 4px;
             margin-top: 10px;
         }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        #jsonContent {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin: 0;
+        }
         .example-urls {
             margin-top: 10px;
             font-size: 0.9em;
@@ -193,12 +208,12 @@
         </h1>
         <p class="description">
             Display random photos from your Google Photos shared albums on TRMNL devices.<br>
-            Test the live plugin with your own album URL below!
+            <strong>Architecture:</strong> JSON API (Polling) + Liquid Templates on TRMNL Platform
         </p>
 
         <div class="demo-section">
-            <h2>🎬 Live Demo</h2>
-            <p>Test the plugin with your Google Photos shared album URL. The backend service fetches photos in real-time!</p>
+            <h2>🎬 JSON API Demo</h2>
+            <p>Test the JSON API endpoint with your Google Photos shared album URL. The backend returns photo data as JSON!</p>
             
             <div class="demo-controls">
                 <input 
@@ -207,25 +222,46 @@
                     placeholder="Paste your Google Photos album URL (photos.app.goo.gl/...)" 
                     value="https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
                 >
-                <select id="layout">
+                <button onclick="fetchPhotoData()" id="fetchBtn">🔄 Fetch Photo Data</button>
+            </div>
+            
+            <div class="example-urls">
+                <strong>Demo album:</strong> <a onclick="useExampleUrl()">Use example album</a> | 
+                <strong>API Docs:</strong> <a href="https://github.com/hossain-khan/trmnl-google-photos-plugin#api" target="_blank">View documentation</a>
+            </div>
+            
+            <div id="errorContainer"></div>
+            
+            <div id="jsonOutput" class="preview-container" style="display: none;">
+                <pre id="jsonContent" style="text-align: left; padding: 20px; overflow: auto; width: 100%;"></pre>
+            </div>
+            
+            <div id="previewContainer" class="preview-container">
+                <div class="preview-empty">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
+                    <p>Enter a Google Photos album URL and click "Fetch Photo Data" to see the JSON response!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎨 Layout Previews</h2>
+            <p>Browse the four layout templates with sample data. These templates are uploaded to TRMNL's Markup Editor.</p>
+            
+            <div class="demo-controls">
+                <select id="layoutPreview" onchange="loadPreviewTemplate()">
+                    <option value="">Select a layout to preview...</option>
                     <option value="full">Full Screen</option>
                     <option value="half_horizontal">Half Horizontal</option>
                     <option value="half_vertical">Half Vertical</option>
                     <option value="quadrant">Quadrant</option>
                 </select>
-                <button onclick="fetchMarkup()" id="previewBtn">🔄 Preview</button>
             </div>
             
-            <div class="example-urls">
-                <strong>Demo album:</strong> <a onclick="useExampleUrl()">Use example album</a>
-            </div>
-            
-            <div id="errorContainer"></div>
-            
-            <div id="previewContainer" class="preview-container">
+            <div id="templatePreview" class="preview-container">
                 <div class="preview-empty">
-                    <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
-                    <p>Enter a Google Photos album URL and click Preview to see your photos!</p>
+                    <div style="font-size: 48px; margin-bottom: 10px;">📐</div>
+                    <p>Select a layout above to preview the template with sample data</p>
                 </div>
             </div>
         </div>
@@ -239,7 +275,8 @@
                 <li>Paste your shared album URL in the plugin settings</li>
                 <li>Add to your TRMNL playlist</li>
             </ol>
-            <p><strong>Status:</strong> Backend service is live and operational! Photos are fetched and optimized for e-ink displays in real-time.</p>
+            <p><strong>Status:</strong> JSON API is live! Worker returns photo data as JSON. TRMNL platform merges JSON into Liquid templates stored in Markup Editor.</p>
+            <p><strong>Architecture:</strong> Polling strategy (GET /api/photo) - Worker returns JSON, not HTML. TRMNL does the template rendering.</p>
         </div>
 
         <div class="layouts">
@@ -299,20 +336,21 @@
     </div>
 
     <script>
-        const WORKER_URL = 'https://trmnl-google-photos.hk-c91.workers.dev/markup';
+        const API_URL = 'https://trmnl-google-photos.hk-c91.workers.dev/api/photo';
         
         function useExampleUrl() {
             document.getElementById('albumUrl').value = 'https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8';
         }
         
-        async function fetchMarkup() {
+        async function fetchPhotoData() {
             const albumUrl = document.getElementById('albumUrl').value.trim();
-            const layout = document.getElementById('layout').value;
-            const previewContainer = document.getElementById('previewContainer');
             const errorContainer = document.getElementById('errorContainer');
-            const previewBtn = document.getElementById('previewBtn');
+            const jsonOutput = document.getElementById('jsonOutput');
+            const jsonContent = document.getElementById('jsonContent');
+            const fetchBtn = document.getElementById('fetchBtn');
+            const previewContainer = document.getElementById('previewContainer');
             
-            // Clear previous error
+            // Clear previous messages
             errorContainer.innerHTML = '';
             
             // Validate input
@@ -322,53 +360,73 @@
             }
             
             // Show loading state
-            previewBtn.disabled = true;
-            previewBtn.textContent = '⏳ Loading...';
-            previewContainer.classList.add('loading');
-            previewContainer.innerHTML = '<div class="preview-empty"><div style="font-size: 48px;">⏳</div><p>Fetching your photos...</p></div>';
+            fetchBtn.disabled = true;
+            fetchBtn.textContent = '⏳ Fetching...';
+            previewContainer.style.display = 'none';
+            jsonOutput.style.display = 'flex';
+            jsonContent.textContent = 'Loading...';
             
             try {
-                const response = await fetch(WORKER_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        trmnl: {
-                            plugin_settings: {
-                                instance_name: 'Demo Preview',
-                                shared_album_url: albumUrl
-                            },
-                            layout: layout
-                        }
-                    })
-                });
-                
-                const html = await response.text();
+                const url = `${API_URL}?album_url=${encodeURIComponent(albumUrl)}`;
+                const response = await fetch(url);
                 
                 if (!response.ok) {
                     throw new Error(`Server returned ${response.status}: ${response.statusText}`);
                 }
                 
-                // Display the rendered HTML
-                previewContainer.classList.remove('loading');
-                previewContainer.innerHTML = html;
+                const data = await response.json();
+                
+                // Display the JSON response
+                jsonContent.textContent = JSON.stringify(data, null, 2);
+                errorContainer.innerHTML = `<div class="success-message">
+                    <strong>✓ Success!</strong> Photo data fetched successfully. 
+                    <br>Photo URL: <a href="${data.photo_url}" target="_blank">View photo</a>
+                    <br>Album: ${data.album_name} (${data.photo_count} photos)
+                </div>`;
                 
             } catch (error) {
-                console.error('Error fetching markup:', error);
-                previewContainer.classList.remove('loading');
-                previewContainer.innerHTML = '<div class="preview-empty"><div style="font-size: 48px;">❌</div><p>Failed to load preview</p></div>';
+                console.error('Error fetching photo data:', error);
+                jsonOutput.style.display = 'none';
+                previewContainer.style.display = 'flex';
                 errorContainer.innerHTML = `<div class="error-message"><strong>Error:</strong> ${error.message}</div>`;
             } finally {
-                previewBtn.disabled = false;
-                previewBtn.textContent = '🔄 Preview';
+                fetchBtn.disabled = false;
+                fetchBtn.textContent = '🔄 Fetch Photo Data';
             }
         }
         
-        // Allow Enter key to trigger preview
+        async function loadPreviewTemplate() {
+            const layout = document.getElementById('layoutPreview').value;
+            const templatePreview = document.getElementById('templatePreview');
+            
+            if (!layout) {
+                templatePreview.innerHTML = '<div class="preview-empty"><div style="font-size: 48px; margin-bottom: 10px;">📐</div><p>Select a layout above to preview the template with sample data</p></div>';
+                return;
+            }
+            
+            templatePreview.innerHTML = '<div class="preview-empty"><div style="font-size: 48px;">⏳</div><p>Loading template...</p></div>';
+            
+            try {
+                const response = await fetch(`templates/preview/${layout}.liquid`);
+                const html = await response.text();
+                
+                // Wrap in TRMNL framework
+                templatePreview.innerHTML = `
+                    <link rel="stylesheet" href="https://usetrmnl.com/css/framework.css">
+                    <div style="max-width: 800px; width: 100%;">
+                        ${html}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading template:', error);
+                templatePreview.innerHTML = '<div class="preview-empty"><div style="font-size: 48px;">❌</div><p>Failed to load template</p></div>';
+            }
+        }
+        
+        // Allow Enter key to trigger fetch
         document.getElementById('albumUrl').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                fetchMarkup();
+                fetchPhotoData();
             }
         });
     </script>
