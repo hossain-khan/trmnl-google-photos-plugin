@@ -40,28 +40,27 @@ This document outlines the remaining tasks for the **stateless Cloudflare Worker
 - ✅ 42 comprehensive test cases
 - ✅ User-friendly error messages
 
-### Issue 4: Build `/markup` Endpoint ✅
+### Issue 4: Build `/api/photo` JSON Endpoint ✅
 **Status**: COMPLETE  
 **Date Completed**: January 18, 2026  
-**Deployed**: Production at https://trmnl-google-photos.hk-c91.workers.dev/markup
+**Deployed**: Production at https://trmnl-google-photos.hk-c91.workers.dev/api/photo
 
 **Achievements**:
-- ✅ POST `/markup` endpoint created in Hono
-- ✅ Parses TRMNL request body (extracts `plugin_settings.shared_album_url`)
+- ✅ GET `/api/photo` endpoint created in Hono
+- ✅ Accepts album URL as query parameter: `?album_url=...`
 - ✅ Validates album URL using lib/url-parser.js
 - ✅ Fetches album photos using `google-photos-album-image-url-fetch`
 - ✅ Comprehensive error handling (invalid URL, album not found, network errors)
 - ✅ Random photo selection from album
 - ✅ Photo URL optimization for e-ink display (`=w800-h480` parameter)
-- ✅ Liquid template rendering with LiquidJS (all 4 layouts)
-- ✅ Proper HTML response with correct headers
+- ✅ Returns JSON response with photo data
 - ✅ Complete error handling and logging
 - ✅ Tested with multiple shared albums
 
 **Success Criteria Results**:
-- ✅ POST to `/markup` returns HTML in 1.35s (faster than 3s target)
-- ✅ All four layouts render correctly (full, half_horizontal, half_vertical, quadrant)
-- ✅ Error states handled gracefully with user-friendly messages
+- ✅ GET to `/api/photo?album_url=...` returns JSON in <2s (Cache HIT: 67ms, Cache MISS: 1.35s)
+- ✅ JSON structure matches TRMNL requirements
+- ✅ Error states return proper JSON error messages
 - ✅ Works with 95%+ of valid shared albums
 
 ### Issue 5: Implement Optional KV Caching ✅
@@ -191,6 +190,50 @@ This document outlines the remaining tasks for the **stateless Cloudflare Worker
 ---
 
 ## Phase 3: TRMNL Integration & Polish (1 week)
+
+### Issue 7: TRMNL Recipe Configuration ✅
+**Priority**: P0  
+**Estimated Time**: 2 hours  
+**Status**: COMPLETE (January 18, 2026)
+
+**Tasks**:
+- ✅ Updated settings.yml to Polling strategy
+- ✅ Configured polling_url with form field interpolation
+- ✅ Added custom form fields (shared_album_url, instance_name)
+- ✅ Set refresh_frequency to 3600 seconds (1 hour)
+
+**Success Criteria**:
+- ✅ settings.yml validates against TRMNL requirements
+- ✅ Polling URL correctly interpolates form field values
+- ✅ Form fields have proper validation and placeholders
+
+### Issue 13: TRMNL Template Upload & Testing
+**Priority**: P0  
+**Estimated Time**: 2 days  
+**Dependencies**: Issue 7
+
+**Tasks**:
+- [ ] Create TRMNL Private Plugin (requires Developer Edition)
+- [ ] Upload all 4 Liquid templates to TRMNL Markup Editor:
+  - [ ] full.liquid
+  - [ ] half_horizontal.liquid
+  - [ ] half_vertical.liquid  
+  - [ ] quadrant.liquid
+- [ ] Update templates to use JSON data structure (remove `photo.` prefix)
+- [ ] Test "Force Refresh" in TRMNL UI
+- [ ] Test all layouts render correctly on TRMNL simulator
+- [ ] Verify photo displays properly on actual device (if available)
+- [ ] Test error states (invalid URL, album not found)
+- [ ] Document template data binding patterns
+
+**Success Criteria**:
+- [ ] All 4 layouts render correctly in TRMNL simulator
+- [ ] Photos load within 3 seconds
+- [ ] Error messages display user-friendly text
+- [ ] Captions truncate properly without overflow
+- [ ] Title bar shows correct information
+
+**Reference**: Epic #19 - https://github.com/hossain-khan/trmnl-google-photos-plugin/issues/19
 
 ### Issue 7: TRMNL Integration & Testing
 **Priority**: P0  

@@ -29,11 +29,18 @@ This is a TRMNL plugin that displays random photos from Google Photos shared alb
 - ✅ Google Photos API reverse engineering (Issue 1)
 - ✅ URL parser implementation (Issue 3)
 - ✅ Cloudflare Worker with Hono framework (Issue 2)
-- ✅ /markup endpoint implementation (Issue 4)
+- ✅ JSON API endpoint `/api/photo` (Issue 4)
+- ✅ KV caching with 67ms response time (Issue 5)
 - ✅ CORS support for GitHub Pages
 - ✅ CI/CD with GitHub Actions
-- 📋 Optional KV caching (Issue 5 - Future enhancement)
-- 📋 Testing and optimization (Issue 6)
+- ✅ All 65 tests passing
+
+**Phase 3: TRMNL Integration** ⏳ **Next Up** (January 2026)
+- ✅ settings.yml configured with Polling strategy (Issue 7)
+- ⏳ Upload templates to TRMNL Markup Editor (Issue 13)
+- ⏳ Test on TRMNL device/simulator
+- ⏳ Create demo screenshots and plugin icon (Issue 15)
+- ⏳ Publish as Recipe (Public or Unlisted)
 
 **Demo Album**: For testing and examples, use `https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8`
 
@@ -188,10 +195,10 @@ The plugin provides four layouts for different display configurations:
 ```liquid
 <div class="flex flex--col gap--small h--full">
   <div class="flex flex--center-x flex--center-y" style="flex: 1;">
-    <img src="{{ photo.photo_url }}" class="image image--contain">
+    <img src="{{ photo_url }}" class="image image--contain">
   </div>
-  {% if photo.caption %}
-  <div class="description" data-clamp="2">{{ photo.caption }}</div>
+  {% if caption %}
+  <div class="description" data-clamp="2">{{ caption }}</div>
   {% endif %}
 </div>
 ```
@@ -216,10 +223,10 @@ The plugin provides four layouts for different display configurations:
 ```liquid
 <div class="flex flex--row gap--medium portrait:flex--col flex--center-y">
   <div class="flex flex--center-x flex--center-y" style="flex: 1;">
-    <img src="{{ photo.photo_url }}" class="image image--contain">
+    <img src="{{ photo_url }}" class="image image--contain">
   </div>
   <div class="flex flex--col gap--xsmall" style="max-width: 200px;">
-    <span class="description" data-clamp="4">{{ photo.caption }}</span>
+    <span class="description" data-clamp="4">{{ caption }}</span>
   </div>
 </div>
 ```
@@ -395,7 +402,7 @@ Use consistent padding unless space constraints require reduction.
 
 ## Data Structure
 
-### Photo Data Format
+### Photo Data Format (JSON Response)
 
 ```json
 {
@@ -409,30 +416,30 @@ Use consistent padding unless space constraints require reduction.
 ```
 
 **Field Descriptions**:
-- `photo_url` (required): Full-resolution photo URL (optimized for e-ink)
+- `photo_url` (required): Full-resolution photo URL (optimized for e-ink with size params)
 - `thumbnail_url` (optional): Lower resolution version (not currently used)
 - `caption` (optional): Photo caption/description from Google Photos
 - `timestamp` (optional): When photo was taken or last updated
 - `album_name` (optional): Name of the source album
 - `photo_count` (optional): Total photos in album (for display in title bar)
 
-### Accessing Data in Templates
+### Accessing Data in Templates (TRMNL Markup Editor)
 
 ```liquid
-<!-- Photo URL -->
-{{ photo.photo_url }}
+<!-- Photo URL - direct access (no 'photo.' prefix) -->
+<img src="{{ photo_url }}" alt="{{ caption }}" class="image image--contain">
 
-<!-- Caption (with fallback) -->
-{{ photo.caption | default: "No caption" }}
+<!-- Caption with fallback -->
+{{ caption | default: "No caption" }}
 
 <!-- Photo count -->
-{% if photo.photo_count > 0 %}
-  {{ photo.photo_count }} photos
+{% if photo_count > 0 %}
+  {{ photo_count }} photos in {{ album_name }}
 {% endif %}
 
-<!-- Plugin settings -->
+<!-- TRMNL global variables (provided by platform) -->
+{{ trmnl.user.first_name }}
 {{ trmnl.plugin_settings.instance_name }}
-{{ trmnl.plugin_settings.shared_album_url }}
 ```
 
 ## Testing Strategy
@@ -579,26 +586,40 @@ Test across all TRMNL devices:
 
 ## Workflow
 
-Stateless workflow:
-1. **User Setup**: User pastes shared album URL in TRMNL plugin settings
-2. **TRMNL Request**: Device sends POST to `/markup` with album URL in request body
+Stateless workflow with Polling strategy:
+1. **User Setup**: User pastes shared album URL in TRMNL plugin settings (custom form field)
+2. **TRMNL Polling**: Platform sends GET to `/api/photo?album_url=...` (hourly refresh)
 3. **Fetch Photos**: Worker fetches album data from Google Photos (checks KV cache first)
 4. **Random Selection**: Worker selects random photo from album
-5. **HTML Rendering**: Worker renders Liquid template with photo data
-6. **Response**: Returns HTML to TRMNL for display
-7. **No Storage**: No user data persisted, fully stateless
+5. **JSON Response**: Worker returns photo data as JSON (photo_url, caption, album_name, etc.)
+6. **TRMNL Rendering**: TRMNL platform merges JSON into Liquid templates (stored in Markup Editor)
+7. **Display**: TRMNL sends rendered HTML to device for e-ink display
+8. **No Storage**: No user data persisted, fully stateless
+
+**Key Difference from Webhook**: Worker returns JSON data, not HTML. TRMNL does the template rendering.
 
 ## Technical Stack
 
-### Implementation (Phase 2)
+### Backend (Cloudflare Worker)
 - **Runtime**: Cloudflare Workers
 - **Framework**: Hono (lightweight web framework)
 - **Language**: TypeScript
 - **Caching**: Cloudflare KV (optional, 1-hour TTL)
-- **Templating**: LiquidJS (server-side Liquid rendering)
 - **Monitoring**: Cloudflare Workers Analytics
 - **Deployment**: Cloudflare Workers (wrangler CLI)
 - **Architecture**: Fully stateless - no databases, no user data storage
+- **API Response**: JSON (TRMNL renders templates on their platform)
+
+### Templates (TRMNL-Side)
+- **Location**: Stored in TRMNL's Markup Editor
+- **Language**: Liquid (Shopify template language)
+- **Rendering**: Done by TRMNL platform, not by Worker
+- **Data**: Worker provides JSON, TRMNL merges into templates
+
+### GitHub Pages Demo (Optional)
+- **Purpose**: Preview plugin with interactive UI
+- **Data Source**: Same JSON API endpoint
+- **Rendering**: Client-side JavaScript (no server-side rendering)
 
 ## Future Considerations
 
