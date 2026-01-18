@@ -1,6 +1,6 @@
 # 📷 Google Photos Shared Album for TRMNL
 
-<img src="assets/icon/icon.png" align="right" alt="Google Photos Icon" width="120"/>
+<img src="assets/icon/google-photos-icon-small.png" align="right" alt="Google Photos Icon" width="100"/>
 
 Display random photos from your Google Photos shared albums on TRMNL e-ink displays — no OAuth, no complex setup. Just paste your shared album link and enjoy your memories!
 
