@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { parseAlbumUrl } from '../lib/url-parser.js';
 import { fetchRandomPhoto } from './services/photo-fetcher';
 import {
@@ -20,6 +21,19 @@ type Bindings = {
 
 // Create Hono app with type safety
 const app = new Hono<{ Bindings: Bindings }>();
+
+// Enable CORS for GitHub Pages and TRMNL platform
+app.use('/*', cors({
+  origin: [
+    'https://hossain-khan.github.io',
+    'https://usetrmnl.com',
+    'http://localhost:8787',
+    'http://localhost:3000'
+  ],
+  allowMethods: ['GET', 'POST', 'OPTIONS'],
+  allowHeaders: ['Content-Type'],
+  maxAge: 86400, // 24 hours
+}));
 
 // Preload all templates on Worker initialization
 Object.entries(TEMPLATES).forEach(([layout, content]) => {

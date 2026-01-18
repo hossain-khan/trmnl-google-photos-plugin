@@ -746,4 +746,5 @@ The entire system fits in a single Cloudflare Worker (~100KB) and delivers rando
 
 **Document Version**: 1.0  
 **Last Updated**: January 18, 2026  
-**Maintained By**: TRMNL Google Photos Plugin Team
+**Author**: Hossain Khan  
+**Project**: Community plugin for TRMNL

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Photos TRMNL Plugin - Preview</title>
+    <title>Google Photos TRMNL Plugin - Live Demo</title>
+    <link rel="stylesheet" href="https://usetrmnl.com/css/framework.css">
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -80,9 +81,91 @@
             font-weight: 500;
             margin-left: 10px;
         }
-        .status-development {
-            background: #fff3cd;
-            color: #856404;
+        .status-live {
+            background: #d4edda;
+            color: #155724;
+        }
+        .demo-section {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .demo-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .demo-controls input {
+            flex: 1;
+            min-width: 300px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .demo-controls select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .demo-controls button {
+            padding: 10px 20px;
+            background: #0366d6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .demo-controls button:hover {
+            background: #0256c7;
+        }
+        .demo-controls button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .preview-container {
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            min-height: 400px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+        }
+        .preview-container.loading {
+            background: #f8f9fa;
+        }
+        .preview-empty {
+            color: #999;
+            text-align: center;
+            padding: 40px;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .example-urls {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .example-urls a {
+            color: #0366d6;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .example-urls a:hover {
+            color: #0256c7;
         }
         .github-link {
             text-align: center;
@@ -101,23 +184,57 @@
     <div class="container">
         <h1>
             📷 Google Photos TRMNL Plugin
-            <span class="status-badge status-development">In Development</span>
+            <span class="status-badge status-live">Live Demo</span>
         </h1>
         <p class="description">
             Display random photos from your Google Photos shared albums on TRMNL devices.<br>
-            This preview page shows the four available layout options.
+            Test the live plugin with your own album URL below!
         </p>
 
+        <div class="demo-section">
+            <h2>🎬 Live Demo</h2>
+            <p>Test the plugin with your Google Photos shared album URL. The backend service fetches photos in real-time!</p>
+            
+            <div class="demo-controls">
+                <input 
+                    type="text" 
+                    id="albumUrl" 
+                    placeholder="Paste your Google Photos album URL (photos.app.goo.gl/...)" 
+                    value="https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5"
+                >
+                <select id="layout">
+                    <option value="full">Full Screen</option>
+                    <option value="half_horizontal">Half Horizontal</option>
+                    <option value="half_vertical">Half Vertical</option>
+                    <option value="quadrant">Quadrant</option>
+                </select>
+                <button onclick="fetchMarkup()" id="previewBtn">🔄 Preview</button>
+            </div>
+            
+            <div class="example-urls">
+                <strong>Demo album:</strong> <a onclick="useExampleUrl()">Use example album</a>
+            </div>
+            
+            <div id="errorContainer"></div>
+            
+            <div id="previewContainer" class="preview-container">
+                <div class="preview-empty">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
+                    <p>Enter a Google Photos album URL and click Preview to see your photos!</p>
+                </div>
+            </div>
+        </div>
+
         <div class="setup-info">
-            <h2>🚀 Setup Instructions (Coming Soon)</h2>
+            <h2>🚀 Setup Instructions</h2>
             <ol>
                 <li>Create a shared album in Google Photos</li>
                 <li>Get the shared album link (photos.app.goo.gl/...)</li>
-                <li>Install the plugin from TRMNL marketplace</li>
+                <li>Install the plugin from TRMNL marketplace (coming soon)</li>
                 <li>Paste your shared album URL in the plugin settings</li>
                 <li>Add to your TRMNL playlist</li>
             </ol>
-            <p><strong>Note:</strong> This plugin is currently under development. The backend service to fetch photos from Google Photos shared albums is not yet implemented.</p>
+            <p><strong>Status:</strong> Backend service is live and operational! Photos are fetched and optimized for e-ink displays in real-time.</p>
         </div>
 
         <div class="layouts">
@@ -175,5 +292,80 @@
             </p>
         </div>
     </div>
+
+    <script>
+        const WORKER_URL = 'https://trmnl-google-photos.hk-c91.workers.dev/markup';
+        
+        function useExampleUrl() {
+            document.getElementById('albumUrl').value = 'https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5';
+        }
+        
+        async function fetchMarkup() {
+            const albumUrl = document.getElementById('albumUrl').value.trim();
+            const layout = document.getElementById('layout').value;
+            const previewContainer = document.getElementById('previewContainer');
+            const errorContainer = document.getElementById('errorContainer');
+            const previewBtn = document.getElementById('previewBtn');
+            
+            // Clear previous error
+            errorContainer.innerHTML = '';
+            
+            // Validate input
+            if (!albumUrl) {
+                errorContainer.innerHTML = '<div class="error-message">Please enter a Google Photos album URL</div>';
+                return;
+            }
+            
+            // Show loading state
+            previewBtn.disabled = true;
+            previewBtn.textContent = '⏳ Loading...';
+            previewContainer.classList.add('loading');
+            previewContainer.innerHTML = '<div class="preview-empty"><div style="font-size: 48px;">⏳</div><p>Fetching your photos...</p></div>';
+            
+            try {
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        trmnl: {
+                            plugin_settings: {
+                                instance_name: 'Demo Preview',
+                                shared_album_url: albumUrl
+                            },
+                            layout: layout
+                        }
+                    })
+                });
+                
+                const html = await response.text();
+                
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                }
+                
+                // Display the rendered HTML
+                previewContainer.classList.remove('loading');
+                previewContainer.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error fetching markup:', error);
+                previewContainer.classList.remove('loading');
+                previewContainer.innerHTML = '<div class="preview-empty"><div style="font-size: 48px;">❌</div><p>Failed to load preview</p></div>';
+                errorContainer.innerHTML = `<div class="error-message"><strong>Error:</strong> ${error.message}</div>`;
+            } finally {
+                previewBtn.disabled = false;
+                previewBtn.textContent = '🔄 Preview';
+            }
+        }
+        
+        // Allow Enter key to trigger preview
+        document.getElementById('albumUrl').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                fetchMarkup();
+            }
+        });
+    </script>
 </body>
 </html>
