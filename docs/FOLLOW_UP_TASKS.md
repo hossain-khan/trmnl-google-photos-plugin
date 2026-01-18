@@ -1,153 +1,122 @@
 # Follow-Up Tasks for Google Photos TRMNL Plugin
 
-This document outlines the remaining tasks that should be completed in subsequent development phases. Each phase can be broken down into separate GitHub issues for better tracking.
+This document outlines the remaining tasks for the **stateless Cloudflare Workers** implementation. The architecture is simplified: no databases, no cron jobs, no user data storage.
 
-## Phase 2: Backend Development (3 weeks)
+## Phase 2: Backend Development (2 weeks)
 
-### Issue 1: Research & Reverse Engineer Google Photos API
+### Issue 1: Research & Reverse Engineer Google Photos API ✅
+**Status**: COMPLETE  
+**Date Completed**: January 18, 2026
+
+**Achievements**:
+- ✅ Discovered `google-photos-album-image-url-fetch` library
+- ✅ Validated approach with proof-of-concept
+- ✅ Documented in `docs/GOOGLE_PHOTOS_API.md`
+- ✅ 95%+ success rate confirmed
+
+### Issue 2: Set Up Cloudflare Worker Infrastructure
 **Priority**: P0 - Blocking for all other work  
-**Estimated Time**: 1 week  
+**Estimated Time**: 2 days  
 **Dependencies**: None
 
 **Tasks**:
-- [ ] Collect 10+ Google Photos shared album URLs with different formats
-- [ ] Use Chrome DevTools to analyze network requests when viewing shared albums
-- [ ] Identify undocumented API endpoints used by Google Photos web app
-- [ ] Document request format (headers, parameters, authentication)
-- [ ] Document response format (JSON structure, photo URLs)
-- [ ] Create proof-of-concept Node.js script to fetch album data
-- [ ] Test with various album sizes (1, 10, 100, 1000+ photos)
-- [ ] Test with different privacy settings (public, link-only)
-- [ ] Identify rate limits and restrictions
-- [ ] Legal review of ToS compliance risk
-
-**Success Criteria**:
-- Successfully fetch photo URLs from 90%+ of test albums
-- Understand API structure well enough to implement production code
-- Document findings in `docs/GOOGLE_PHOTOS_API.md`
-
-### Issue 2: Set Up Next.js Backend Infrastructure
-**Priority**: P0  
-**Estimated Time**: 3 days  
-**Dependencies**: None
-
-**Tasks**:
-- [ ] Initialize Next.js 15 project with App Router
+- [ ] Initialize Cloudflare Workers project with Wrangler CLI
 - [ ] Set up TypeScript configuration
-- [ ] Install core dependencies (Zod, AWS SDK, etc.)
-- [ ] Configure environment variables (.env.example)
-- [ ] Set up AWS DynamoDB table with schema
-- [ ] Set up AWS S3 bucket for album metadata caching
-- [ ] Configure Vercel deployment
-- [ ] Set up local development environment
-- [ ] Add basic health check endpoint
-- [ ] Configure CORS for TRMNL domains
+- [ ] Install Hono framework
+- [ ] Install core dependencies (LiquidJS, Zod, google-photos-album-image-url-fetch)
+- [ ] Configure wrangler.toml for development and production
+- [ ] Set up local development environment (wrangler dev)
+- [ ] Add basic health check endpoint (`/` or `/health`)
+- [ ] Test local deployment
+- [ ] Deploy to Cloudflare Workers
+- [ ] Verify endpoint is accessible
 
 **Success Criteria**:
-- Next.js app runs locally and deploys to Vercel
-- DynamoDB and S3 accessible from application
-- Environment properly configured for dev/staging/prod
+- Worker runs locally with `wrangler dev`
+- Worker deployed to Cloudflare and accessible via HTTPS
+- Health check returns 200 OK
+- Environment ready for implementation
 
-### Issue 3: Implement Album URL Parser & Validator
-**Priority**: P0  
-**Estimated Time**: 2 days  
-**Dependencies**: Issue 1
+### Issue 3: Implement Album URL Parser & Validator ✅
+**Status**: COMPLETE  
+**Date Completed**: January 18, 2026
 
-**Tasks**:
-- [ ] Create Zod schema for shared album URL validation
-- [ ] Implement regex patterns for all URL formats
-- [ ] Extract album ID from various URL formats
-- [ ] Add unit tests for URL parser (20+ test cases)
-- [ ] Handle edge cases (malformed URLs, non-Google domains)
-- [ ] Provide user-friendly error messages
-- [ ] Document supported URL formats
+**Achievements**:
+- ✅ Zod schema for URL validation
+- ✅ Support for all Google Photos URL formats
+- ✅ 42 comprehensive test cases
+- ✅ User-friendly error messages
 
-**Success Criteria**:
-- Parse 100% of valid Google Photos shared album URLs
-- Reject invalid URLs with clear error messages
-- All tests pass
-
-### Issue 4: Build Album Metadata Fetcher Service
-**Priority**: P0  
-**Estimated Time**: 5 days  
-**Dependencies**: Issues 1, 2
-
-**Tasks**:
-- [ ] Implement HTTP client for Google Photos API
-- [ ] Add request headers and user-agent spoofing (if needed)
-- [ ] Parse API response and extract photo metadata
-- [ ] Handle pagination for large albums
-- [ ] Filter out videos (photos only)
-- [ ] Implement error handling (network errors, invalid albums, etc.)
-- [ ] Add retry logic with exponential backoff
-- [ ] Respect rate limits
-- [ ] Add integration tests with real albums
-- [ ] Mock API responses for unit tests
-
-**Success Criteria**:
-- Fetch metadata from albums with 1-10,000 photos
-- Handle errors gracefully
-- Respect rate limits
-- 90%+ success rate in testing
-
-### Issue 5: Implement S3 Caching Layer
-**Priority**: P1  
-**Estimated Time**: 2 days  
-**Dependencies**: Issues 2, 4
-
-**Tasks**:
-- [ ] Design S3 object key structure (e.g., `users/{uuid}/album-{id}.json`)
-- [ ] Implement cache write function
-- [ ] Implement cache read function
-- [ ] Add TTL check (24 hours)
-- [ ] Handle cache misses gracefully
-- [ ] Add cache invalidation logic
-- [ ] Implement compression for large metadata
-- [ ] Add unit tests for cache operations
-
-**Success Criteria**:
-- Album metadata cached for 24 hours
-- Cache hits reduce API calls by 90%+
-- Handle cache failures gracefully (fallback to fresh fetch)
-
-### Issue 6: Build Settings Page UI
+### Issue 4: Build `/markup` Endpoint
 **Priority**: P0  
 **Estimated Time**: 4 days  
-**Dependencies**: Issues 2, 3
+**Dependencies**: Issue 2
 
 **Tasks**:
-- [ ] Create `/google-shared/settings` route in Next.js
-- [ ] Build form for pasting album URL
-- [ ] Add real-time URL validation feedback
-- [ ] Display album status (photo count, last updated)
-- [ ] Show error messages for invalid URLs
-- [ ] Add "Save & Fetch Photos" button
-- [ ] Create mobile-responsive layout
-- [ ] Add loading states during save
-- [ ] Implement success confirmation
-- [ ] Add "Back to TRMNL" button
+- [ ] Create POST `/markup` endpoint in Hono
+- [ ] Parse TRMNL request body (extract `plugin_settings.shared_album_url`)
+- [ ] Validate album URL using existing parser (lib/url-parser.js)
+- [ ] Fetch album photos using `google-photos-album-image-url-fetch`
+- [ ] Handle errors gracefully (invalid URL, album not found, network errors)
+- [ ] Select random photo from album
+- [ ] Optimize photo URL for e-ink display (add `=w800-h480` parameter)
+- [ ] Load appropriate Liquid template based on layout
+- [ ] Render template with photo data using LiquidJS
+- [ ] Return HTML response with correct headers
+- [ ] Add comprehensive error handling and logging
+- [ ] Test with multiple shared albums
 
 **Success Criteria**:
-- Users can paste URL and see immediate validation
-- Form submits successfully and triggers album fetch
-- Works on mobile and desktop browsers
-- Matches wireframes in PRD
+- POST to `/markup` returns HTML within 3 seconds
+- Different layouts render correctly
+- Error states handled gracefully
+- Works with 95%+ of valid shared albums
 
-### Issue 7: Build Preview Page
-**Priority**: P1  
-**Estimated Time**: 3 days  
-**Dependencies**: Issues 4, 5, 6
+### Issue 5: Implement Optional KV Caching
+**Priority**: P1 (Nice to have)  
+**Estimated Time**: 1 day  
+**Dependencies**: Issue 4
 
 **Tasks**:
-- [ ] Create `/google-shared/preview` route
-- [ ] Fetch album metadata from cache/API
-- [ ] Select random photo for display
-- [ ] Render all four layout previews (full, half_horizontal, half_vertical, quadrant)
-- [ ] Add "Refresh" button to see different photo
-- [ ] Display last updated timestamp
-- [ ] Show photo count
-- [ ] Add mobile-responsive design
-- [ ] Handle error states (no photos, invalid album)
+- [ ] Set up Cloudflare KV namespace in wrangler.toml
+- [ ] Design cache key structure: `album:{albumId}`
+- [ ] Implement cache check before fetching from Google Photos
+- [ ] Store album photo list in KV with 1-hour TTL
+- [ ] Handle cache misses gracefully (fetch and cache)
+- [ ] Add cache hit/miss metrics
+- [ ] Test cache expiration
+- [ ] Document caching behavior
+
+**Success Criteria**:
+- Cache reduces Google Photos fetch by 80%+
+- Cache misses don't break functionality
+- TTL properly expires old data
+- Response time <500ms for cached albums
+
+**Note**: Only implement if Google Photos fetching is slow (>2s). Start without caching first!
+
+### Issue 6: Testing & Optimization
+**Priority**: P0  
+**Estimated Time**: 3 days  
+**Dependencies**: Issues 4, 5
+
+**Tasks**:
+- [ ] Write integration tests for `/markup` endpoint
+- [ ] Test with various album sizes (1, 10, 100, 1000+ photos)
+- [ ] Test error scenarios (invalid URLs, deleted albums, network failures)
+- [ ] Load testing (simulate 100+ concurrent requests)
+- [ ] Test all four layout templates
+- [ ] Test on all TRMNL device simulators
+- [ ] Optimize bundle size (stay under 1MB Worker limit)
+- [ ] Optimize CPU time (stay under 50ms free tier limit)
+- [ ] Add request logging for debugging
+- [ ] Document API behavior and limitations
+
+**Success Criteria**:
+- All tests pass
+- Worker stays within Cloudflare limits
+- Response time <3s (95th percentile)
+- Error rate <1%
 
 **Success Criteria**:
 - Preview shows random photos from user's album
@@ -220,175 +189,170 @@ This document outlines the remaining tasks that should be completed in subsequen
 - [ ] Test job execution and error handling
 
 **Success Criteria**:
-- All albums refreshed daily
-- <5% failure rate
-- Failed albums retried next day
-- Monitoring alerts for issues
-
-### Issue 11: Add Monitoring & Error Tracking
-**Priority**: P1  
-**Estimated Time**: 2 days  
-**Dependencies**: All previous issues
-
-**Tasks**:
-- [ ] Set up Sentry for error tracking
-- [ ] Add Sentry to all API routes
-- [ ] Configure CloudWatch logs
-- [ ] Create CloudWatch dashboard with key metrics
-- [ ] Add alarms for error rate >5%
-- [ ] Add alarms for API latency P95 >3s
-- [ ] Add alarms for background job failures
-- [ ] Set up UptimeRobot for uptime monitoring
-- [ ] Configure alert notifications (email/Slack)
-- [ ] Document monitoring setup in README
-
-**Success Criteria**:
-- All errors captured in Sentry
-- CloudWatch dashboard shows key metrics
-- Alerts fire for critical issues
-- 99.5%+ uptime tracked
+- All tests pass
+- Worker stays within Cloudflare limits
+- Response time <3s (95th percentile)
+- Error rate <1%
 
 ---
 
-## Phase 4: Testing & Launch (2 weeks)
+## Phase 3: TRMNL Integration & Polish (1 week)
 
-### Issue 12: Alpha Testing with Internal Users
+### Issue 7: TRMNL Integration & Testing
 **Priority**: P0  
-**Estimated Time**: 1 week  
-**Dependencies**: Issues 8, 9, 10
-
-**Tasks**:
-- [ ] Recruit 10 internal alpha testers
-- [ ] Create testing guide with setup instructions
-- [ ] Deploy to staging environment
-- [ ] Testers install plugin and configure albums
-- [ ] Collect feedback via survey
-- [ ] Monitor for errors and issues
-- [ ] Track key metrics (setup completion rate, error rate)
-- [ ] Create bug tracking spreadsheet
-- [ ] Prioritize and fix critical bugs
-- [ ] Document common issues in troubleshooting guide
-
-**Success Criteria**:
-- 80%+ setup completion rate
-- <5% error rate
-- 8/10 testers rate experience 4+ stars
-- All P0 bugs fixed
-
-### Issue 13: Security Audit & CodeQL
-**Priority**: P0  
-**Estimated Time**: 3 days  
-**Dependencies**: All Phase 3 issues
-
-**Tasks**:
-- [ ] Run GitHub CodeQL scanner
-- [ ] Fix all critical and high-severity issues
-- [ ] Review input validation (XSS, SQL injection, etc.)
-- [ ] Review authentication and authorization
-- [ ] Check for secret exposure (API keys, tokens)
-- [ ] Review CORS configuration
-- [ ] Test rate limiting
-- [ ] Review data encryption (at rest and in transit)
-- [ ] Check GDPR compliance (data deletion, retention)
-- [ ] Document security measures in README
-
-**Success Criteria**:
-- Zero critical/high security vulnerabilities
-- GDPR compliant
-- All sensitive data encrypted
-- Rate limiting enforced
-
-### Issue 14: Load & Performance Testing
-**Priority**: P1  
 **Estimated Time**: 2 days  
-**Dependencies**: All Phase 3 issues
+**Dependencies**: Issue 4
 
 **Tasks**:
-- [ ] Set up load testing tool (k6, Artillery, etc.)
-- [ ] Create test scenarios (1x, 10x, 100x normal load)
-- [ ] Test /markup endpoint with 1000 concurrent users
-- [ ] Test background job with 100 albums
-- [ ] Measure P50, P95, P99 latency
-- [ ] Identify bottlenecks
-- [ ] Optimize slow endpoints
-- [ ] Add caching where needed
-- [ ] Retest after optimizations
-- [ ] Document performance benchmarks
+- [ ] Update settings.yml with production Worker URL
+- [ ] Test plugin on TRMNL device/simulator
+- [ ] Verify all four layouts render correctly
+- [ ] Test with multiple album URLs
+- [ ] Verify error states display properly
+- [ ] Test photo refresh behavior
+- [ ] Document any device-specific issues
 
 **Success Criteria**:
-- P95 latency <2s for /markup endpoint
-- Support 1000+ concurrent users
-- No errors under normal load
+- Plugin works end-to-end with TRMNL
+- All layouts display correctly on all devices
+- Photos refresh hourly as configured
 
-### Issue 15: Beta Launch & Marketplace Submission
-**Priority**: P0  
-**Estimated Time**: 1 week  
-**Dependencies**: Issues 12, 13, 14
+### Issue 8: Monitoring & Analytics
+**Priority**: P1  
+**Estimated Time**: 1 day  
+**Dependencies**: Issue 4
 
 **Tasks**:
-- [ ] Deploy to production
-- [ ] Create private TRMNL plugin
-- [ ] Test plugin on actual TRMNL devices (all sizes)
+- [ ] Enable Cloudflare Workers Analytics
+- [ ] Add custom logging for errors
+- [ ] Monitor response times
+- [ ] Track cache hit rates (if using KV)
+- [ ] Set up basic alerts for errors
+- [ ] Document monitoring approach
+
+**Success Criteria**:
+- Visibility into Worker performance
+- Errors logged for debugging
+- No sensitive data in logs
+
+### Issue 9: Documentation & Assets
+**Priority**: P0  
+**Estimated Time**: 2 days  
+**Dependencies**: Issue 7
+
+**Tasks**:
 - [ ] Create demo screenshots for all layouts
 - [ ] Design plugin icon (512x512px)
-- [ ] Write user documentation
-- [ ] Create video tutorial (optional)
-- [ ] Beta launch to 100 opt-in users
-- [ ] Monitor for 48 hours
-- [ ] Gather feedback via survey
-- [ ] Fix critical bugs from beta
-- [ ] Submit plugin to TRMNL marketplace
-- [ ] Await TRMNL team approval
-- [ ] Publish announcement
+- [ ] Write user installation guide
+- [ ] Add troubleshooting section
+- [ ] Document privacy stance (no data stored)
+- [ ] Create simple setup video (optional)
+- [ ] Update README with final details
 
 **Success Criteria**:
-- Plugin approved by TRMNL marketplace
-- 500+ installs in first month
-- >80% setup completion rate
-- NPS >40
-- 99.5%+ uptime
+- Professional demo screenshots
+- Clear installation instructions
+- Privacy policy stated
+
+### Issue 10: Security Review
+**Priority**: P0  
+**Estimated Time**: 1 day  
+**Dependencies**: Issue 4
+
+**Tasks**:
+- [ ] Review for security vulnerabilities
+- [ ] Test with malicious inputs
+- [ ] Verify no data leakage in logs
+- [ ] Test rate limiting (if implemented)
+- [ ] Review Cloudflare Workers security best practices
+- [ ] Document security considerations
+
+**Success Criteria**:
+- No security vulnerabilities
+- Malicious inputs handled safely
+- Privacy-first architecture confirmed
 
 ---
 
-## Issue Breakdown Summary
+## Phase 4: Launch (3-5 days)
 
-**Phase 2 (7 issues)**: Backend infrastructure and core functionality  
-**Phase 3 (4 issues)**: TRMNL integration and automation  
-**Phase 4 (4 issues)**: Testing, security, and launch  
+### Issue 11: Beta Testing
+**Priority**: P0  
+**Estimated Time**: 2 days  
+**Dependencies**: Issues 7, 9, 10
 
-**Total**: 15 major issues spanning ~7 weeks of development
+**Tasks**:
+- [ ] Recruit 5-10 beta testers
+- [ ] Deploy to production Cloudflare Workers
+- [ ] Provide setup instructions
+- [ ] Collect feedback
+- [ ] Monitor error rates
+- [ ] Fix critical bugs
+- [ ] Iterate based on feedback
 
-## Critical Path
+**Success Criteria**:
+- 90%+ setup success rate
+- <2% error rate
+- Positive feedback from testers
 
-The following issues are on the critical path and must be completed sequentially:
+### Issue 12: Marketplace Submission & Launch
+**Priority**: P0  
+**Estimated Time**: 1 day  
+**Dependencies**: Issue 11
 
-1. Issue 1 → Issue 4 → Issue 8 → Issue 12 → Issue 15
+**Tasks**:
+- [ ] Submit plugin to TRMNL marketplace
+- [ ] Create announcement post
+- [ ] Share with TRMNL community
+- [ ] Monitor initial adoption
+- [ ] Respond to user questions
+- [ ] Track key metrics
 
-All other issues can be parallelized or have flexible dependencies.
+**Success Criteria**:
+- Plugin approved and published
+- Documentation accessible
+- Community aware of launch
+- Support channel established
 
-## Risk Mitigation
+---
 
-**Risk**: Google Photos API cannot be reverse engineered (Issue 1)  
-**Mitigation**: Pivot to OAuth approach (use official Google Photos API)  
-**Impact**: 2-week delay, requires UX redesign
+## Summary
 
-**Risk**: ToS violation leads to cease-and-desist (Phase 4)  
-**Mitigation**: Include ToS disclaimer, have OAuth fallback ready  
-**Impact**: Plugin shutdown, user migration to OAuth version
+**Total Time Estimate**: 3-4 weeks  
+**Total Issues**: 12 (reduced from 16)
 
-**Risk**: Load testing reveals performance issues (Issue 14)  
-**Mitigation**: Start load testing earlier (after Issue 8)  
-**Impact**: 1-week delay for optimization
+### Complexity Reduction
+- ❌ No Next.js - using lightweight Hono
+- ❌ No DynamoDB - fully stateless
+- ❌ No S3 - optional KV only
+- ❌ No Hatchet - no cron jobs needed
+- ❌ No settings page - TRMNL handles UI
+- ❌ No preview page - not needed
+- ✅ Cloudflare Workers - edge computing
+- ✅ Privacy-first - zero data storage
+- ✅ Simple deployment - single Worker
 
-## Next Steps
+### Critical Path
+Issue 2 → Issue 4 → Issue 7 → Issue 11 → Issue 12
 
-1. Create GitHub issues from this document (one per section)
-2. Assign priorities (P0 = must-have, P1 = should-have, P2 = nice-to-have)
-3. Assign to team members
-4. Set up project board for tracking
-5. Begin work on Issue 1 (Research & Reverse Engineer API)
+All other issues can run in parallel or be skipped initially.
+
+### Risk Mitigation
+
+**Risk**: Google Photos scraping is slow (>3s)  
+**Mitigation**: Implement KV caching (Issue 5)  
+**Impact**: 1 day additional work
+
+**Risk**: Worker exceeds Cloudflare limits  
+**Mitigation**: Optimize bundle size, use streaming responses  
+**Impact**: 1-2 days optimization
+
+**Risk**: ToS violation concern  
+**Mitigation**: Clear disclaimer, proven library usage  
+**Impact**: Potential plugin removal (low probability)
 
 ---
 
 **Last Updated**: January 18, 2026  
-**Status**: Phase 1 Complete ✅, Phase 2 Planning
+**Status**: Phase 1 Complete ✅, Phase 2 Ready to Start 🚀  
+**Architecture**: Stateless Cloudflare Workers with Hono

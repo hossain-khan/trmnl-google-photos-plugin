@@ -28,11 +28,10 @@ This is a TRMNL plugin that displays random photos from Google Photos shared alb
 **Phase 2: Backend Development** 🚧 **In Progress** (40% Complete)
 - ✅ Google Photos API reverse engineering (Issue 1)
 - ✅ URL parser implementation (Issue 3)
-- 🚧 Next.js backend infrastructure (Issue 2 - Next)
-- 📋 Album metadata fetcher (Issue 4)
-- 📋 S3 caching layer (Issue 5)
-- 📋 Settings page UI (Issue 6)
-- 📋 Preview page (Issue 7)
+- 🚧 Cloudflare Worker with Hono framework (Issue 2 - Next)
+- 📋 /markup endpoint implementation (Issue 4)
+- 📋 Optional KV caching (Issue 5)
+- 📋 Testing and optimization (Issue 6)
 
 See `docs/PHASE_1_COMPLETE.md` and `docs/FOLLOW_UP_TASKS.md` for detailed status and next steps.
 
@@ -576,25 +575,26 @@ Test across all TRMNL devices:
 
 ## Workflow
 
-Planned workflow (Phase 2+):
-1. **User Setup**: User pastes shared album URL in settings page
-2. **Album Crawl**: Backend fetches album metadata, caches in S3
-3. **Daily Refresh**: Cron job updates album metadata every 24 hours
-4. **TRMNL Request**: Device requests `/markup` endpoint
-5. **Random Selection**: Backend selects random photo from cache
-6. **HTML Rendering**: Server-side renders HTML for e-ink
-7. **Display**: Photo appears on device
+Stateless workflow:
+1. **User Setup**: User pastes shared album URL in TRMNL plugin settings
+2. **TRMNL Request**: Device sends POST to `/markup` with album URL in request body
+3. **Fetch Photos**: Worker fetches album data from Google Photos (checks KV cache first)
+4. **Random Selection**: Worker selects random photo from album
+5. **HTML Rendering**: Worker renders Liquid template with photo data
+6. **Response**: Returns HTML to TRMNL for display
+7. **No Storage**: No user data persisted, fully stateless
 
 ## Technical Stack
 
-### Planned (Phase 2+)
-- **Framework**: Next.js 15 (App Router)
+### Implementation (Phase 2)
+- **Runtime**: Cloudflare Workers
+- **Framework**: Hono (lightweight web framework)
 - **Language**: TypeScript
-- **Database**: AWS DynamoDB (user data)
-- **Storage**: AWS S3 (album metadata cache)
-- **Jobs**: Hatchet (background refresh)
-- **Monitoring**: Sentry + CloudWatch
-- **Deployment**: Vercel
+- **Caching**: Cloudflare KV (optional, 1-hour TTL)
+- **Templating**: LiquidJS (server-side Liquid rendering)
+- **Monitoring**: Cloudflare Workers Analytics
+- **Deployment**: Cloudflare Workers (wrangler CLI)
+- **Architecture**: Fully stateless - no databases, no user data storage
 
 ## Future Considerations
 

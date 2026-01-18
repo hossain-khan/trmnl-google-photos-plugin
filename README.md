@@ -26,10 +26,9 @@ Display random photos from your Google Photos shared albums on TRMNL e-ink displ
   - Album ID extraction from all URL formats
   - 42 comprehensive test cases covering all scenarios
   - User-friendly error messages
-- [ ] Next.js backend with `/markup` endpoint
-- [ ] DynamoDB schema and S3 caching
-- [ ] Settings page UI
-- [ ] Preview functionality
+- [ ] Cloudflare Worker with `/markup` endpoint (Hono framework)
+- [ ] Stateless photo fetching and rendering
+- [ ] Optional KV caching for performance
 
 **Phase 3: TRMNL Integration** 📋 (Planned)
 - [ ] `/markup` endpoint for TRMNL
@@ -146,12 +145,13 @@ Visit the preview page: [https://hossain-khan.github.io/trmnl-google-photos-plug
 
 ## 📋 Technical Details
 
-- **Strategy**: `webhook` - Next.js backend serves dynamic HTML to TRMNL
+- **Strategy**: `webhook` - Cloudflare Worker serves dynamic HTML to TRMNL
 - **Refresh**: Every hour (3600 seconds)
 - **Framework**: TRMNL Framework v2 with responsive layouts
-- **Backend**: Next.js 15 + TypeScript (in development)
-- **Storage**: DynamoDB + S3 (in development)
-- **Deployment**: Vercel
+- **Backend**: Hono + TypeScript on Cloudflare Workers (in development)
+- **Caching**: Cloudflare KV (optional, for performance optimization)
+- **Architecture**: Fully stateless - no user data stored
+- **Deployment**: Cloudflare Workers
 
 ## ⚠️ Important Notes
 
