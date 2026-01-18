@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Photos TRMNL Plugin - Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        .layouts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .layout-preview {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .layout-preview h2 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.2em;
+        }
+        .layout-preview .specs {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        .preview-frame {
+            border: 2px solid #ddd;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            min-height: 200px;
+        }
+        .placeholder {
+            color: #999;
+            text-align: center;
+        }
+        .setup-info {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .setup-info h2 {
+            margin-top: 0;
+        }
+        .setup-info ol {
+            line-height: 1.8;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        .status-development {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .github-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .github-link a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        .github-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            📷 Google Photos TRMNL Plugin
+            <span class="status-badge status-development">In Development</span>
+        </h1>
+        <p class="description">
+            Display random photos from your Google Photos shared albums on TRMNL devices.<br>
+            This preview page shows the four available layout options.
+        </p>
+
+        <div class="setup-info">
+            <h2>🚀 Setup Instructions (Coming Soon)</h2>
+            <ol>
+                <li>Create a shared album in Google Photos</li>
+                <li>Get the shared album link (photos.app.goo.gl/...)</li>
+                <li>Install the plugin from TRMNL marketplace</li>
+                <li>Paste your shared album URL in the plugin settings</li>
+                <li>Add to your TRMNL playlist</li>
+            </ol>
+            <p><strong>Note:</strong> This plugin is currently under development. The backend service to fetch photos from Google Photos shared albums is not yet implemented.</p>
+        </div>
+
+        <div class="layouts">
+            <div class="layout-preview">
+                <h2>Full Screen</h2>
+                <p class="specs">800x480px or 1024x758px</p>
+                <div class="preview-frame">
+                    <div class="placeholder">
+                        <div style="font-size: 48px;">📷</div>
+                        <p>Full screen layout<br>Largest photo display</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layout-preview">
+                <h2>Half Horizontal</h2>
+                <p class="specs">~400x480px or ~512x758px</p>
+                <div class="preview-frame">
+                    <div class="placeholder">
+                        <div style="font-size: 36px;">📷</div>
+                        <p>Wide horizontal layout<br>Photo with caption</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layout-preview">
+                <h2>Half Vertical</h2>
+                <p class="specs">800x~240px or 1024x~379px</p>
+                <div class="preview-frame">
+                    <div class="placeholder">
+                        <div style="font-size: 36px;">📷</div>
+                        <p>Tall vertical layout<br>Photo focused</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layout-preview">
+                <h2>Quadrant</h2>
+                <p class="specs">~400x~240px or ~512x~379px</p>
+                <div class="preview-frame">
+                    <div class="placeholder">
+                        <div style="font-size: 24px;">📷</div>
+                        <p>Compact quarter size<br>Photo only</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="github-link">
+            <p>
+                <strong>For Developers:</strong> 
+                <a href="https://github.com/hossain-khan/trmnl-google-photos-plugin" target="_blank">
+                    View on GitHub →
+                </a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
