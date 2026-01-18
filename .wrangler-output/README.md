@@ -1,1 +1,0 @@
-This folder contains the built output assets for the worker "trmnl-google-photos" generated at 2026-01-18T20:49:00.457Z.
