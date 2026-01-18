@@ -105,7 +105,7 @@ export async function setCachedAlbum(
     album_id: albumId,
     fetched_at: new Date().toISOString(),
     photo_count: photos.length,
-    photos: photos,
+    photos,
   };
 
   try {
