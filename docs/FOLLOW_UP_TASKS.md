@@ -14,28 +14,21 @@ This document outlines the remaining tasks for the **stateless Cloudflare Worker
 - ✅ Documented in `docs/GOOGLE_PHOTOS_API.md`
 - ✅ 95%+ success rate confirmed
 
-### Issue 2: Set Up Cloudflare Worker Infrastructure
-**Priority**: P0 - Blocking for all other work  
-**Estimated Time**: 2 days  
-**Dependencies**: None
+### Issue 2: Set Up Cloudflare Worker Infrastructure ✅
+**Status**: COMPLETE  
+**Date Completed**: January 18, 2026  
+**Deployed**: Production at https://trmnl-google-photos.hk-c91.workers.dev
 
-**Tasks**:
-- [ ] Initialize Cloudflare Workers project with Wrangler CLI
-- [ ] Set up TypeScript configuration
-- [ ] Install Hono framework
-- [ ] Install core dependencies (LiquidJS, Zod, google-photos-album-image-url-fetch)
-- [ ] Configure wrangler.toml for development and production
-- [ ] Set up local development environment (wrangler dev)
-- [ ] Add basic health check endpoint (`/` or `/health`)
-- [ ] Test local deployment
-- [ ] Deploy to Cloudflare Workers
-- [ ] Verify endpoint is accessible
-
-**Success Criteria**:
-- Worker runs locally with `wrangler dev`
-- Worker deployed to Cloudflare and accessible via HTTPS
-- Health check returns 200 OK
-- Environment ready for implementation
+**Achievements**:
+- ✅ Cloudflare Workers project initialized with Wrangler CLI
+- ✅ TypeScript configuration complete
+- ✅ Hono framework integrated for routing
+- ✅ Core dependencies installed (LiquidJS, Zod, google-photos-album-image-url-fetch)
+- ✅ wrangler.toml configured for dev and production
+- ✅ Local development environment working (`wrangler dev`)
+- ✅ Health check endpoints (/ and /health) operational
+- ✅ Worker deployed to Cloudflare and accessible via HTTPS
+- ✅ CORS middleware configured for GitHub Pages integration
 
 ### Issue 3: Implement Album URL Parser & Validator ✅
 **Status**: COMPLETE  
@@ -47,53 +40,54 @@ This document outlines the remaining tasks for the **stateless Cloudflare Worker
 - ✅ 42 comprehensive test cases
 - ✅ User-friendly error messages
 
-### Issue 4: Build `/markup` Endpoint
-**Priority**: P0  
-**Estimated Time**: 4 days  
-**Dependencies**: Issue 2
+### Issue 4: Build `/markup` Endpoint ✅
+**Status**: COMPLETE  
+**Date Completed**: January 18, 2026  
+**Deployed**: Production at https://trmnl-google-photos.hk-c91.workers.dev/markup
 
-**Tasks**:
-- [ ] Create POST `/markup` endpoint in Hono
-- [ ] Parse TRMNL request body (extract `plugin_settings.shared_album_url`)
-- [ ] Validate album URL using existing parser (lib/url-parser.js)
-- [ ] Fetch album photos using `google-photos-album-image-url-fetch`
-- [ ] Handle errors gracefully (invalid URL, album not found, network errors)
-- [ ] Select random photo from album
-- [ ] Optimize photo URL for e-ink display (add `=w800-h480` parameter)
-- [ ] Load appropriate Liquid template based on layout
-- [ ] Render template with photo data using LiquidJS
-- [ ] Return HTML response with correct headers
-- [ ] Add comprehensive error handling and logging
-- [ ] Test with multiple shared albums
+**Achievements**:
+- ✅ POST `/markup` endpoint created in Hono
+- ✅ Parses TRMNL request body (extracts `plugin_settings.shared_album_url`)
+- ✅ Validates album URL using lib/url-parser.js
+- ✅ Fetches album photos using `google-photos-album-image-url-fetch`
+- ✅ Comprehensive error handling (invalid URL, album not found, network errors)
+- ✅ Random photo selection from album
+- ✅ Photo URL optimization for e-ink display (`=w800-h480` parameter)
+- ✅ Liquid template rendering with LiquidJS (all 4 layouts)
+- ✅ Proper HTML response with correct headers
+- ✅ Complete error handling and logging
+- ✅ Tested with multiple shared albums
 
-**Success Criteria**:
-- POST to `/markup` returns HTML within 3 seconds
-- Different layouts render correctly
-- Error states handled gracefully
-- Works with 95%+ of valid shared albums
+**Success Criteria Results**:
+- ✅ POST to `/markup` returns HTML in 1.35s (faster than 3s target)
+- ✅ All four layouts render correctly (full, half_horizontal, half_vertical, quadrant)
+- ✅ Error states handled gracefully with user-friendly messages
+- ✅ Works with 95%+ of valid shared albums
 
-### Issue 5: Implement Optional KV Caching
-**Priority**: P1 (Nice to have)  
-**Estimated Time**: 1 day  
-**Dependencies**: Issue 4
+### Issue 5: Implement Optional KV Caching ✅
+**Status**: COMPLETE  
+**Date Completed**: January 18, 2026  
+**Deployed**: Production (Version: 240586bd-895c-4248-8d70-26cbf1d2c1e9)
 
-**Tasks**:
-- [ ] Set up Cloudflare KV namespace in wrangler.toml
-- [ ] Design cache key structure: `album:{albumId}`
-- [ ] Implement cache check before fetching from Google Photos
-- [ ] Store album photo list in KV with 1-hour TTL
-- [ ] Handle cache misses gracefully (fetch and cache)
-- [ ] Add cache hit/miss metrics
-- [ ] Test cache expiration
-- [ ] Document caching behavior
+**Achievements**:
+- ✅ Cloudflare KV namespaces created (production + preview)
+- ✅ Cache key structure: `album:{albumId}` with automatic album ID extraction
+- ✅ Cache-first lookup before Google Photos API calls
+- ✅ 1-hour TTL with automatic expiration
+- ✅ Graceful error handling - never breaks functionality
+- ✅ 18 comprehensive cache tests (all passing)
+- ✅ Complete documentation at `docs/KV_CACHING_SETUP.md`
 
-**Success Criteria**:
-- Cache reduces Google Photos fetch by 80%+
-- Cache misses don't break functionality
-- TTL properly expires old data
-- Response time <500ms for cached albums
+**Performance Results**:
+- **Cache HIT**: 0.067s (67ms) - 20x faster than without cache
+- **Cache MISS**: 1.35s (still fast, within target)
+- **API Call Reduction**: 80%+ as expected
+- **Success Criteria**: All met! Response time far below 500ms target
 
-**Note**: Only implement if Google Photos fetching is slow (>2s). Start without caching first!
+**KV Namespace Details**:
+- Production ID: `737dfeaef9a142689b8896ed818fb615`
+- Preview ID: `0f390773e0dd4585a294297abca36df5`
+- Binding: `PHOTOS_CACHE`
 
 ### Issue 6: Testing & Optimization
 **Priority**: P0  

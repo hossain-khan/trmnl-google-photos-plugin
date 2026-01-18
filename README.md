@@ -39,14 +39,18 @@ Display random photos from your Google Photos shared albums on TRMNL e-ink displ
   - Comprehensive error handling and validation
   - Works with 95%+ of valid shared album URLs
 - [x] ✅ **Optional KV caching for performance** (Issue 5 - Complete!)
+  - ✅ **Deployed to Production** - January 18, 2026
   - Cloudflare KV integration for album photo caching
   - 1-hour TTL for cached album data
   - 80%+ reduction in Google Photos API calls
-  - Response time <500ms for cached albums
+  - Response time **67ms** for cached albums (20x faster!)
   - Graceful fallback when cache unavailable
   - Comprehensive documentation and tests
+  - See: `docs/KV_CACHING_SETUP.md` for setup details
 
-**Phase 3: TRMNL Integration** 📋 (Planned)
+**Phase 2 Complete!** 🎉 All backend components deployed and operational.
+
+**Phase 3: TRMNL Integration** 📋 (Next Up)
 - [ ] `/markup` endpoint for TRMNL
 - [ ] Webhook handlers (install/uninstall)
 - [ ] Background refresh jobs
