@@ -17,7 +17,7 @@ This document outlines the remaining tasks for the **stateless Cloudflare Worker
 ### Issue 2: Set Up Cloudflare Worker Infrastructure ✅
 **Status**: COMPLETE  
 **Date Completed**: January 18, 2026  
-**Deployed**: Production at https://trmnl-google-photos.hk-c91.workers.dev
+**Deployed**: Production at https://trmnl-google-photos.gohk.xyz
 
 **Achievements**:
 - ✅ Cloudflare Workers project initialized with Wrangler CLI
@@ -43,7 +43,7 @@ This document outlines the remaining tasks for the **stateless Cloudflare Worker
 ### Issue 4: Build `/api/photo` JSON Endpoint ✅
 **Status**: COMPLETE  
 **Date Completed**: January 18, 2026  
-**Deployed**: Production at https://trmnl-google-photos.hk-c91.workers.dev/api/photo
+**Deployed**: Production at https://trmnl-google-photos.gohk.xyz/api/photo
 
 **Achievements**:
 - ✅ GET `/api/photo` endpoint created in Hono

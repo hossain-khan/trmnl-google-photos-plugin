@@ -48,7 +48,7 @@ npm run deploy
 This will:
 - Build and bundle your TypeScript code
 - Upload to Cloudflare Workers
-- Deploy to: `https://trmnl-google-photos.hk-c91.workers.dev`
+- Deploy to: `https://trmnl-google-photos.gohk.xyz`
 
 ### Expected Output
 
@@ -60,7 +60,7 @@ Your worker has access to the following bindings:
 Total Upload: XX.XX KiB / gzip: XX.XX KiB
 Uploaded trmnl-google-photos (X.XX sec)
 Published trmnl-google-photos (X.XX sec)
-  https://trmnl-google-photos.hk-c91.workers.dev
+  https://trmnl-google-photos.gohk.xyz
 Current Deployment ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
@@ -70,10 +70,10 @@ Test the deployed worker:
 
 ```bash
 # Test root endpoint
-curl https://trmnl-google-photos.hk-c91.workers.dev/
+curl https://trmnl-google-photos.gohk.xyz/
 
 # Test health endpoint
-curl https://trmnl-google-photos.hk-c91.workers.dev/health
+curl https://trmnl-google-photos.gohk.xyz/health
 ```
 
 Expected response:
@@ -110,7 +110,7 @@ Add your account ID to `wrangler.toml` (see Step 2).
 
 ### Subdomain already taken
 
-If `trmnl-google-photos.hk-c91.workers.dev` is taken, you can:
+If `trmnl-google-photos.gohk.xyz` is taken, you can:
 
 1. Choose a different subdomain in `wrangler.toml`:
    ```toml

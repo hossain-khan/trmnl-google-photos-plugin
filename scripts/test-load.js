@@ -16,7 +16,7 @@
  * 
  * Example:
  *   node scripts/test-load.js http://localhost:8787 50
- *   node scripts/test-load.js https://trmnl-google-photos.hk-c91.workers.dev 100
+ *   node scripts/test-load.js https://trmnl-google-photos.gohk.xyz 100
  */
 
 import { performance } from 'node:perf_hooks';

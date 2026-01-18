@@ -76,7 +76,7 @@ Response: JSON { photo_url, caption, album_name, photo_count, timestamp }
 **Before**:
 ```yaml
 strategy: webhook
-markup_webhook_url: https://trmnl-google-photos.hk-c91.workers.dev/markup
+markup_webhook_url: https://trmnl-google-photos.gohk.xyz/markup
 private_variables:
   - name: shared_album_url
     type: string
@@ -85,7 +85,7 @@ private_variables:
 **After**:
 ```yaml
 strategy: polling
-polling_url: https://trmnl-google-photos.hk-c91.workers.dev/api/photo?album_url={{ shared_album_url }}
+polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}
 polling_verb: GET
 form_fields:
   - name: shared_album_url

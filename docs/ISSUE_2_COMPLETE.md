@@ -179,7 +179,7 @@ The worker is ready for deployment. To deploy:
 
 3. **Verify deployment:**
    ```bash
-   curl https://trmnl-google-photos.hk-c91.workers.dev/
+   curl https://trmnl-google-photos.gohk.xyz/
    ```
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
@@ -230,7 +230,7 @@ The infrastructure is complete and ready for feature implementation:
 ## Notes
 
 - Deployment to Cloudflare requires authentication and will be done by the repository owner
-- The worker name in `wrangler.toml` is set to `trmnl-google-photos` which will deploy to `trmnl-google-photos.hk-c91.workers.dev`
+- The worker name in `wrangler.toml` is set to `trmnl-google-photos` which will deploy to `trmnl-google-photos.gohk.xyz`
 - Development environment is configured with name `trmnl-google-photos-dev`
 - KV namespace bindings are commented out in `wrangler.toml` and will be enabled when caching is implemented
 

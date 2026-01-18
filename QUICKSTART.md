@@ -51,7 +51,7 @@ curl http://localhost:8787/
 
 3. Your worker is live at:
    ```
-   https://trmnl-google-photos.hk-c91.workers.dev
+   https://trmnl-google-photos.gohk.xyz
    ```
 
 ## 📚 Available Commands
