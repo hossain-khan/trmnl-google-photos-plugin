@@ -26,6 +26,12 @@ Display random photos from your Google Photos shared albums on TRMNL e-ink displ
   - Album ID extraction from all URL formats
   - 42 comprehensive test cases covering all scenarios
   - User-friendly error messages
+- [x] ✅ **Cloudflare Worker infrastructure setup** (Issue 2 - Complete!)
+  - Wrangler CLI and TypeScript configuration
+  - Hono framework integration
+  - Basic health check endpoints (/ and /health)
+  - Development environment with hot reload
+  - Deployment scripts ready
 - [ ] Cloudflare Worker with `/markup` endpoint (Hono framework)
 - [ ] Stateless photo fetching and rendering
 - [ ] Optional KV caching for performance
@@ -78,6 +84,9 @@ This plugin is built following the [NEW_RECIPE_GUIDE.md](docs/NEW_RECIPE_GUIDE.m
 
 ```
 trmnl-google-photos-plugin/
+├── src/                          # Cloudflare Worker source code
+│   ├── index.ts                 # Worker entry point (Hono app)
+│   └── README.md                # Worker documentation
 ├── lib/                          # Core library modules
 │   └── url-parser.js            # URL parser & validator
 ├── scripts/                      # Build and automation scripts
@@ -101,10 +110,42 @@ trmnl-google-photos-plugin/
 ├── .github/                      # GitHub configuration
 │   ├── workflows/               # GitHub Actions
 │   └── copilot-instructions.md  # Copilot development guide
+├── wrangler.toml                 # Cloudflare Workers configuration
+├── tsconfig.json                 # TypeScript configuration
 ├── index.html                    # Preview/testing page
 ├── settings.yml                  # TRMNL plugin configuration
+├── DEPLOYMENT.md                 # Deployment guide for Cloudflare
 └── data.json                     # Sample data for testing
 ```
+
+### Worker Development
+
+The Cloudflare Worker handles photo fetching and rendering:
+
+```bash
+# Start local development server
+npm run dev
+
+# Test endpoints
+curl http://localhost:8787/
+curl http://localhost:8787/health
+
+# Run TypeScript type checking
+npm run types
+
+# Deploy to production
+npm run deploy
+
+# Deploy to development environment
+npm run deploy:dev
+```
+
+**Worker Endpoints:**
+- `GET /` - Service information and health status
+- `GET /health` - Health check endpoint
+- `POST /markup` - _(Coming soon)_ TRMNL markup endpoint
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions and [src/README.md](src/README.md) for worker architecture details.
 
 ### URL Parser Usage
 

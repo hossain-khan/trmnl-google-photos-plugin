@@ -143,3 +143,6 @@ vite.config.ts.timestamp-*
 .wrangler/
 .dev.vars
 wrangler.toml.local
+
+# Test artifacts
+api/
