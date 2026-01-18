@@ -6,7 +6,9 @@
 
 ## 1. Overview
 
-The TRMNL Google Photos Plugin allows users to display random images from their Google Photos shared albums on their TRMNL device. The user sets it up by supplying a shareable Google Photos album link, after which the plugin securely retrieves, caches, and presents random photos on the device.
+The TRMNL Google Photos Plugin allows users to display random images from their Google Photos shared albums on their TRMNL device. Users simply paste a shareable Google Photos album link in TRMNL settings, and the plugin retrieves and displays random photos.
+
+**Architecture**: Fully stateless Cloudflare Workers - no user data storage, zero privacy liability.
 
 ---
 
@@ -75,17 +77,26 @@ The TRMNL Google Photos Plugin allows users to display random images from their 
 ## 5. Technical Details
 
 - **Supported Link Type:**  
-  - Accept Google Photos “shared album” links ([example format](https://photos.app.goo.gl/...)).  
+  - Google Photos "shared album" links (e.g., `https://photos.app.goo.gl/...` or `https://photos.google.com/share/...`)
+  
 - **Fetching Logic:**  
-  - Use public metadata APIs or page scraping if allowed, since Google Photos does not have a fully open API for shared links.
-  - Fetch a list of image URLs.
+  - Uses `google-photos-album-image-url-fetch` library (proven since 2019)
+  - Parses public HTML from shared album pages
+  - No authentication required
+  
 - **Backend:**  
-  - Scheduled worker crawls the album and updates a per-user cache (DynamoDB/S3, as in Apple plugin).
-  - Expose API endpoints for front-end to get a random image and check status.
+  - **Cloudflare Worker** with Hono framework
+  - Fully stateless - album URL comes from TRMNL request
+  - Optional KV caching (1-hour TTL) for performance
+  - Server-side Liquid template rendering
+  
 - **Frontend:**  
-  - Next.js and React components to manage the UI, settings panel, and photo preview.
+  - No web UI needed - TRMNL handles settings
+  - Users paste album URL directly in TRMNL plugin settings
+  
 - **Monitoring:**  
-  - Track fetch success/failure, album changes, and usage for support/diagnostics.
+  - Cloudflare Workers Analytics
+  - Error logging for debugging
 
 ---
 

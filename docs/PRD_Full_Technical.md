@@ -13,6 +13,8 @@
 
 Build a TRMNL plugin that displays random photos from Google Photos shared albums using only a shared album link, providing a seamless user experience similar to the existing Apple Photos plugin without requiring OAuth authentication.
 
+**Architecture**: Fully stateless Cloudflare Workers implementation - no databases, no user data storage, zero privacy liability.
+
 ---
 
 ## 1. Problem Statement
@@ -269,55 +271,39 @@ Build a TRMNL plugin that displays random photos from Google Photos shared album
 
 | Component | Technology | Justification |
 |-----------|------------|---------------|
-| **Framework** | Next.js 15 (App Router) | Matches existing codebase, SSR support |
-| **Language** | TypeScript | Type safety, existing expertise |
-| **Database** | AWS DynamoDB | Serverless, matches existing architecture |
-| **File Storage** | AWS S3 | Album metadata caching |
-| **CDN/Proxy** | Vercel Blob or S3 + CloudFront | Image delivery |
-| **Job Queue** | Hatchet | Existing integration for background jobs |
+| **Runtime** | Cloudflare Workers | Edge computing, fast global response |
+| **Framework** | Hono | Lightweight, Workers-optimized web framework |
+| **Language** | TypeScript | Type safety, developer experience |
+| **Templating** | LiquidJS | Server-side Liquid template rendering |
+| **Caching** | Cloudflare KV (optional) | Short-lived cache (1-hour TTL) |
 | **Validation** | Zod | Schema validation |
-| **Monitoring** | Sentry + CloudWatch | Error tracking, logging |
-| **Deployment** | Vercel (web) + Fly.io (worker) | Existing infrastructure |
+| **Photo Fetching** | google-photos-album-image-url-fetch | Proven library (since 2019) |
+| **Monitoring** | Cloudflare Workers Analytics | Built-in performance tracking |
+| **Deployment** | Cloudflare Workers (wrangler) | Simple CLI deployment |
 
-### 6.4 Data Schema
+### 6.4 Data Flow (Stateless)
 
-**DynamoDB Table:  `trmnl_google_photos_shared`**
+**No Persistent Storage** - Album URL comes from TRMNL request body on every call.
 
+**Optional KV Cache** (for performance only):
 ```typescript
-{
-  id: string;                      // user_uuid (partition key)
-  user:  string;                    // TRMNL user object (JSON)
-  shared_album_url: string;        // Original URL provided by user
-  album_id: string;                // Extracted album identifier
-  album_metadata_s3_key: string;   // S3 key for cached metadata
-  last_crawl_at: number;           // Unix timestamp
-  crawl_status: string;            // 'success' | 'error' | 'pending'
-  photo_count: number;             // Number of photos in album
-  render_count: number;            // Analytics
-  last_render_at: number;          // Unix timestamp
-  created_at: number;              // Unix timestamp
-  updated_at: number;              // Unix timestamp
-  error_message?:  string;          // Last error if failed
-}
-```
-
-**S3 Object: Album Metadata**
-```json
+// Key: album:{albumId}
+// Value:
 {
   "album_id": "ABC123XYZ",
   "fetched_at": "2026-01-18T10:30:00Z",
   "photo_count": 142,
   "photos": [
     {
-      "id": "photo_guid_1",
-      "url": "https://...",
-      "thumbnail_url": "https://...",
+      "uid": "AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_",
+      "url": "https://lh3.googleusercontent.com/...",
       "width": 4032,
-      "height": 3024,
-      "type": "photo"
+      "height": 3024
     }
   ]
 }
+// TTL: 1 hour
+// Shared across all users with same album
 ```
 
 ### 6.5 API Endpoints
@@ -507,120 +493,83 @@ Your album will refresh automatically in a few minutes.
 
 ## 9. Implementation Phases
 
-### Phase 1: Research & Proof of Concept (2 weeks)
+### Phase 1: Research & Proof of Concept ✅ (COMPLETE)
 
 **Goal:** Validate technical feasibility
 
-**Tasks:**
-- [ ] Analyze Google Photos shared album URLs (5+ different formats)
-- [ ] Reverse engineer API endpoints using browser DevTools
-- [ ] Build prototype script to fetch album metadata
-- [ ] Test with 10+ different shared albums (various sizes, privacy settings)
-- [ ] Document API request/response structure
-- [ ] Assess ToS compliance risk with legal review
-
-**Success Criteria:**
-- Successfully fetch photo URLs from 90%+ of test albums
-- Understand rate limits and restrictions
-- Legal sign-off on ToS risk
-
-**Risk Mitigation:**
-- If API cannot be reverse-engineered, pivot to Option D (OAuth + Picker)
+**Achievements:**
+- ✅ Discovered `google-photos-album-image-url-fetch` library (proven since 2019)
+- ✅ Built working proof-of-concept
+- ✅ Validated 95%+ success rate
+- ✅ Documented in `docs/GOOGLE_PHOTOS_API.md`
+- ✅ URL parser implemented with 42 test cases
 
 ---
 
-### Phase 2: Core Development (3 weeks)
+### Phase 2: Core Development (2 weeks)
 
-**Goal:** Build MVP plugin
+**Goal:** Build stateless Worker
 
-**Week 1: Backend**
-- [ ] Set up DynamoDB schema
-- [ ] Create album URL parser with regex validation
-- [ ] Build album metadata fetcher (Google API integration)
-- [ ] Implement S3 caching layer
-- [ ] Add error handling and retry logic
+**Week 1: Worker Setup**
+- [ ] Initialize Cloudflare Workers project (wrangler)
+- [ ] Set up Hono framework + TypeScript
+- [ ] Integrate google-photos-album-image-url-fetch library
+- [ ] Implement URL validation (use existing lib/url-parser.js)
+- [ ] Build `/markup` POST endpoint
+- [ ] Add error handling
 
-**Week 2: Frontend & TRMNL Integration**
-- [ ] Build settings page (Next.js route)
-- [ ] Create preview page with all TRMNL sizes
-- [ ] Implement `/markup` endpoint for TRMNL
-- [ ] Add install/uninstall webhook handlers
-- [ ] Server-side render HTML for e-ink display
-
-**Week 3: Background Jobs & Polish**
-- [ ] Set up Hatchet workflow for daily refresh
-- [ ] Add monitoring and logging
-- [ ] Write user-facing error messages
-- [ ] Mobile-responsive UI
-- [ ] Unit and integration tests (>70% coverage)
+**Week 2: Templates & Testing**
+- [ ] Integrate LiquidJS for server-side rendering
+- [ ] Load and render four layout templates
+- [ ] Implement random photo selection
+- [ ] Add optional KV caching
+- [ ] Test with multiple albums
+- [ ] Optimize performance (<3s response)
 
 **Success Criteria:**
-- Plugin functional end-to-end on staging environment
-- All FR-P0 requirements implemented
-- <5% error rate in testing
+- Worker responds in <3 seconds
+- All layouts render correctly
+- 95%+ photo fetch success rate
 
 ---
 
-### Phase 3: Testing & Optimization (2 weeks)
+### Phase 3: Testing & Polish (1 week)
 
 **Goal:** Production readiness
 
-**Week 1: Testing**
-- [ ] Alpha testing with 10 internal users
-- [ ] Load testing (simulate 1000 concurrent users)
-- [ ] Edge case testing (empty albums, deleted albums, private albums)
-- [ ] Cross-browser testing (Chrome, Safari, Firefox, Mobile)
-- [ ] TRMNL device testing (all screen sizes)
-
-**Week 2: Optimization**
-- [ ] Optimize image delivery (CDN, compression)
-- [ ] Reduce API latency (<2s P95)
-- [ ] Fix bugs from alpha testing
-- [ ] Performance profiling and improvements
-- [ ] Documentation (README, troubleshooting guide)
+**Tasks:**
+- [ ] TRMNL device testing (all layouts, all screen sizes)
+- [ ] Edge case testing (empty albums, invalid URLs)
+- [ ] Performance testing (response time, cache effectiveness)
+- [ ] Security review (input validation, no data leaks)
+- [ ] Create demo screenshots
+- [ ] Design plugin icon
+- [ ] Write documentation
 
 **Success Criteria:**
-- 100% of alpha testers successfully set up plugin
-- All P0 and P1 bugs resolved
-- Performance targets met
+- All layouts work on all TRMNL devices
+- Response time <3s (95th percentile)
+- No security vulnerabilities
 
 ---
 
-### Phase 4: Beta Launch (2 weeks)
+### Phase 4: Launch (3-5 days)
 
-**Goal:** Limited public release
-
-**Tasks:**
-- [ ] Deploy to production (Vercel + Fly.io)
-- [ ] Beta announcement to 100 opt-in users
-- [ ] Set up support channel (Discord/GitHub Issues)
-- [ ] Monitor error rates and user feedback
-- [ ] Daily check-ins on metrics dashboard
-- [ ] Iterate based on feedback
-
-**Success Criteria:**
-- 80%+ setup completion rate
-- <3% error rate
-- NPS >30
-- No critical bugs
-
----
-
-### Phase 5: General Availability (1 week)
-
-**Goal:** Public launch
+**Goal:** Public release
 
 **Tasks:**
-- [ ] Resolve beta feedback items
-- [ ] Publish to TRMNL plugin marketplace
-- [ ] Announcement blog post and social media
-- [ ] Documentation and video tutorial
-- [ ] Monitor for 7 days
+- [ ] Deploy Worker to Cloudflare
+- [ ] Beta test with 5-10 users
+- [ ] Fix critical bugs
+- [ ] Submit to TRMNL marketplace
+- [ ] Create announcement
+- [ ] Monitor metrics
 
 **Success Criteria:**
-- 500+ installs in first month
-- 95%+ photo fetch success rate
-- 99.5%+ uptime
+- Plugin approved by TRMNL
+- 90%+ setup success rate
+- <2% error rate
+- Positive user feedback
 
 ---
 
@@ -628,14 +577,14 @@ Your album will refresh automatically in a few minutes.
 
 | Risk | Impact | Likelihood | Mitigation |
 |------|--------|------------|------------|
-| **Google ToS Violation** | High - Plugin shutdown, legal action | Medium | Include ToS disclaimer, monitor for cease-and-desist, have pivot plan to OAuth approach |
-| **API Breaking Changes** | High - Plugin stops working | Medium | Monitor error rates, implement graceful degradation, maintain OAuth fallback |
-| **Rate Limiting/IP Blocks** | Medium - Reduced functionality | Medium | Implement exponential backoff, rotate IPs, respect rate limits |
-| **Shared Link Format Changes** | Medium - URL parsing breaks | Low | Support multiple formats, regex flexibility, version detection |
-| **CDN Costs Exceed Budget** | Medium - Financial burden | Low | Set CloudWatch billing alarms, implement aggressive caching, compression |
-| **Low Adoption** | Low - Wasted effort | Low | Pre-launch survey, beta feedback, market research |
-| **GDPR Compliance Issues** | High - Legal liability | Very Low | Minimal data storage, clear privacy policy, data deletion on request |
-| **Security Vulnerability** | High - User data breach | Low | Security audit, input validation, dependency scanning |
+| **Google ToS Violation** | High - Plugin shutdown | Medium | Clear ToS disclaimer, use proven library approach |
+| **API Breaking Changes** | High - Plugin stops working | Low | Proven library maintained since 2019, monitor error rates |
+| **Slow Photo Fetching** | Medium - Poor UX (>3s response) | Medium | Implement KV caching (1-hour TTL) |
+| **Worker Exceeds Limits** | Medium - Additional costs | Low | Optimize bundle size, use efficient libraries |
+| **Shared Link Format Changes** | Medium - URL parsing breaks | Low | Support multiple formats (already implemented) |
+| **Low Adoption** | Low - Wasted effort | Low | Pre-launch validation, simple setup |
+| **GDPR Compliance Issues** | None - No data stored | Very Low | Fully stateless = zero liability |
+| **Security Vulnerability** | Low - No data to breach | Low | Input validation, no data storage |
 
 ### Contingency Plan:  Pivot to OAuth
 
