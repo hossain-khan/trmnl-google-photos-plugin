@@ -32,5 +32,6 @@ ENVIRONMENT = "development"
 # preview_id = "your-kv-preview-namespace-id-here"
 
 # Limits and resources
-[limits]
-cpu_ms = 50  # 50ms CPU time limit for free tier
+# Note: CPU limits are not supported on the Free plan
+# [limits]
+# cpu_ms = 50  # 50ms CPU time limit for paid plans only
