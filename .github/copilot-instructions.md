@@ -94,6 +94,7 @@ trmnl-google-photos-plugin/
 ## Key Files
 
 - **templates/*.liquid**: Four layout templates that adapt to different display sizes and orientations
+- **templates/preview/*.liquid**: Preview versions with hardcoded content (for testing without API)
 - **lib/url-parser.js**: URL parser and validator for Google Photos shared albums
 - **scripts/fetch-photos.js**: Photo fetching implementation using `google-photos-album-image-url-fetch`
 - **settings.yml**: TRMNL plugin configuration (webhook strategy, refresh frequency)
@@ -101,6 +102,26 @@ trmnl-google-photos-plugin/
 - **index.html**: Preview/testing page
 - **docs/PHASE_1_COMPLETE.md**: Summary of completed Phase 1 work
 - **docs/FOLLOW_UP_TASKS.md**: Detailed breakdown of Phase 2-4 tasks
+
+### Template Structure and Synchronization
+
+**Main Templates** (`templates/*.liquid`) are the **source of truth**:
+- Use Liquid template variables (e.g., `{{ photo.photo_url }}`, `{{ photo.caption }}`)
+- Conditionals for handling missing data
+- Error states for unconfigured plugins
+- These are deployed to TRMNL and used in production
+
+**Preview Templates** (`templates/preview/*.liquid`) are **synchronized mirrors**:
+- Use hardcoded content instead of template variables
+- Same HTML structure and CSS classes as main templates
+- Use `https://picsum.photos/300/200?grayscale` for images
+- Hardcoded captions and data (e.g., "Google Photos Album", "142 photos")
+- Purpose: Test layouts in TRMNL Markup Editor without API calls
+
+**⚠️ Critical Rule**: Always keep preview templates in sync with main templates. When you modify a main template:
+1. Update the corresponding preview template with the same structural changes
+2. Replace template variables with hardcoded equivalents
+3. Test both templates to ensure visual consistency
 
 ## TRMNL Framework v2
 
