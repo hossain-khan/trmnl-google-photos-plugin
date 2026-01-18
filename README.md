@@ -11,8 +11,8 @@ Display random photos from your Google Photos shared albums on TRMNL e-ink displ
 **Phase 1: Initial Setup** ✅ (Complete)
 - [x] Project structure created
 - [x] Basic templates for all layouts
-- [x] GitHub Pages deployment configured
 - [x] Preview page created
+- [x] Core library modules
 
 **Phase 2: Backend Development** 🚧 (In Progress)
 - [x] ✅ **Reverse engineering Google Photos API** (Issue 1 - Complete!)
@@ -26,8 +26,9 @@ Display random photos from your Google Photos shared albums on TRMNL e-ink displ
   - Album ID extraction from all URL formats
   - 42 comprehensive test cases covering all scenarios
   - User-friendly error messages
+- [ ] Next.js backend with `/markup` endpoint
 - [ ] DynamoDB schema and S3 caching
-- [ ] Settings page UI (Next.js)
+- [ ] Settings page UI
 - [ ] Preview functionality
 
 **Phase 3: TRMNL Integration** 📋 (Planned)
@@ -78,8 +79,6 @@ This plugin is built following the [NEW_RECIPE_GUIDE.md](docs/NEW_RECIPE_GUIDE.m
 
 ```
 trmnl-google-photos-plugin/
-├── api/                          # API endpoints (GitHub Pages)
-│   └── photo.json               # Current photo data
 ├── lib/                          # Core library modules
 │   └── url-parser.js            # URL parser & validator
 ├── scripts/                      # Build and automation scripts
@@ -147,12 +146,12 @@ Visit the preview page: [https://hossain-khan.github.io/trmnl-google-photos-plug
 
 ## 📋 Technical Details
 
-- **Strategy**: `merge_tag` - Fetches data from GitHub Pages endpoint
+- **Strategy**: `webhook` - Next.js backend serves dynamic HTML to TRMNL
 - **Refresh**: Every hour (3600 seconds)
 - **Framework**: TRMNL Framework v2 with responsive layouts
-- **Backend**: Next.js 15 + TypeScript (planned)
-- **Storage**: DynamoDB + S3 (planned)
-- **Deployment**: Vercel + GitHub Pages
+- **Backend**: Next.js 15 + TypeScript (in development)
+- **Storage**: DynamoDB + S3 (in development)
+- **Deployment**: Vercel
 
 ## ⚠️ Important Notes
 

@@ -16,10 +16,9 @@ Created complete directory structure following TRMNL best practices:
 ```
 trmnl-google-photos-plugin/
 ├── .github/
-│   ├── workflows/pages.yml         # GitHub Pages deployment
 │   └── copilot-instructions.md     # 557 lines - Development guidelines
-├── api/
-│   └── photo.json                  # Public endpoint for TRMNL
+├── lib/
+│   └── url-parser.js               # URL parser and validator
 ├── assets/
 │   ├── icon/                       # Plugin icon (placeholder)
 │   ├── demo/                       # Demo screenshots (placeholder)
@@ -50,7 +49,7 @@ trmnl-google-photos-plugin/
 
 **File**: `settings.yml`
 
-- **Strategy**: `merge_tag` (fetch from GitHub Pages)
+- **Strategy**: `webhook` (Next.js backend serves dynamic content)
 - **Refresh**: 1 hour (3600 seconds)
 - **Layouts**: 4 (full, half_horizontal, half_vertical, quadrant)
 - **Variables**: 
@@ -93,22 +92,13 @@ Three major documentation files created/updated:
    - Risk mitigation strategies
    - Success criteria for each issue
 
-### 5. GitHub Actions ✅
-
-**File**: `.github/workflows/pages.yml`
-
-- Deploys to GitHub Pages on push to `main`
-- Serves `api/photo.json` endpoint
-- Hosts `index.html` preview page
-- Ready for TRMNL to fetch data
-
 ---
 
 ## Key Decisions Made
 
-1. **merge_tag Strategy**: TRMNL fetches from GitHub Pages URL
-   - Simple, stateless for Phase 1
-   - Backend service will update `api/photo.json` in Phase 2
+1. **Webhook Strategy**: Next.js backend serves dynamic HTML to TRMNL
+   - Dynamic rendering on each TRMNL request
+   - Backend implemented in Phase 2
 
 2. **Four Layouts**: Full coverage of TRMNL device configurations
    - Full: Large photo with caption
@@ -122,28 +112,28 @@ Three major documentation files created/updated:
 
 4. **Refresh Rate**: 1 hour
    - Balance between freshness and API load
-   - Can be adjusted in Phase 2 based on usage
+   - Can be adjusted based on usage
 
 5. **Legal Risk**: Documented in README
-   - Reverse engineering approach similar to Apple Photos plugin
+   - Reverse engineering approach similar to other plugins
    - ToS disclaimer included
-   - OAuth fallback planned
 
 ---
 
 ## What's Working Now
 
-✅ **GitHub Pages Deployment**: Ready to deploy when merged to `main`  
-✅ **Preview Page**: `index.html` shows plugin information  
 ✅ **Templates**: All four layouts render with sample data  
 ✅ **Settings**: Plugin configuration ready for TRMNL  
 ✅ **Documentation**: Comprehensive guides for development  
+✅ **URL Parser**: 42 test cases validating Google Photos URLs  
+✅ **Photo Fetcher**: Proof-of-concept using proven library  
 
 ⚠️ **What's NOT Working**: Backend service (Phase 2)
-- Cannot fetch real Google Photos yet
+- No Next.js backend yet
 - No settings page UI
 - No /markup endpoint for TRMNL
 - No background refresh jobs
+- No DynamoDB/S3 infrastructure
 
 ---
 
@@ -199,13 +189,13 @@ open index.html  # View preview page
 
 ### For Development (Phase 2)
 1. Read `docs/FOLLOW_UP_TASKS.md`
-2. Create GitHub issue for "Issue 1: Research & Reverse Engineer Google Photos API"
-3. Start research using browser DevTools on shared album pages
-4. Document findings in `docs/GOOGLE_PHOTOS_API.md`
+2. Start with Issue 2: Set up Next.js backend infrastructure
+3. Set up AWS DynamoDB and S3
+4. Implement `/markup` endpoint using templates
 
 ### For Testing Templates
 1. Edit `data.json` with sample photo data
-2. Copy to `api/photo.json`
+2. Open `index.html` in browser to preview layouts
 3. Test templates in TRMNL simulator or private plugin
 
 ---
@@ -217,12 +207,13 @@ All Phase 1 objectives achieved:
 - [x] Project structure follows TRMNL best practices
 - [x] All four layout templates created and functional
 - [x] Error states implemented
-- [x] GitHub Pages deployment configured
 - [x] README with comprehensive documentation
 - [x] Copilot instructions adapted for this project
-- [x] Follow-up tasks documented with 15 issues
+- [x] Follow-up tasks documented with issues
 - [x] Critical path identified
 - [x] Risk mitigation strategies documented
+- [x] URL parser implemented (Issue 3 - bonus!)
+- [x] Photo fetcher proven (Issue 1 - bonus!)
 
 ---
 

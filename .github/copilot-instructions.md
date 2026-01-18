@@ -20,14 +20,19 @@ This is a TRMNL plugin that displays random photos from Google Photos shared alb
 **Phase 1: Project Setup** ✅ **Complete** (January 2026)
 - Project structure created with all necessary directories
 - Four Liquid templates built and tested
-- GitHub Pages deployment configured
 - Comprehensive documentation written
 - Settings and configuration files ready
+- URL parser implemented and tested (42 test cases)
+- Photo fetcher proven with library integration
 
-**Phase 2: Backend Development** 🚧 **Next** (Planned)
-- Google Photos API reverse engineering
-- Backend service implementation
-- Settings page UI development
+**Phase 2: Backend Development** 🚧 **In Progress** (40% Complete)
+- ✅ Google Photos API reverse engineering (Issue 1)
+- ✅ URL parser implementation (Issue 3)
+- 🚧 Next.js backend infrastructure (Issue 2 - Next)
+- 📋 Album metadata fetcher (Issue 4)
+- 📋 S3 caching layer (Issue 5)
+- 📋 Settings page UI (Issue 6)
+- 📋 Preview page (Issue 7)
 
 See `docs/PHASE_1_COMPLETE.md` and `docs/FOLLOW_UP_TASKS.md` for detailed status and next steps.
 
@@ -53,8 +58,6 @@ trmnl-google-photos-plugin/
 │   ├── workflows/               # GitHub Actions
 │   │   └── pages.yml           # Deploy to GitHub Pages
 │   └── copilot-instructions.md  # This file
-├── api/                          # API endpoints
-│   └── photo.json               # Current photo data (served via GitHub Pages)
 ├── assets/                       # Design assets
 │   ├── icon/                    # Plugin icons (placeholder)
 │   └── demo/                    # Demo screenshots (placeholder)
@@ -81,11 +84,11 @@ trmnl-google-photos-plugin/
 ## Key Files
 
 - **templates/*.liquid**: Four layout templates that adapt to different display sizes and orientations
-- **api/photo.json**: Current photo data endpoint (will be updated by backend service in Phase 2)
-- **settings.yml**: TRMNL plugin configuration (merge_tag strategy, refresh frequency)
+- **lib/url-parser.js**: URL parser and validator for Google Photos shared albums
+- **scripts/fetch-photos.js**: Photo fetching implementation using `google-photos-album-image-url-fetch`
+- **settings.yml**: TRMNL plugin configuration (webhook strategy, refresh frequency)
 - **data.json**: Sample data for testing templates locally
 - **index.html**: Preview/testing page
-- **scripts/fetch-photos.js**: Placeholder for photo fetching script (to be implemented in Phase 2)
 - **docs/PHASE_1_COMPLETE.md**: Summary of completed Phase 1 work
 - **docs/FOLLOW_UP_TASKS.md**: Detailed breakdown of Phase 2-4 tasks
 
@@ -573,14 +576,7 @@ Test across all TRMNL devices:
 
 ## Workflow
 
-Current workflow (Phase 1):
-1. **Manual Update**: Developer updates `api/photo.json` with sample data
-2. **GitHub Pages**: Automatically serves updated JSON endpoint
-3. **TRMNL Fetch**: TRMNL devices fetch from GitHub Pages URL
-4. **Template Rendering**: TRMNL renders appropriate layout template
-5. **Display**: Photo appears on device
-
-Future workflow (Phase 2+):
+Planned workflow (Phase 2+):
 1. **User Setup**: User pastes shared album URL in settings page
 2. **Album Crawl**: Backend fetches album metadata, caches in S3
 3. **Daily Refresh**: Cron job updates album metadata every 24 hours
@@ -591,11 +587,6 @@ Future workflow (Phase 2+):
 
 ## Technical Stack
 
-### Current (Phase 1)
-- **Frontend**: HTML, Liquid templates
-- **Deployment**: GitHub Pages (static hosting)
-- **Data**: Static JSON files
-
 ### Planned (Phase 2+)
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
@@ -603,7 +594,7 @@ Future workflow (Phase 2+):
 - **Storage**: AWS S3 (album metadata cache)
 - **Jobs**: Hatchet (background refresh)
 - **Monitoring**: Sentry + CloudWatch
-- **Deployment**: Vercel (web) + GitHub Pages (static assets)
+- **Deployment**: Vercel
 
 ## Future Considerations
 
