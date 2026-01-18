@@ -7,7 +7,12 @@
   "scripts": {
     "fetch": "node scripts/fetch-photos.js",
     "investigate": "node scripts/investigate-api.js",
-    "test": "node --test scripts/test-*.js"
+    "test": "node --test scripts/test-*.js",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:dev": "wrangler deploy --env development",
+    "types": "wrangler types",
+    "cf:login": "wrangler login"
   },
   "keywords": [
     "trmnl",
@@ -20,9 +25,16 @@
     "axios": "^1.6.5",
     "cheerio": "^1.0.0-rc.12",
     "google-photos-album-image-url-fetch": "^3.2.0",
+    "hono": "^4.11.4",
+    "liquidjs": "^10.24.0",
     "zod": "^4.3.5"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260118.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.59.2"
   }
 }

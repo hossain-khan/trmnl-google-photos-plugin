@@ -1,0 +1,36 @@
+name = "trmnl-google-photos"
+main = "src/index.ts"
+compatibility_date = "2026-01-18"
+compatibility_flags = ["nodejs_compat"]
+
+# Account ID and Workers.dev subdomain
+# account_id will be set via wrangler login or environment variables
+workers_dev = true
+
+# Environment variables (can be overridden with wrangler.toml.local or in Cloudflare dashboard)
+[vars]
+ENVIRONMENT = "production"
+
+# Development configuration
+[env.development]
+name = "trmnl-google-photos-dev"
+workers_dev = true
+
+[env.development.vars]
+ENVIRONMENT = "development"
+
+# Observability - bindings for Analytics Engine, etc.
+# Uncomment when ready to add observability
+# [[analytics_engine_datasets]]
+# binding = "ANALYTICS"
+
+# KV namespace bindings (optional - for caching)
+# Uncomment when ready to implement caching
+# [[kv_namespaces]]
+# binding = "PHOTOS_CACHE"
+# id = "your-kv-namespace-id-here"
+# preview_id = "your-kv-preview-namespace-id-here"
+
+# Limits and resources
+[limits]
+cpu_ms = 50  # 50ms CPU time limit for free tier
