@@ -7,17 +7,9 @@ compatibility_flags = ["nodejs_compat"]
 # account_id will be set via wrangler login or environment variables
 workers_dev = true
 
-# Environment variables (can be overridden with wrangler.toml.local or in Cloudflare dashboard)
+# Environment variables
 [vars]
 ENVIRONMENT = "production"
-
-# Development configuration
-[env.development]
-name = "trmnl-google-photos-dev"
-workers_dev = true
-
-[env.development.vars]
-ENVIRONMENT = "development"
 
 # Observability - bindings for Analytics Engine, etc.
 # Uncomment when ready to add observability
