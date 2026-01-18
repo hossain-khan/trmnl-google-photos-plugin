@@ -14,9 +14,13 @@ Display random photos from your Google Photos shared albums on TRMNL e-ink displ
 - [x] GitHub Pages deployment configured
 - [x] Preview page created
 
-**Phase 2: Backend Development** 🚧 (Next)
+**Phase 2: Backend Development** 🚧 (In Progress)
+- [x] ✅ **Reverse engineering Google Photos API** (Issue 1 - Complete!)
+  - Discovered proven library: `google-photos-album-image-url-fetch`
+  - Created proof-of-concept implementation
+  - Documented approach in `docs/GOOGLE_PHOTOS_API.md`
+  - Validated with comprehensive tests
 - [ ] URL parser for Google Photos shared albums
-- [ ] Reverse engineering Google Photos API
 - [ ] DynamoDB schema and S3 caching
 - [ ] Settings page UI (Next.js)
 - [ ] Preview functionality
