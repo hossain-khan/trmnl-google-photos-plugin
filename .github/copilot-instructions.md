@@ -1,33 +1,42 @@
-# TRMNL Elements Plugin - Copilot Instructions
+# TRMNL Google Photos Shared Album Plugin - Copilot Instructions
 
 ## Project Overview
 
-This is a TRMNL plugin that displays the "Periodic Element of the Day" - showcasing a different chemical element each day with its properties, category, and scientific details. The plugin leverages the TRMNL Framework v2 to create responsive, adaptive layouts that work across all TRMNL devices.
+This is a TRMNL plugin that displays random photos from Google Photos shared albums without requiring OAuth authentication. Users simply paste their shared album link, and photos are automatically fetched and displayed on their TRMNL e-ink devices. The plugin leverages the TRMNL Framework v2 to create responsive, adaptive layouts that work across all TRMNL devices.
+
+### Key Goals
+
+1. **Simplicity**: Match Apple Photos plugin UX (paste link → photos display)
+2. **No Authentication**: Avoid OAuth or Google account linking
+3. **Reliability**: 99%+ uptime for photo fetching
+4. **Performance**: Photo refresh in <3 seconds
 
 ## Project Structure
 
 ```
-trmnl-elements-plugin/
+trmnl-google-photos-plugin/
 ├── .github/                      # GitHub configuration
-│   └── copilot-instructions.md   # This file
+│   ├── workflows/               # GitHub Actions
+│   │   └── pages.yml           # Deploy to GitHub Pages
+│   └── copilot-instructions.md  # This file
 ├── api/                          # API endpoints
-│   └── element-of-the-day.json   # Current element data
+│   └── photo.json               # Current photo data (served via GitHub Pages)
 ├── assets/                       # Design assets
-│   └── icon/                     # Plugin icons
-├── data/                         # Source data
-│   ├── PubChemElements_all.csv   # Element data (CSV format)
-│   └── PubChemElements_all.json  # Element data (JSON format)
+│   ├── icon/                    # Plugin icons
+│   ├── demo/                    # Demo screenshots
+│   └── raw/                     # Source design files
 ├── docs/                         # Documentation
-│   ├── NEW_RECIPE_GUIDE.md       # Guide for creating new recipes
-│   └── PRD.md                    # Product requirements
-├── scripts/                      # Build scripts
-│   └── update-element-of-the-day.js  # Daily element update script
+│   ├── NEW_RECIPE_GUIDE.md      # Guide for creating TRMNL recipes
+│   ├── PRD_Full_Technical.md    # Full Product Requirements Document
+│   └── PRD_TRMNL_Google_Photos_Plugin.md  # Original PRD
 ├── templates/                    # Liquid templates for layouts
-│   ├── full.liquid               # Full-screen layout
-│   ├── half_horizontal.liquid    # Half-size horizontal layout
-│   ├── half_vertical.liquid      # Half-size vertical layout
-│   └── quadrant.liquid           # Quarter-size layout
-├── data.json                     # Element data for templates
+│   ├── full.liquid              # Full-screen layout
+│   ├── half_horizontal.liquid   # Half-size horizontal layout
+│   ├── half_vertical.liquid     # Half-size vertical layout
+│   └── quadrant.liquid          # Quarter-size layout
+├── scripts/                      # Build and automation scripts (future)
+│   └── fetch-photos.js          # Photo fetching script (to be built)
+├── data.json                     # Sample photo data for templates
 ├── index.html                    # Preview/testing page
 └── settings.yml                  # Plugin settings configuration
 ```
@@ -35,9 +44,10 @@ trmnl-elements-plugin/
 ## Key Files
 
 - **templates/*.liquid**: Four layout templates that adapt to different display sizes and orientations
-- **data/PubChemElements_all.json**: Contains all 118 elements with properties (atomic number, mass, symbol, name, category, state, density, electron configuration, year discovered)
-- **scripts/update-element-of-the-day.js**: Node.js script that updates the daily element (runs via GitHub Actions)
-- **data.json**: Current element data used by templates
+- **api/photo.json**: Current photo data endpoint (will be updated by backend service)
+- **settings.yml**: TRMNL plugin configuration (merge_tag strategy, refresh frequency)
+- **data.json**: Sample data for testing templates locally
+- **index.html**: Preview page for testing layouts
 
 ## TRMNL Framework v2
 
@@ -123,317 +133,425 @@ The plugin provides four layouts for different display configurations:
 **Use Case**: Full-screen display (entire TRMNL screen)
 
 **Key Features**:
-- Responsive grid: 1 column (mobile) → 2 columns (md) → 3 columns (lg)
-- Fixed card width: `w--52 min-w--52` for consistency
-- Title with fit-value for long element names
-- Category badge with `label--inverted`
+- Large photo display area (90% of screen height)
+- Optional caption below photo (truncated to 2 lines)
+- Photo count badge in title bar
+- Error state for unconfigured plugin
 
 **Layout Structure**:
 ```liquid
-<div class="grid grid--cols-1 md:grid--cols-2 lg:grid--cols-3 gap--xsmall">
-  <!-- Left: Element card with fixed width -->
-  <div class="w--52 min-w--52">...</div>
-  
-  <!-- Right: Element details in grid -->
-  <div class="grid grid--cols-2 gap--small">...</div>
+<div class="flex flex--col gap--small h--full">
+  <div class="flex flex--center-x flex--center-y" style="flex: 1;">
+    <img src="{{ photo.photo_url }}" class="image image--contain">
+  </div>
+  {% if photo.caption %}
+  <div class="description" data-clamp="2">{{ photo.caption }}</div>
+  {% endif %}
 </div>
 ```
 
 **Critical Learnings**:
-- Use `grid--cols-*` for precise column control (better than flex-wrap)
-- Use `min-w--52` without `w--` to allow card to grow with long atomic masses (e.g., "259.10100")
-- Combine `min-w--` with `gap--small` in flex rows to prevent content touching edges
-- `data-value-fit` with `max-height` essential for long names (e.g., RUTHERFORDIUM - 13 chars)
-- `title` element handles long single-word text better than `value` element
+- Use `flex: 1` to make photo area fill available space
+- `image--contain` ensures photo fits without cropping
+- `data-clamp="2"` prevents long captions from taking too much space
+- Always provide error state for unconfigured albums
 
 #### 2. Half Horizontal Layout (`half_horizontal.liquid`)
 
 **Use Case**: Half-size horizontal display (abundant horizontal space, minimal vertical)
 
 **Key Features**:
-- Flex row layout with vertical centering: `flex--row flex--center-y`
-- Responsive card widths: `w--40 md:w--44 lg:w--48`
-- 2-column grid for details (maximizes horizontal space)
-- Layout padding: `p--2`
+- Flex row layout with photo on left, caption on right
+- Vertical centering: `flex--center-y`
+- Portrait mode fallback: `portrait:flex--col`
+- Photo count badge in caption area
 
 **Layout Structure**:
 ```liquid
-<div class="flex flex--row gap--medium portrait:flex--col p--2 flex--center-y">
-  <!-- Left: Element card -->
-  <div class="w--40 md:w--44 lg:w--48 min-w--40">...</div>
-  
-  <!-- Right: Element details (vertically centered) -->
-  <div class="flex flex--col gap--xsmall">
-    <div class="grid grid--cols-2 gap--xsmall">...</div>
+<div class="flex flex--row gap--medium portrait:flex--col flex--center-y">
+  <div class="flex flex--center-x flex--center-y" style="flex: 1;">
+    <img src="{{ photo.photo_url }}" class="image image--contain">
+  </div>
+  <div class="flex flex--col gap--xsmall" style="max-width: 200px;">
+    <span class="description" data-clamp="4">{{ photo.caption }}</span>
   </div>
 </div>
 ```
 
 **Critical Learnings**:
-- `flex--center-y` centers content vertically in row layouts
-- **DO NOT** use `stretch` class on child containers - it conflicts with `flex--center-y`
-- 2-column grid (`grid--cols-2`) better utilizes abundant horizontal space
-- Responsive widths scale better across devices than fixed widths
-- Remove redundant category from title (already shown in card badge)
+- Horizontal layouts benefit from side-by-side photo + caption
+- Limit caption width to prevent it from dominating the layout
+- Use `portrait:flex--col` for graceful degradation on portrait screens
 
 #### 3. Half Vertical Layout (`half_vertical.liquid`)
 
 **Use Case**: Half-size vertical display
 
 **Key Features**:
-- Title with data-value-fit for category display
-- `label--inverted` for category badge
-- Responsive minimum widths: `min-w--48`
+- Maximizes photo display area (85% of height)
+- Compact caption below (2 lines max)
+- Minimal padding to maximize space
 
 **Critical Learnings**:
-- Vertical layouts need more compact text sizing
-- Category as main title works well for vertical orientation
+- Vertical layouts should prioritize photo over caption
+- Reduce padding (`p--2`) for more photo space
+- Keep caption concise with `data-clamp="2"`
 
 #### 4. Quadrant Layout (`quadrant.liquid`)
 
 **Use Case**: Quarter-size display (most compact)
 
 **Key Features**:
-- Minimal card width: `min-w--32`
-- Smallest text sizes
-- Most compact spacing
+- Photo only, no caption
+- Minimal padding (`p--1`)
+- Photo fills entire space
+- Simplified title bar
 
 **Critical Learnings**:
-- Smallest layout requires aggressive space optimization
-- May need special handling for very long element names
+- Smallest layout drops caption entirely
+- Focus on clean photo display
+- Every pixel counts in quadrant layouts
 
 ## Design Patterns & Best Practices
 
-### 1. Element Card Structure
+### 1. Photo Display Pattern
 
-Standard pattern across all layouts:
+Standard pattern for displaying photos across layouts:
 
 ```liquid
-<div class="outline rounded p--2 bg--white">
-  <!-- Top: Atomic number (left) and Atomic mass (right) -->
-  <div class="flex flex--row flex--between mb--xsmall">
-    <div class="value value--small value--tnums">{{ element.atomic_number }}</div>
-    <div class="value value--xsmall value--tnums" data-value-fit="true">{{ element.atomic_mass }}</div>
-  </div>
-  
-  <!-- Center: Symbol (large) -->
-  <div class="text--center mb--xsmall">
-    <div class="value value--xlarge">{{ element.symbol }}</div>
-  </div>
-  
-  <!-- Bottom: Name and category -->
-  <div class="text--center">
-    <div class="title title--small mb--xsmall">{{ element.name }}</div>
-    <div class="label label--small label--inverted">{{ element.category }}</div>
-  </div>
+<div class="flex flex--center-x flex--center-y" style="flex: 1;">
+  <img src="{{ photo.photo_url }}" 
+       alt="{{ photo.caption }}" 
+       class="image image--contain"
+       style="max-width: 100%; max-height: 100%; object-fit: contain;">
 </div>
 ```
 
 **Key Points**:
-- `value--tnums` for tabular numbers (consistent spacing)
-- `data-value-fit="true"` on atomic mass prevents cutoff (up to 9 chars)
-- `label--inverted` for category badge (consistent across all layouts)
+- Always use `flex--center-x flex--center-y` to center photos
+- `image--contain` ensures photo fits without cropping
+- `object-fit: contain` maintains aspect ratio
+- Use `flex: 1` on parent to fill available space
+- Always provide alt text for accessibility
 
-### 2. Long Text Handling
+### 2. Caption Handling
 
-For element names that may be very long (e.g., "RUTHERFORDIUM" - 13 characters):
+For captions that may be very long:
 
 ```liquid
-<div class="title title--large md:title--xlarge" 
-     data-value-fit="true" 
-     data-value-fit-max-height="120">
-  {{ element.name | upcase }}
+{% if photo.caption %}
+<div class="text--center">
+  <span class="description" data-clamp="2">{{ photo.caption }}</span>
 </div>
+{% endif %}
 ```
 
 **Why**:
-- `title` element handles long single-word text better than `value`
-- `data-value-fit` automatically resizes text to fit container
-- `max-height` constraint prevents text from growing too large
+- `data-clamp="2"` truncates to 2 lines, preventing layout overflow
+- Always wrap in conditional to handle missing captions
+- Use `description` class for appropriate font sizing
+- Center captions for better visual balance
 
-### 3. Responsive Width Strategy
+### 3. Error States
 
-**Fixed widths** (for consistency):
-- Use when content varies (short vs long names)
-- Example: `w--52 min-w--52` in full layout
-- Prevents card from shrinking with short names (e.g., Lithium)
-- **WARNING**: Fixed widths (`w--52`) prevent horizontal growth - content may get cut off
-
-**Responsive widths** (for flexibility):
-- Use when adapting to different screen sizes
-- Example: `w--40 md:w--44 lg:w--48` in half_horizontal
-- Better space utilization across devices
-
-**Minimum widths** (for safety):
-- Always set `min-w--*` to prevent content cutoff
-- Critical for atomic numbers (3-4 chars) and masses (up to 9 chars)
-- **BEST PRACTICE**: Use `min-w--52` without `w--` to allow horizontal growth
-- Example: Element 102's atomic mass "259.10100" (9 chars) needs room to expand
-
-**Key Insight - Fixed vs Minimum Width**:
-- `w--52 min-w--52` = **Fixed width** - Card cannot grow, content may overflow
-- `min-w--52` (no `w--`) = **Minimum width** - Card can grow horizontally as needed
-- Use minimum-only when content length varies significantly (atomic masses: 4-9 chars)
-- Combine with `gap--small` in flex containers for proper spacing between items
-
-### 4. Grid vs Flexbox
-
-**Use Grid when**:
-- Need precise column control (e.g., 2 or 3 columns)
-- Creating responsive multi-column layouts
-- Example: `grid grid--cols-1 md:grid--cols-2 lg:grid--cols-3`
-
-**Use Flexbox when**:
-- Creating single-direction flows
-- Need vertical/horizontal centering
-- Example: `flex flex--row flex--center-y`
-
-### 5. Vertical Alignment
-
-For vertically centering content in horizontal layouts:
+Always provide helpful error states for unconfigured plugins:
 
 ```liquid
-<div class="flex flex--row flex--center-y">
-  <div>Card</div>
-  <div class="flex flex--col">Details</div>
-</div>
+{% if photo.photo_url %}
+  <!-- Display photo -->
+{% else %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--medium h--full">
+    <div class="value value--large text--center">📷</div>
+    <div class="title title--medium text--center">No Photos Available</div>
+    <div class="description text--center">
+      Please configure your Google Photos shared album URL in the plugin settings.
+    </div>
+  </div>
+{% endif %}
 ```
 
-**Critical**: Do NOT use `stretch` class on child containers - it conflicts with `flex--center-y` by forcing containers to fill vertical space.
+**Why**:
+- Users need clear guidance when plugin isn't configured
+- Emoji provides visual feedback (📷)
+- Instructions should be actionable
+- Error state should be visually distinct but not alarming
 
-### 6. Spacing Hierarchy
+### 4. Responsive Sizing Strategy
 
-- `gap--xsmall` - Minimal spacing (within grids)
-- `gap--small` - Small spacing (between related items)
-- `gap--medium` - Medium spacing (between major sections)
-- `p--2` - Standard padding for layout containers
-- `mb--xsmall`, `mb--small` - Bottom margins for vertical stacking
+**Image sizing**:
+- Use percentage-based sizing: `max-width: 100%; max-height: 100%`
+- Let container control size via `flex: 1`
+- Always use `object-fit: contain` to prevent cropping
+
+**Text sizing**:
+- Use framework classes: `description`, `title`, `value`
+- Use `data-clamp` to prevent overflow
+- Adjust font size for compact layouts (quadrant uses smaller sizes)
+
+### 5. Layout Padding Strategy
+
+- **Full layout**: `p--2` (standard padding for breathing room)
+- **Half layouts**: `p--2` (same as full)
+- **Quadrant layout**: `p--1` (minimal padding to maximize space)
+
+Use consistent padding unless space constraints require reduction.
 
 ## Common Issues & Solutions
 
-### Issue 1: Atomic Mass Cutoff
+### Issue 1: Photo Not Displaying
 
-**Problem**: Long atomic masses (e.g., "259.10100" - 9 chars) get cut off
-
-**Solution**:
-- Use `min-w--52` without `w--` to allow card to grow horizontally
-- Add `gap--small` to flex row with `flex--between` for proper spacing
-- Remove fixed width constraints that prevent horizontal growth
-
-### Issue 2: Long Element Names Breaking Layout
-
-**Problem**: Single-word names like "RUTHERFORDIUM" push layout
+**Problem**: Photo doesn't appear or shows broken image icon
 
 **Solution**:
-- Use `title` element instead of `value`
-- Add `data-value-fit="true"` with `data-value-fit-max-height`
-- Wrap in constrained width container
+- Check `photo.photo_url` is valid and accessible
+- Ensure URL is HTTPS (TRMNL requires secure connections)
+- Test image URL in browser first
+- Add error state fallback for failed loads
 
-### Issue 3: Inconsistent Card Widths
+### Issue 2: Caption Overflowing
 
-**Problem**: Cards too narrow with short names (e.g., "Lithium")
-
-**Solution**:
-- Use fixed widths: `w--52 min-w--52`
-- Prevents card from shrinking below minimum
-
-### Issue 4: Vertical Alignment Not Working
-
-**Problem**: `flex--center-y` not centering content
+**Problem**: Long captions push photo out of view
 
 **Solution**:
-- Remove `stretch` class from child containers
-- `stretch` forces `align-self: stretch`, overriding parent's `align-items: center`
+- Use `data-clamp="2"` or `data-clamp="4"` to limit lines
+- Set `max-width` on caption container (e.g., `style="max-width: 200px"`)
+- Wrap caption in conditional to handle missing captions
 
-### Issue 5: Wasted Horizontal Space
+### Issue 3: Photo Aspect Ratio Issues
 
-**Problem**: Single-column layouts waste space on wide screens
+**Problem**: Photo appears stretched or cropped incorrectly
 
 **Solution**:
-- Use responsive grid: `grid--cols-1 md:grid--cols-2 lg:grid--cols-3`
-- Or 2-column grid for details: `grid--cols-2`
+- Always use `object-fit: contain` to maintain aspect ratio
+- Use `image--contain` class from TRMNL framework
+- Center photo with `flex--center-x flex--center-y`
+- Let container size control photo size via `flex: 1`
+
+### Issue 4: Layout Looks Different on Different Devices
+
+**Problem**: Layout breaks on certain TRMNL screen sizes
+
+**Solution**:
+- Test all four device sizes (see Device Specifications above)
+- Use responsive breakpoints: `md:`, `lg:` for size-specific adjustments
+- Use `portrait:` prefix for portrait-specific styles
+- Keep layouts simple - complexity increases breakage risk
+
+### Issue 5: Empty State Not Showing
+
+**Problem**: No feedback when plugin unconfigured
+
+**Solution**:
+- Always check `{% if photo.photo_url %}` before displaying photo
+- Provide clear else block with instructions
+- Include visual indicator (emoji) for better UX
+- Center error state content for visual balance
+
+## Data Structure
+
+### Photo Data Format
+
+```json
+{
+  "photo_url": "https://lh3.googleusercontent.com/...",
+  "thumbnail_url": "https://lh3.googleusercontent.com/.../w400-h300",
+  "caption": "Beautiful sunset at the beach",
+  "timestamp": "2026-01-18T14:00:00Z",
+  "album_name": "Summer Vacation 2026",
+  "photo_count": 142
+}
+```
+
+**Field Descriptions**:
+- `photo_url` (required): Full-resolution photo URL (optimized for e-ink)
+- `thumbnail_url` (optional): Lower resolution version (not currently used)
+- `caption` (optional): Photo caption/description from Google Photos
+- `timestamp` (optional): When photo was taken or last updated
+- `album_name` (optional): Name of the source album
+- `photo_count` (optional): Total photos in album (for display in title bar)
+
+### Accessing Data in Templates
+
+```liquid
+<!-- Photo URL -->
+{{ photo.photo_url }}
+
+<!-- Caption (with fallback) -->
+{{ photo.caption | default: "No caption" }}
+
+<!-- Photo count -->
+{% if photo.photo_count > 0 %}
+  {{ photo.photo_count }} photos
+{% endif %}
+
+<!-- Plugin settings -->
+{{ trmnl.plugin_settings.instance_name }}
+{{ trmnl.plugin_settings.shared_album_url }}
+```
 
 ## Testing Strategy
 
-### Test Elements
+### Test Scenarios
 
-Critical elements to test (cover edge cases):
+Critical scenarios to test:
 
-- **Element 3 (Lithium)**: Short name, tests minimum widths
-- **Element 99 (Einsteinium)**: Long atomic mass (252.0830 - 8 chars)
-- **Element 104 (Rutherfordium)**: Long name (13 chars), large atomic number (104)
-- **Elements 100-102**: Longest atomic masses (257.09511, 258.09843, 259.10100 - 9 chars)
+1. **Happy Path**:
+   - Valid shared album URL with multiple photos
+   - Photos display correctly in all four layouts
+   - Captions truncate properly
+   - Photo count shows in title bar
 
-### Testing Override
+2. **Edge Cases**:
+   - Empty album (0 photos)
+   - Album with 1 photo only
+   - Very long captions (100+ characters)
+   - Photos with various aspect ratios (square, landscape, portrait)
+   - Album URL that becomes invalid
 
-Use `templates/shared.liquid` for testing specific elements:
+3. **Error States**:
+   - No album URL configured (initial state)
+   - Invalid album URL format
+   - Album link sharing disabled
+   - Album deleted by owner
+   - Network errors fetching photos
 
-```liquid
-{% comment %}
-Uncomment to test specific elements:
-{% assign element_index = 99 %}  {# Einsteinium - long atomic mass #}
-{% assign element_index = 104 %} {# Rutherfordium - long name #}
-{% assign element_index = 3 %}   {# Lithium - short name #}
-{% endcomment %}
-```
+### Manual Testing Checklist
+
+- [ ] Test on TRMNL simulator for all device sizes
+- [ ] Verify each layout (full, half_horizontal, half_vertical, quadrant)
+- [ ] Test with photos of different aspect ratios
+- [ ] Verify caption truncation with long text
+- [ ] Check error states display properly
+- [ ] Verify title bar shows correct instance name
+- [ ] Test portrait mode rendering (if applicable)
+- [ ] Check photo centering and sizing
 
 ### Device Testing
 
-Test across all responsive breakpoints:
-- Small (600px+): Kindle 2024
-- Medium (800px+): TRMNL OG, OG V2
-- Large (1024px+): TRMNL V2
+Test across all TRMNL devices:
+- **Kindle 2024**: 600x800px (portrait), 4-bit
+- **TRMNL OG**: 800x480px (landscape), 1-bit
+- **TRMNL OG V2**: 800x480px (landscape), 2-bit
+- **TRMNL V2**: 1024x758px (landscape), 4-bit
 
 ## Code Style Guidelines
 
 1. **Use semantic class names**: `title`, `value`, `label`, `description`
 2. **Follow mobile-first responsive**: Base styles first, then `md:`, then `lg:`
-3. **Combine modifiers in order**: `size:orientation:bit-depth:utility`
-4. **Always set minimum widths**: Prevent content cutoff
-5. **Use data-value-fit for dynamic content**: Automatically handle long text
-6. **Prefer grid for multi-column**: More predictable than flex-wrap
-7. **Add layout padding**: `p--2` for breathing room
-8. **Use gap utilities**: Better than margins for consistent spacing
-9. **Test with edge cases**: Long names, long numbers, short names
+3. **Always provide error states**: Users need feedback when plugin unconfigured
+4. **Center photos**: Use `flex--center-x flex--center-y` for all photo displays
+5. **Truncate captions**: Use `data-clamp` to prevent overflow
+6. **Test all layouts**: Changes should work across all four layout types
+7. **Add conditional rendering**: Check for data existence before displaying
+8. **Use framework utilities**: Prefer TRMNL classes over custom CSS
+9. **Test with real photos**: Use actual Google Photos URLs, not placeholders
 
-## Element Data Structure
+## Implementation Phases
 
-```json
-{
-  "atomic_number": "3",
-  "symbol": "Li",
-  "name": "Lithium",
-  "atomic_mass": "6.9410",
-  "cpk_hex_color": "CC80FF",
-  "electron_configuration": "[He]2s1",
-  "electronegativity": "0.98",
-  "atomic_radius": "167",
-  "ionization_energy": "5.3917",
-  "electron_affinity": "59.6326",
-  "oxidation_states": "1",
-  "standard_state": "Solid",
-  "bonding_type": "Metallic",
-  "melting_point": "453.65",
-  "boiling_point": "1603",
-  "density": "0.534",
-  "group_block": "Alkali metal",
-  "year_discovered": "1817",
-  "category": "Alkali metal"
-}
-```
+### Phase 1: Project Setup ✅ (Completed)
+- [x] Created directory structure
+- [x] Added settings.yml configuration
+- [x] Built four Liquid templates
+- [x] Created preview page (index.html)
+- [x] Set up GitHub Pages deployment
+- [x] Updated README and copilot-instructions
+
+### Phase 2: Backend Development 🚧 (Next)
+
+**Week 1: Research & Reverse Engineering**
+- [ ] Analyze Google Photos shared album URL formats
+- [ ] Use browser DevTools to discover API endpoints
+- [ ] Build proof-of-concept photo fetcher script
+- [ ] Document API request/response structure
+- [ ] Test with multiple shared albums
+
+**Week 2: Core Backend**
+- [ ] Set up Next.js 15 project with TypeScript
+- [ ] Create DynamoDB schema for user data
+- [ ] Build URL parser with regex validation
+- [ ] Implement album metadata fetcher
+- [ ] Add S3 caching layer (24hr TTL)
+- [ ] Error handling and retry logic
+
+**Week 3: Web Interface**
+- [ ] Build settings page UI (Next.js route)
+- [ ] Create preview page with random photo display
+- [ ] Add form validation for album URLs
+- [ ] Implement photo refresh endpoint
+- [ ] Mobile-responsive design
+
+### Phase 3: TRMNL Integration 📋 (Planned)
+
+**Week 4: Integration & Jobs**
+- [ ] Implement `/markup` POST endpoint for TRMNL
+- [ ] Add webhook handlers (install/uninstall)
+- [ ] Set up Hatchet workflow for daily refresh
+- [ ] Random photo selection logic
+- [ ] Render HTML for e-ink display
+
+**Week 5: Monitoring & Polish**
+- [ ] Add Sentry error tracking
+- [ ] CloudWatch logging and alarms
+- [ ] Rate limiting implementation
+- [ ] Analytics tracking (render count)
+- [ ] Documentation and user guides
+
+### Phase 4: Launch 📋 (Planned)
+
+**Week 6-7: Testing**
+- [ ] Alpha testing with internal users
+- [ ] Security audit and CodeQL checks
+- [ ] Load testing (1000+ concurrent users)
+- [ ] Cross-device testing (all TRMNL devices)
+- [ ] Bug fixes and optimization
+
+**Week 8: Beta & GA**
+- [ ] Beta launch to 100 users
+- [ ] Gather feedback and iterate
+- [ ] Final polish and fixes
+- [ ] TRMNL marketplace submission
+- [ ] Public announcement
 
 ## Workflow
 
-1. **Daily Update**: GitHub Action runs `scripts/update-element-of-the-day.js`
-2. **Element Selection**: Rotates through elements based on day of year
-3. **Template Rendering**: TRMNL renders appropriate layout template
-4. **Responsive Adaptation**: Framework applies device-specific styles
-5. **Display**: Element appears on TRMNL device with optimized layout
+Current workflow (Phase 1):
+1. **Manual Update**: Developer updates `api/photo.json` with sample data
+2. **GitHub Pages**: Automatically serves updated JSON endpoint
+3. **TRMNL Fetch**: TRMNL devices fetch from GitHub Pages URL
+4. **Template Rendering**: TRMNL renders appropriate layout template
+5. **Display**: Photo appears on device
+
+Future workflow (Phase 2+):
+1. **User Setup**: User pastes shared album URL in settings page
+2. **Album Crawl**: Backend fetches album metadata, caches in S3
+3. **Daily Refresh**: Cron job updates album metadata every 24 hours
+4. **TRMNL Request**: Device requests `/markup` endpoint
+5. **Random Selection**: Backend selects random photo from cache
+6. **HTML Rendering**: Server-side renders HTML for e-ink
+7. **Display**: Photo appears on device
+
+## Technical Stack
+
+### Current (Phase 1)
+- **Frontend**: HTML, Liquid templates
+- **Deployment**: GitHub Pages (static hosting)
+- **Data**: Static JSON files
+
+### Planned (Phase 2+)
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Database**: AWS DynamoDB (user data)
+- **Storage**: AWS S3 (album metadata cache)
+- **Jobs**: Hatchet (background refresh)
+- **Monitoring**: Sentry + CloudWatch
+- **Deployment**: Vercel (web) + GitHub Pages (static assets)
 
 ## Future Considerations
 
-- Support for additional TRMNL devices as they're released
-- Enhanced bit-depth specific styling (currently minimal)
-- Portrait orientation optimizations (currently using `portrait:flex--col`)
-- Animation/transition effects if framework adds support
-- Interactive elements if TRMNL adds touch support
+- Support for private albums (requires OAuth - deferred to v2.0)
+- Video thumbnail support (photos only in v1.0)
+- Multiple albums per user (single album in v1.0)
+- Photo filters (date range, tags) - deferred
+- Custom refresh schedules (fixed 1hr in v1.0)
+- Photo upload functionality - out of scope
+- Real-time sync (<1hr latency acceptable for v1.0)

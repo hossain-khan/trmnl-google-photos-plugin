@@ -1,0 +1,23 @@
+<div class="layout p--1">
+  {% if photo.photo_url %}
+  <div class="flex flex--col gap--xsmall h--full">
+    <!-- Photo Display Area (most of the space) -->
+    <div class="flex flex--center-x flex--center-y" style="flex: 1;">
+      <img src="{{ photo.photo_url }}" 
+           alt="{{ photo.caption }}" 
+           class="image image--contain"
+           style="max-width: 100%; max-height: 100%; object-fit: contain;">
+    </div>
+  </div>
+  {% else %}
+  <!-- No Photo Available -->
+  <div class="flex flex--col flex--center-x flex--center-y gap--xsmall h--full">
+    <div class="value value--small">📷</div>
+    <div class="description text--center" style="font-size: 0.7em;">No Photos</div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="title_bar">
+  <span class="title title--small">{{ trmnl.plugin_settings.instance_name }}</span>
+</div>

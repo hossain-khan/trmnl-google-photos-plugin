@@ -1,0 +1,41 @@
+uuid: PLACEHOLDER_UUID  # TRMNL will generate this upon plugin submission
+name: Google Photos Shared Album
+author: Hossain Khan
+author_email: hossain.khan@gmail.com
+homepage: https://github.com/hossain-khan/trmnl-google-photos-plugin
+description: Display random photos from your Google Photos shared albums on TRMNL
+markup_version: 1
+strategy: merge_tag
+refresh_frequency: 3600  # 1 hour (will fetch new random photo hourly)
+
+merge_tag:
+  - tag_name: photo
+    # GitHub Pages URL for photo data endpoint
+    source: https://hossain-khan.github.io/trmnl-google-photos-plugin/api/photo.json
+    merge_object: false
+
+private_variables:
+  - name: shared_album_url
+    type: string
+    value: ""
+    label: Google Photos Shared Album URL
+    description: "Paste your Google Photos shared album link (e.g., https://photos.app.goo.gl/ABC123)"
+  - name: instance_name
+    type: string
+    value: "My Photos"
+    label: Display Name
+    description: "Name to show in the title bar"
+
+layouts:
+  - name: full
+    label: Full Screen
+    filename: full.liquid
+  - name: half_horizontal
+    label: Half Horizontal
+    filename: half_horizontal.liquid
+  - name: half_vertical
+    label: Half Vertical
+    filename: half_vertical.liquid
+  - name: quadrant
+    label: Quadrant
+    filename: quadrant.liquid
