@@ -1,0 +1,64 @@
+# This file contains custom fields for the TRMNL Google Photos Shared Album Plugin
+# Dev Documentation: https://help.usetrmnl.com/en/articles/10513740-custom-plugin-form-builder
+- keyname: author_bio
+  name: About This Plugin
+  field_type: author_bio
+  category: images,personal
+  description: |
+    Google Photos Shared Album brings your cherished memories to your TRMNL device by displaying random photos from your Google Photos shared albums—no authentication required.
+    <br><br>
+    <strong>🔑 Privacy-First Design:</strong><br>
+    🔒 No OAuth or Google account linking required<br>
+    🚫 No user data storage—fully stateless architecture<br>
+    🔗 Simply paste your shared album link and photos appear<br>
+    ⚡ Cloudflare Workers with KV caching (67ms response time)<br>
+    🌐 Open source and transparent—review the code anytime
+    <br><br>
+    <strong>Features:</strong><br>
+    📸 Random photo selection from your shared albums<br>
+    ⏰ Automatic hourly refresh with new photos<br>
+    🎨 Four optimized layouts for all TRMNL device sizes<br>
+    📱 Responsive design across all e-ink displays<br>
+    💬 Caption support with smart truncation<br>
+    🏷️ Album name and photo count display
+    <br><br>
+    <strong>How It Works:</strong><br>
+    1. Create a shared album in Google Photos<br>
+    2. Copy the shared album link<br>
+    3. Paste it into the plugin settings<br>
+    4. Photos automatically appear on your TRMNL device<br>
+    5. New random photo displayed every hour
+    <br><br>
+    <strong>Perfect For:</strong><br>
+    👨‍👩‍👧‍👦 Family photo galleries<br>
+    🏖️ Vacation memories<br>
+    🎉 Event highlights<br>
+    🐾 Pet photo collections<br>
+    🎨 Photography portfolios<br>
+    💝 Gift displays for loved ones
+    <br><br>
+    <strong>Technical Details:</strong><br>
+    • 99%+ uptime reliability<br>
+    • <3 second photo refresh<br>
+    • No databases—stateless architecture<br>
+    • Leverages Google Photos' public shared album API<br>
+    • Hosted on Cloudflare Workers (global CDN)
+    <br><br>
+    <strong>Data Privacy:</strong> This plugin does not store any user data. Your album URL is only used to fetch photos in real-time. No cookies, no tracking, no data retention. Fully GDPR and privacy compliant.
+  github_url: https://github.com/hossain-khan/trmnl-google-photos-plugin
+  learn_more_url: https://hossain-khan.github.io/trmnl-google-photos-plugin/
+  email_address: trmnl@hossain.dev
+- keyname: shared_album_url
+  field_type: url
+  name: Google Photos Shared Album URL
+  description: "Paste your Google Photos shared album link (e.g., https://photos.app.goo.gl/ABC123)"
+  placeholder: "https://photos.app.goo.gl/..."
+  help_text: To create a shared album, open Google Photos → Create → Shared Album → Get Link. Ensure link sharing is enabled.
+- keyname: instance_name
+  field_type: string
+  name: Display Name
+  description: "Custom name to show in the title bar (optional)"
+  placeholder: "My Google Photos"
+  default: "My Google Photos"
+  optional: true
+  help_text: This name appears in the plugin's title bar. Leave blank to use "My Google Photos".
