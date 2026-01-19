@@ -109,10 +109,12 @@ trmnl-google-photos-plugin/
 
 **Main Templates** (`templates/*.liquid`) are the **source of truth**:
 
-- Use template variables from JSON API (e.g., `{{ photo_url }}`, `{{ caption }}`)
+- Use template variables from JSON API (e.g., `{{ photo_url }}`, `{{ photo_count }}`)
 - Conditionals for handling missing data
 - Error states for unconfigured plugins
 - These are uploaded to TRMNL Markup Editor and used in production
+
+**Note**: `caption` is always `null` and `album_name` is always "Google Photos Shared Album" because these are not available from the Google Photos shared album API.
 
 **Preview Templates** (`templates/preview/*.liquid`) are **synchronized mirrors**:
 
@@ -465,9 +467,9 @@ Use consistent padding unless space constraints require reduction.
 {
   "photo_url": "https://lh3.googleusercontent.com/...",
   "thumbnail_url": "https://lh3.googleusercontent.com/.../w400-h300",
-  "caption": "Beautiful sunset at the beach",
+  "caption": null,
   "timestamp": "2026-01-18T14:00:00Z",
-  "album_name": "Summer Vacation 2026",
+  "album_name": "Google Photos Shared Album",
   "photo_count": 142
 }
 ```
@@ -476,9 +478,9 @@ Use consistent padding unless space constraints require reduction.
 
 - `photo_url` (required): Full-resolution photo URL (optimized for e-ink with size params)
 - `thumbnail_url` (optional): Lower resolution version (not currently used)
-- `caption` (optional): Photo caption/description from Google Photos
+- `caption` (optional): Photo caption/description (**always `null` - not available from API**)
 - `timestamp` (optional): When photo was taken or last updated
-- `album_name` (optional): Name of the source album
+- `album_name` (optional): Name of the source album (**always "Google Photos Shared Album" - actual name not available from API**)
 - `photo_count` (optional): Total photos in album (for display in title bar)
 
 ### Accessing Data in Templates (TRMNL Markup Editor)
@@ -638,7 +640,7 @@ Stateless workflow with Polling strategy:
 2. **TRMNL Polling**: Platform sends GET to `/api/photo?album_url=...` (hourly refresh)
 3. **Fetch Photos**: Worker fetches album data from Google Photos (checks KV cache first)
 4. **Random Selection**: Worker selects random photo from album
-5. **JSON Response**: Worker returns photo data as JSON (photo_url, caption, album_name, etc.)
+5. **JSON Response**: Worker returns photo data as JSON (photo_url, photo_count, timestamp, etc.)
 6. **TRMNL Rendering**: TRMNL platform merges JSON into templates (stored in Markup Editor)
 7. **Display**: TRMNL sends rendered content to device for e-ink display
 8. **No Storage**: No user data persisted, fully stateless

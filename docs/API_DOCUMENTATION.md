@@ -116,14 +116,14 @@ Content-Type: application/json
 
 **Response Fields:**
 
-| Field           | Type           | Description                           |
-| --------------- | -------------- | ------------------------------------- |
-| `photo_url`     | string         | Full-resolution photo URL (optimized) |
-| `thumbnail_url` | string         | Lower resolution version              |
-| `caption`       | string \| null | Photo caption (if available)          |
-| `timestamp`     | string         | ISO 8601 timestamp                    |
-| `album_name`    | string         | Album name                            |
-| `photo_count`   | number         | Total photos in album                 |
+| Field           | Type           | Description                                                                  |
+| --------------- | -------------- | ---------------------------------------------------------------------------- |
+| `photo_url`     | string         | Full-resolution photo URL (optimized)                                        |
+| `thumbnail_url` | string         | Lower resolution version                                                     |
+| `caption`       | string \| null | Photo caption (always `null` - not available from shared albums)             |
+| `timestamp`     | string         | ISO 8601 timestamp                                                           |
+| `album_name`    | string         | Album name (always "Google Photos Shared Album" - actual name not available) |
+| `photo_count`   | number         | Total photos in album                                                        |
 
 **Error: Missing URL (400 Bad Request):**
 

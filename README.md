@@ -15,7 +15,7 @@ See how your photos look across different TRMNL layouts:
     <td width="50%" align="center">
       <img src="assets/demo/demo-full.png" alt="Full Layout" width="100%"/>
       <br/><strong>Full Layout</strong>
-      <br/>Full-screen photo with caption
+      <br/>Full-screen photo display
     </td>
     <td width="50%" align="center">
       <img src="assets/demo/demo-half-horizontal.png" alt="Half Horizontal Layout" width="100%"/>
@@ -58,7 +58,7 @@ This plugin is built with privacy at its core:
 - ✅ **Public Albums Only** - Only accesses albums you've explicitly shared
 - ✅ **Direct Access** - Photos load directly from Google's servers to your device
 
-**What's cached?** Only album metadata (photo URLs, captions) for 1 hour. Your actual photos stay on Google's servers and are never stored by us.
+**What's cached?** Only album metadata (photo URLs) for 1 hour. Your actual photos stay on Google's servers and are never stored by us.
 
 Your photos stay private. We simply help your TRMNL display them.
 
