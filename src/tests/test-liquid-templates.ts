@@ -335,10 +335,7 @@ describe('Template Variables Usage', (): void => {
         return;
       }
       // Check for instance name variable (direct access, not via trmnl.plugin_settings)
-      assert.ok(
-        content.includes('instance_name'),
-        'Should use instance_name variable'
-      );
+      assert.ok(content.includes('instance_name'), 'Should use instance_name variable');
 
       // Check for photo-related variables
       assert.ok(
