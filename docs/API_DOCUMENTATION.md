@@ -410,7 +410,7 @@ When configured, the worker uses Cloudflare KV for album data caching:
 - Faster response times
 - Lower API rate limit impact
 
-**Setup**: See `docs/KV_CACHING_SETUP.md`
+**Setup**: Configure KV namespace in `wrangler.toml` under `[[kv_namespaces]]` binding. See [Cloudflare KV Documentation](https://developers.cloudflare.com/kv/) for setup instructions.
 
 ---
 

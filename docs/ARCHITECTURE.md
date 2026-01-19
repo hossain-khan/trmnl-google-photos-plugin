@@ -761,12 +761,8 @@ The entire system fits in a single Cloudflare Worker (~100KB) and delivers rando
 
 ## Additional Resources
 
-- [Full Technical PRD](PRD_Full_Technical.md)
-- [Phase 1 Completion Summary](PHASE_1_COMPLETE.md)
-- [Follow-Up Tasks](FOLLOW_UP_TASKS.md)
-- [URL Parser Documentation](URL_PARSER.md)
-- [Google Photos API Research](GOOGLE_PHOTOS_API.md)
-- [Testing Strategy](TESTING.md)
+- [API Documentation](API_DOCUMENTATION.md) - Complete API reference
+- [Testing Strategy](TESTING.md) - Testing approach and guidelines
 - [Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)
 - [TRMNL Plugin Guide](https://usetrmnl.com/plugins)
 
