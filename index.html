@@ -224,6 +224,76 @@
             text-align: center;
             padding: 40px;
         }
+        .split-view {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            width: 100%;
+            align-items: start;
+        }
+        @media (max-width: 968px) {
+            .split-view {
+                grid-template-columns: 1fr;
+            }
+        }
+        .json-panel {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .json-panel h3 {
+            margin: 0;
+            padding: 1rem;
+            background: #edf2f7;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .image-preview-panel {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .image-preview-panel h3 {
+            margin: 0;
+            padding: 1rem;
+            background: #edf2f7;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .image-preview-content {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            background: #ffffff;
+        }
+        .image-preview-content img {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .image-info {
+            margin-top: 1rem;
+            padding: 0 1.5rem 1.5rem;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+        .image-info a {
+            color: #3182ce;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .image-info a:hover {
+            text-decoration: underline;
+        }
         .error-message {
             background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
             color: #742a2a;
@@ -385,7 +455,19 @@
             <div id="errorContainer"></div>
             
             <div id="jsonOutput" class="preview-container" style="display: none;">
-                <pre id="jsonContent" style="text-align: left; padding: 20px; overflow: auto; width: 100%;"></pre>
+                <div class="split-view">
+                    <div class="json-panel">
+                        <h3>📋 JSON Response</h3>
+                        <pre id="jsonContent" style="text-align: left; padding: 20px; overflow: auto; margin: 0;"></pre>
+                    </div>
+                    <div class="image-preview-panel">
+                        <h3>🖼️ Photo Preview</h3>
+                        <div class="image-preview-content" id="imagePreviewContent">
+                            <div class="spinner"></div>
+                        </div>
+                        <div class="image-info" id="imageInfo" style="display: none;"></div>
+                    </div>
+                </div>
             </div>
             
             <div id="previewContainer" class="preview-container">
@@ -608,6 +690,23 @@
                 
                 // Display the JSON response
                 jsonContent.textContent = JSON.stringify(data, null, 2);
+                
+                // Display the photo preview
+                const imagePreviewContent = document.getElementById('imagePreviewContent');
+                const imageInfo = document.getElementById('imageInfo');
+                
+                if (data.photo_url) {
+                    console.log('[API] Loading photo preview...');
+                    imagePreviewContent.innerHTML = `<img src="${data.photo_url}" alt="${data.caption || 'Photo from album'}" />`;
+                    imageInfo.style.display = 'block';
+                    imageInfo.innerHTML = `
+                        <strong>Caption:</strong> ${data.caption || 'No caption'}<br>
+                        <strong>Album:</strong> ${data.album_name || 'Unknown'} (${data.photo_count || 0} photos)<br>
+                        <a href="${data.photo_url}" target="_blank">Open full size →</a>
+                    `;
+                } else {
+                    imagePreviewContent.innerHTML = '<div style="color: #999; text-align: center;">📷<br>No photo available</div>';
+                }
                 
                 // Build metadata display
                 const metadataHtml = `
