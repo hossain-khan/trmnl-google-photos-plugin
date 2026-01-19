@@ -126,31 +126,36 @@ app.get('/api/photo', async (c) => {
     // Extract album_url from query parameters
     const album_url = c.req.query('album_url');
 
-    // Validate album URL parameter
-    if (!album_url || album_url.trim() === '') {
-      statusCode = 400;
-      errorType = 'missing_parameter';
-      logger.warn('Missing album_url parameter');
+    // Demo Data: If album_url is empty, 'demo', or '0', return demo photo data
+    // This allows the plugin to display a preview in the TRMNL marketplace without requiring
+    // users to configure their own Google Photos album URL first.
+    // Reference: https://help.usetrmnl.com/en/articles/12772238-demo-data-for-publishing-plugins
+    if (
+      !album_url ||
+      album_url.trim() === '' ||
+      album_url.toLowerCase() === 'demo' ||
+      album_url === '0'
+    ) {
+      logger.info('Demo mode: Returning TRMNL demo photo data');
 
-      // Track error
-      const errorContext: ErrorContext = {
-        requestId,
-        endpoint: '/api/photo',
-        errorMessage: 'Missing required parameter: album_url',
-        errorType,
-        severity: classifyErrorSeverity(statusCode, 'Missing parameter'),
-        statusCode,
+      // Return demo photo data from the demo album
+      const demoPhotoData = {
+        photo_url:
+          'https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/images/google-photos-demo-picture-small.jpg',
+        thumbnail_url:
+          'https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/images/google-photos-demo-picture-thumb.jpg',
+        caption: 'Demo photo from Google Photos Shared Album TRMNL plugin',
+        timestamp: new Date().toISOString(),
+        album_name: 'Demo Album - Google Photos',
+        photo_count: 142,
       };
-      trackError(errorContext);
 
-      return c.json(
-        {
-          error: 'Bad Request',
-          message: 'Missing required parameter: album_url',
-          example: '/api/photo?album_url=https://photos.app.goo.gl/...',
-        },
-        400
-      );
+      // Add response headers
+      c.header('X-Request-ID', requestId);
+      c.header('X-Response-Time', `${Date.now() - startTime}ms`);
+      c.header('X-Cache-Status', 'demo');
+
+      return c.json(demoPhotoData);
     }
 
     logger.info('Album URL provided');
