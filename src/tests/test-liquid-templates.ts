@@ -143,7 +143,7 @@ describe('Main Template Rendering - Valid Data', (): void => {
 
       // Basic assertions
       assert.ok(rendered.length > 0, 'Rendered output should not be empty');
-      
+
       // Skip layout-specific checks for shared.liquid (it's just variables)
       if (template.name !== 'shared.liquid') {
         assert.ok(rendered.includes('img'), 'Should contain image tag');
@@ -185,7 +185,7 @@ describe('Main Template Rendering - Missing Data', (): void => {
 
       // Should handle missing data gracefully
       assert.ok(rendered.length > 0, 'Rendered output should not be empty');
-      
+
       // Skip layout-specific checks for shared.liquid (it's just variables)
       if (template.name !== 'shared.liquid') {
         assert.ok(rendered.includes('Test Instance'), 'Should still include instance name');
@@ -244,7 +244,10 @@ describe('Template Structure Validation', (): void => {
       // Skip layout-specific checks for shared.liquid (it's just variables)
       if (template.name === 'shared.liquid') {
         // shared.liquid should just contain variable definitions
-        assert.ok(content.includes('icon_google_photos'), 'Should define icon_google_photos variable');
+        assert.ok(
+          content.includes('icon_google_photos'),
+          'Should define icon_google_photos variable'
+        );
         return;
       }
 
@@ -310,7 +313,10 @@ describe('Template Variables Usage', (): void => {
       const content = readFileSync(template.path, 'utf-8');
       // Skip for shared.liquid - it defines variables, not uses them
       if (template.name === 'shared.liquid') {
-        assert.ok(content.includes('icon_google_photos'), 'shared.liquid should define icon_google_photos');
+        assert.ok(
+          content.includes('icon_google_photos'),
+          'shared.liquid should define icon_google_photos'
+        );
         return;
       }
       // Check for TRMNL standard variables
@@ -337,7 +343,10 @@ describe('Image Attributes Validation', (): void => {
       // Skip for shared.liquid - it doesn't have layout images
       if (template.name === 'shared.liquid') {
         // shared.liquid has the icon, check for that
-        assert.ok(content.includes('data:image/png;base64'), 'shared.liquid should define base64 icon');
+        assert.ok(
+          content.includes('data:image/png;base64'),
+          'shared.liquid should define base64 icon'
+        );
         return;
       }
 
