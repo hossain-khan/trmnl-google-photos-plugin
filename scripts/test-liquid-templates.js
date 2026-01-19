@@ -1,0 +1,303 @@
+#!/usr/bin/env node
+
+/**
+ * Comprehensive test suite for Liquid Templates
+ * 
+ * This test file validates all Liquid templates in the templates/ directory including:
+ * - Template syntax validity (can parse without errors)
+ * - Template rendering stability (can render with sample data)
+ * - Template rendering with edge cases (empty data, missing fields)
+ * - Both main templates and preview templates
+ * 
+ * Usage:
+ *   npm test
+ * 
+ * Or directly:
+ *   node scripts/test-liquid-templates.js
+ */
+
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { Liquid } from 'liquidjs';
+
+// Get current directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const projectRoot = join(__dirname, '..');
+
+console.log('🧪 Testing Liquid Templates\n');
+
+// Initialize Liquid engine
+const liquid = new Liquid({
+  root: join(projectRoot, 'templates'),
+  extname: '.liquid'
+});
+
+// Template directories and files to test
+const TEMPLATES_DIR = join(projectRoot, 'templates');
+const PREVIEW_DIR = join(TEMPLATES_DIR, 'preview');
+
+// Get all liquid template files
+const mainTemplates = readdirSync(TEMPLATES_DIR)
+  .filter(file => file.endsWith('.liquid'))
+  .map(file => ({
+    name: file,
+    path: join(TEMPLATES_DIR, file),
+    type: 'main'
+  }));
+
+const previewTemplates = readdirSync(PREVIEW_DIR)
+  .filter(file => file.endsWith('.liquid'))
+  .map(file => ({
+    name: file,
+    path: join(PREVIEW_DIR, file),
+    type: 'preview'
+  }));
+
+const allTemplates = [...mainTemplates, ...previewTemplates];
+
+console.log(`📄 Found ${allTemplates.length} templates to test:`);
+allTemplates.forEach(t => console.log(`   - ${t.type}/${t.name}`));
+console.log('');
+
+// Sample data for testing main templates
+const validPhotoData = {
+  photo_url: 'https://lh3.googleusercontent.com/test/photo.jpg',
+  caption: 'Test photo caption',
+  photo_count: 42,
+  album_name: 'Test Album',
+  trmnl: {
+    plugin_settings: {
+      instance_name: 'Test Instance'
+    }
+  }
+};
+
+const emptyPhotoData = {
+  photo_url: '',
+  caption: '',
+  photo_count: 0,
+  album_name: '',
+  trmnl: {
+    plugin_settings: {
+      instance_name: 'Test Instance'
+    }
+  }
+};
+
+const missingPhotoData = {
+  trmnl: {
+    plugin_settings: {
+      instance_name: 'Test Instance'
+    }
+  }
+};
+
+const longCaptionData = {
+  photo_url: 'https://lh3.googleusercontent.com/test/photo.jpg',
+  caption: 'This is a very long caption that should be truncated by the data-clamp attribute. '.repeat(10),
+  photo_count: 142,
+  album_name: 'Summer Vacation 2026',
+  trmnl: {
+    plugin_settings: {
+      instance_name: 'Test Instance'
+    }
+  }
+};
+
+// Test Suite 1: Template Syntax Validity
+describe('Template Syntax Validity', () => {
+  allTemplates.forEach(template => {
+    it(`should parse ${template.type}/${template.name} without syntax errors`, async () => {
+      const content = readFileSync(template.path, 'utf-8');
+      
+      // Attempt to parse the template
+      try {
+        await liquid.parseAndRender(content, validPhotoData);
+        assert.ok(true, 'Template parsed successfully');
+      } catch (error) {
+        assert.fail(`Template has syntax errors: ${error.message}`);
+      }
+    });
+  });
+});
+
+// Test Suite 2: Main Template Rendering with Valid Data
+describe('Main Template Rendering - Valid Data', () => {
+  mainTemplates.forEach(template => {
+    it(`should render ${template.name} with valid photo data`, async () => {
+      const content = readFileSync(template.path, 'utf-8');
+      
+      const rendered = await liquid.parseAndRender(content, validPhotoData);
+      
+      // Basic assertions
+      assert.ok(rendered.length > 0, 'Rendered output should not be empty');
+      assert.ok(rendered.includes('img'), 'Should contain image tag');
+      assert.ok(rendered.includes(validPhotoData.photo_url), 'Should include photo URL');
+      assert.ok(rendered.includes(validPhotoData.trmnl.plugin_settings.instance_name), 'Should include instance name');
+    });
+  });
+});
+
+// Test Suite 3: Main Template Rendering with Empty Data
+describe('Main Template Rendering - Empty Data', () => {
+  mainTemplates.forEach(template => {
+    it(`should render ${template.name} with empty photo data (error state)`, async () => {
+      const content = readFileSync(template.path, 'utf-8');
+      
+      const rendered = await liquid.parseAndRender(content, emptyPhotoData);
+      
+      // Should render error state
+      assert.ok(rendered.length > 0, 'Rendered output should not be empty');
+      assert.ok(!rendered.includes('img') || rendered.includes('No Photo'), 'Should show error state or no image');
+    });
+  });
+});
+
+// Test Suite 4: Main Template Rendering with Missing Data
+describe('Main Template Rendering - Missing Data', () => {
+  mainTemplates.forEach(template => {
+    it(`should render ${template.name} with missing photo data`, async () => {
+      const content = readFileSync(template.path, 'utf-8');
+      
+      const rendered = await liquid.parseAndRender(content, missingPhotoData);
+      
+      // Should handle missing data gracefully
+      assert.ok(rendered.length > 0, 'Rendered output should not be empty');
+      assert.ok(rendered.includes('Test Instance'), 'Should still include instance name');
+    });
+  });
+});
+
+// Test Suite 5: Main Template Rendering with Long Caption
+describe('Main Template Rendering - Long Caption', () => {
+  mainTemplates.forEach(template => {
+    it(`should render ${template.name} with long caption`, async () => {
+      const content = readFileSync(template.path, 'utf-8');
+      
+      const rendered = await liquid.parseAndRender(content, longCaptionData);
+      
+      // Should render without errors
+      assert.ok(rendered.length > 0, 'Rendered output should not be empty');
+      assert.ok(rendered.includes('data-clamp') || !rendered.includes(longCaptionData.caption), 
+        'Should use data-clamp or not include full long caption');
+    });
+  });
+});
+
+// Test Suite 6: Preview Template Rendering
+describe('Preview Template Rendering', () => {
+  previewTemplates.forEach(template => {
+    it(`should render preview/${template.name} with hardcoded data`, async () => {
+      const content = readFileSync(template.path, 'utf-8');
+      
+      // Preview templates have hardcoded content, should render without external data
+      const rendered = await liquid.parseAndRender(content, {});
+      
+      // Basic assertions
+      assert.ok(rendered.length > 0, 'Rendered output should not be empty');
+      assert.ok(rendered.includes('img'), 'Should contain image tag');
+      assert.ok(rendered.includes('https://picsum.photos') || rendered.includes('http'), 'Should include image URL');
+    });
+  });
+});
+
+// Test Suite 7: Template Structure Validation
+describe('Template Structure Validation', () => {
+  allTemplates.forEach(template => {
+    it(`should have proper structure in ${template.type}/${template.name}`, () => {
+      const content = readFileSync(template.path, 'utf-8');
+      
+      // Check for essential structural elements
+      assert.ok(content.includes('<div class="layout">'), 'Should have layout div');
+      assert.ok(content.includes('<div class="title_bar">'), 'Should have title_bar div');
+      assert.ok(content.includes('flex'), 'Should use flex classes');
+      
+      // Main templates should have conditionals for photo_url
+      if (template.type === 'main') {
+        assert.ok(content.includes('{% if photo_url'), 'Main template should check for photo_url');
+        assert.ok(content.includes('{% else %}'), 'Main template should have else clause for empty state');
+        assert.ok(content.includes('{% endif %}'), 'Main template should close if statement');
+      }
+    });
+  });
+});
+
+// Test Suite 8: Template Consistency Between Main and Preview
+describe('Template Consistency - Main vs Preview', () => {
+  mainTemplates.forEach(mainTemplate => {
+    const previewTemplate = previewTemplates.find(p => p.name === mainTemplate.name);
+    
+    if (previewTemplate) {
+      it(`should have similar structure between main/${mainTemplate.name} and preview/${mainTemplate.name}`, () => {
+        const mainContent = readFileSync(mainTemplate.path, 'utf-8');
+        const previewContent = readFileSync(previewTemplate.path, 'utf-8');
+        
+        // Check that preview uses similar CSS classes as main
+        const mainClasses = (mainContent.match(/class="[^"]+"/g) || [])
+          .map(c => c.replace('class="', '').replace('"', ''))
+          .join(' ')
+          .split(' ')
+          .filter(c => c && c !== 'layout' && c !== 'title_bar');
+        
+        const previewClasses = (previewContent.match(/class="[^"]+"/g) || [])
+          .map(c => c.replace('class="', '').replace('"', ''))
+          .join(' ')
+          .split(' ')
+          .filter(c => c && c !== 'layout' && c !== 'title_bar');
+        
+        // Check that most classes are present in both
+        const commonClasses = mainClasses.filter(c => previewClasses.includes(c));
+        const similarityRatio = commonClasses.length / Math.max(mainClasses.length, previewClasses.length);
+        
+        assert.ok(similarityRatio > 0.5, 
+          `Main and preview templates should share most CSS classes (similarity: ${(similarityRatio * 100).toFixed(0)}%)`);
+      });
+    }
+  });
+});
+
+// Test Suite 9: Template Variables Usage
+describe('Template Variables Usage', () => {
+  mainTemplates.forEach(template => {
+    it(`should use standard template variables in ${template.name}`, () => {
+      const content = readFileSync(template.path, 'utf-8');
+      
+      // Check for TRMNL standard variables
+      assert.ok(content.includes('{{ trmnl.plugin_settings.instance_name }}'), 
+        'Should use trmnl.plugin_settings.instance_name');
+      
+      // Check for photo-related variables
+      assert.ok(content.includes('{{ photo_url }}') || content.includes('{{photo_url}}'), 
+        'Should use photo_url variable');
+    });
+  });
+});
+
+// Test Suite 10: Image Attributes Validation
+describe('Image Attributes Validation', () => {
+  allTemplates.forEach(template => {
+    it(`should have proper image attributes in ${template.type}/${template.name}`, () => {
+      const content = readFileSync(template.path, 'utf-8');
+      
+      // Check for image tags
+      const hasImage = content.includes('<img');
+      
+      if (hasImage) {
+        // Check for required attributes
+        assert.ok(content.includes('src='), 'Image should have src attribute');
+        assert.ok(content.includes('alt='), 'Image should have alt attribute for accessibility');
+        assert.ok(content.includes('class=') && content.includes('image'), 'Image should have image class');
+        
+        // Check for responsive image classes
+        assert.ok(content.includes('image--contain') || content.includes('object-fit: contain'), 
+          'Image should use contain sizing');
+      }
+    });
+  });
+});
+
+console.log('\n✅ All Liquid template tests completed!\n');
