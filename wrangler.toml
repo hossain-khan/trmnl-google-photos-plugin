@@ -11,10 +11,11 @@ workers_dev = true
 [vars]
 ENVIRONMENT = "production"
 
-# Observability - bindings for Analytics Engine, etc.
-# Uncomment when ready to add observability
-# [[analytics_engine_datasets]]
-# binding = "ANALYTICS"
+# Observability - Analytics Engine for performance and error tracking
+# Note: Analytics Engine is available on Workers Paid plan ($5/month)
+# For Free tier, structured logging via console.log is used instead
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
 
 # KV namespace bindings (optional - for caching)
 # Production namespace for caching album photo data (1-hour TTL)
