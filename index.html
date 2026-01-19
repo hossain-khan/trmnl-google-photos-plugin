@@ -164,6 +164,57 @@
         .github-link a:hover {
             text-decoration: underline;
         }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0366d6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .metadata-container {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .metadata-container h4 {
+            margin: 0 0 8px 0;
+            color: #495057;
+            font-size: 0.95em;
+        }
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .metadata-item:last-child {
+            border-bottom: none;
+        }
+        .metadata-label {
+            font-weight: 500;
+            color: #6c757d;
+        }
+        .metadata-value {
+            color: #212529;
+            font-family: 'Courier New', monospace;
+        }
+        .cache-hit {
+            color: #28a745;
+            font-weight: 600;
+        }
+        .cache-miss {
+            color: #ffc107;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -276,40 +327,119 @@
             
             // Validate input
             if (!albumUrl) {
-                errorContainer.innerHTML = '<div class="error-message">Please enter a Google Photos album URL</div>';
+                errorContainer.innerHTML = '<div class="error-message"><strong>⚠️ Validation Error:</strong> Please enter a Google Photos album URL</div>';
                 return;
             }
             
-            // Show loading state
+            // Validate URL format
+            if (!albumUrl.includes('photos.app.goo.gl') && !albumUrl.includes('photos.google.com')) {
+                errorContainer.innerHTML = '<div class="error-message"><strong>⚠️ Invalid URL:</strong> Please enter a valid Google Photos shared album URL (photos.app.goo.gl/... or photos.google.com/share/...)</div>';
+                return;
+            }
+            
+            // Show loading state with spinner
             fetchBtn.disabled = true;
             fetchBtn.textContent = '⏳ Fetching...';
             previewContainer.style.display = 'none';
             jsonOutput.style.display = 'flex';
-            jsonContent.textContent = 'Loading...';
+            jsonContent.innerHTML = '<div class="spinner"></div><p style="text-align: center; color: #666; margin-top: 10px;">Fetching photo data from API...</p>';
+            
+            const startTime = performance.now();
             
             try {
                 const url = `${API_URL}?album_url=${encodeURIComponent(albumUrl)}`;
                 const response = await fetch(url);
+                const endTime = performance.now();
+                const clientLatency = Math.round(endTime - startTime);
+                
+                // Extract metadata from response headers
+                const cacheStatus = response.headers.get('x-cache-status') || 'unknown';
+                const serverTime = response.headers.get('x-response-time') || 'N/A';
+                const totalTime = serverTime !== 'N/A' ? `${serverTime} (server) + ${clientLatency}ms (network)` : `${clientLatency}ms (total)`;
                 
                 if (!response.ok) {
-                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                    // More specific error messages based on status code
+                    let errorMsg = '';
+                    switch (response.status) {
+                        case 400:
+                            errorMsg = 'Invalid album URL format. Please check the URL and try again.';
+                            break;
+                        case 403:
+                            errorMsg = 'Album access denied. The album may be private or link sharing may be disabled. Please ensure the album has link sharing enabled.';
+                            break;
+                        case 404:
+                            errorMsg = 'Album not found. The album may have been deleted or the link is incorrect.';
+                            break;
+                        case 429:
+                            errorMsg = 'Rate limit exceeded. Please wait a moment and try again.';
+                            break;
+                        case 500:
+                        case 502:
+                        case 503:
+                            errorMsg = 'Server error. The service may be temporarily unavailable. Please try again later.';
+                            break;
+                        default:
+                            errorMsg = `Server returned ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMsg);
                 }
                 
                 const data = await response.json();
                 
+                // Check if data contains error information
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
                 // Display the JSON response
                 jsonContent.textContent = JSON.stringify(data, null, 2);
+                
+                // Build metadata display
+                const metadataHtml = `
+                    <div class="metadata-container">
+                        <h4>📊 Response Metadata</h4>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Cache Status:</span>
+                            <span class="metadata-value ${cacheStatus.toLowerCase() === 'hit' ? 'cache-hit' : 'cache-miss'}">
+                                ${cacheStatus.toUpperCase()} ${cacheStatus.toLowerCase() === 'hit' ? '⚡' : '🔄'}
+                            </span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Response Time:</span>
+                            <span class="metadata-value">${totalTime}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Photos in Album:</span>
+                            <span class="metadata-value">${data.photo_count || 'N/A'}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Album Name:</span>
+                            <span class="metadata-value">${data.album_name || 'Unknown'}</span>
+                        </div>
+                    </div>
+                `;
+                
                 errorContainer.innerHTML = `<div class="success-message">
-                    <strong>✓ Success!</strong> Photo data fetched successfully. 
-                    <br>Photo URL: <a href="${data.photo_url}" target="_blank">View photo</a>
-                    <br>Album: ${data.album_name} (${data.photo_count} photos)
-                </div>`;
+                    <strong>✓ Success!</strong> Photo data fetched successfully in ${clientLatency}ms
+                    <br>Photo URL: <a href="${data.photo_url}" target="_blank">View photo →</a>
+                </div>` + metadataHtml;
                 
             } catch (error) {
                 console.error('Error fetching photo data:', error);
                 jsonOutput.style.display = 'none';
                 previewContainer.style.display = 'flex';
-                errorContainer.innerHTML = `<div class="error-message"><strong>Error:</strong> ${error.message}</div>`;
+                
+                // Enhanced error message with troubleshooting tips
+                let troubleshootingTips = '';
+                if (error.message.includes('Album access denied') || error.message.includes('403')) {
+                    troubleshootingTips = '<br><br><strong>💡 Troubleshooting:</strong><br>1. Open the album in Google Photos<br>2. Click the share button (⋯)<br>3. Enable "Share album" or "Create link"<br>4. Copy the new link and try again';
+                } else if (error.message.includes('Album not found') || error.message.includes('404')) {
+                    troubleshootingTips = '<br><br><strong>💡 Troubleshooting:</strong><br>• Verify the URL is correct<br>• Check if the album still exists<br>• Try accessing the album in your browser first';
+                } else if (error.message.includes('Invalid album URL')) {
+                    troubleshootingTips = '<br><br><strong>💡 Expected format:</strong><br>• photos.app.goo.gl/XXXXXXXXX<br>• photos.google.com/share/XXXXXXXXX';
+                }
+                
+                errorContainer.innerHTML = `<div class="error-message"><strong>❌ Error:</strong> ${error.message}${troubleshootingTips}</div>`;
             } finally {
                 fetchBtn.disabled = false;
                 fetchBtn.textContent = '🔄 Fetch Photo Data';
