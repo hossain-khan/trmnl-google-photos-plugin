@@ -110,8 +110,9 @@ export class Logger {
         continue;
       }
 
-      // Don't log full error stacks in production (only in development)
-      if (key === 'stack' && process.env.ENVIRONMENT === 'production') {
+      // Don't log full error stacks (can be enabled via environment variable)
+      // Note: In Cloudflare Workers, check c.env.ENVIRONMENT in the handler
+      if (key === 'stack') {
         continue;
       }
 

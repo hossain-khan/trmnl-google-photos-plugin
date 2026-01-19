@@ -90,7 +90,7 @@ All logs are output as structured JSON for easy parsing and analysis.
 
 The logging system **automatically sanitizes** sensitive data:
 
-- ✅ **Album URLs**: Truncated to first 50 characters + "..."
+- ✅ **Album URLs**: Truncated to first 40 characters + "..."
 - ✅ **Photo URLs**: Never logged
 - ✅ **User Data**: No user identifiers logged
 - ✅ **Error Stacks**: Only logged in development (not production)

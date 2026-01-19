@@ -20,6 +20,9 @@ type Bindings = {
   ANALYTICS?: AnalyticsEngineDataset; // Optional Analytics Engine for monitoring
 };
 
+// Constants
+const CACHE_HIT_THRESHOLD_MS = 500; // Cache hits typically respond in <500ms
+
 // Create Hono app with type safety
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -181,7 +184,7 @@ app.get('/api/photo', async (c) => {
     try {
       photoData = await fetchRandomPhoto(urlValidation.url, c.env.PHOTOS_CACHE);
       const fetchDuration = Date.now() - fetchStartTime;
-      cacheHit = fetchDuration < 500; // Likely cached if <500ms
+      cacheHit = fetchDuration < CACHE_HIT_THRESHOLD_MS; // Likely cached if <500ms
 
       logger.info('Photo fetched successfully', {
         uid: photoData.metadata?.uid,
