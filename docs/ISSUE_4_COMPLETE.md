@@ -207,7 +207,7 @@ As per `docs/FOLLOW_UP_TASKS.md`:
    - Optimize cold start performance
 
 3. **Deployment to Production**
-   - Deploy to `trmnl-google-photos.hk-c91.workers.dev`
+   - Deploy to `trmnl-google-photos.gohk.xyz`
    - Test in production environment
    - Monitor performance and errors
    - Set up Cloudflare Workers Analytics

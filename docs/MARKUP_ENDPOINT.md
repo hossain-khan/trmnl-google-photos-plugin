@@ -255,7 +255,7 @@ curl -X POST http://localhost:8787/markup \
 ### Using JavaScript
 
 ```javascript
-const response = await fetch('https://trmnl-google-photos.hk-c91.workers.dev/markup', {
+const response = await fetch('https://trmnl-google-photos.gohk.xyz/markup', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',

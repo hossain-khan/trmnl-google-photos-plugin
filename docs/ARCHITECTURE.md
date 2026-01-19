@@ -97,7 +97,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 
 ### 2. Cloudflare Worker (Core Backend)
 
-**Location**: `https://trmnl-google-photos.hk-c91.workers.dev`
+**Location**: `https://trmnl-google-photos.gohk.xyz`
 
 **Framework**: Hono (lightweight web framework)
 
@@ -210,7 +210,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 
 ```
 1. TRMNL Platform → Cloudflare Worker
-   GET https://trmnl-google-photos.hk-c91.workers.dev/api/photo?album_url=https://photos.app.goo.gl/ABC123
+   GET https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/ABC123
    
    Query Parameters:
    - album_url: Google Photos shared album URL (from form field)
@@ -346,7 +346,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐ │
 │  │   Worker: trmnl-google-photos                    │ │
-│  │   URL: trmnl-google-photos.hk-c91.workers.dev   │ │
+│  │   URL: trmnl-google-photos.gohk.xyz   │ │
 │  │   Version: Latest (auto-deployed)                │ │
 │  └──────────────────────────────────────────────────┘ │
 │                                                         │
@@ -452,7 +452,7 @@ Planned GitHub Actions workflow:
 **TRMNL Integration** (`settings.yml`):
 ```yaml
 strategy: polling
-polling_url: https://trmnl-google-photos.hk-c91.workers.dev/api/photo?album_url={{ shared_album_url }}
+polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}
 refresh_frequency: 60  # minutes (1 hour)
 ```
 

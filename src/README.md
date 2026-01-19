@@ -7,7 +7,7 @@ This directory contains the Cloudflare Worker implementation for the TRMNL Googl
 - **Framework**: Hono (lightweight web framework for Cloudflare Workers)
 - **Language**: TypeScript
 - **Runtime**: Cloudflare Workers
-- **Deployment**: `trmnl-google-photos.hk-c91.workers.dev`
+- **Deployment**: `trmnl-google-photos.gohk.xyz`
 
 ## Project Structure
 
@@ -134,7 +134,7 @@ npm test
 npm run deploy
 ```
 
-This deploys to: `https://trmnl-google-photos.hk-c91.workers.dev`
+This deploys to: `https://trmnl-google-photos.gohk.xyz`
 
 ### Deploy to Development Environment
 
