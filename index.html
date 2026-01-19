@@ -30,41 +30,6 @@
             color: #666;
             margin-bottom: 40px;
         }
-        .layouts {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
-        }
-        .layout-preview {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .layout-preview h2 {
-            margin-top: 0;
-            color: #333;
-            font-size: 1.2em;
-        }
-        .layout-preview .specs {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 15px;
-        }
-        .preview-frame {
-            border: 2px solid #ddd;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            min-height: 200px;
-        }
-        .placeholder {
-            color: #999;
-            text-align: center;
-        }
         .setup-info {
             background: #fff;
             padding: 20px;
@@ -279,52 +244,6 @@
             </ol>
             <p><strong>Status:</strong> JSON API is live! Worker returns photo data as JSON. TRMNL platform renders templates stored in Markup Editor.</p>
             <p><strong>Architecture:</strong> Polling strategy (GET /api/photo) - Worker returns JSON, not HTML. TRMNL handles all template rendering.</p>
-        </div>
-
-        <div class="layouts">
-            <div class="layout-preview">
-                <h2>Full Screen</h2>
-                <p class="specs">800x480px or 1024x758px</p>
-                <div class="preview-frame">
-                    <div class="placeholder">
-                        <div style="font-size: 48px;">📷</div>
-                        <p>Full screen layout<br>Largest photo display</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="layout-preview">
-                <h2>Half Horizontal</h2>
-                <p class="specs">~400x480px or ~512x758px</p>
-                <div class="preview-frame">
-                    <div class="placeholder">
-                        <div style="font-size: 36px;">📷</div>
-                        <p>Wide horizontal layout<br>Photo with caption</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="layout-preview">
-                <h2>Half Vertical</h2>
-                <p class="specs">800x~240px or 1024x~379px</p>
-                <div class="preview-frame">
-                    <div class="placeholder">
-                        <div style="font-size: 36px;">📷</div>
-                        <p>Tall vertical layout<br>Photo focused</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="layout-preview">
-                <h2>Quadrant</h2>
-                <p class="specs">~400x~240px or ~512x~379px</p>
-                <div class="preview-frame">
-                    <div class="placeholder">
-                        <div style="font-size: 24px;">📷</div>
-                        <p>Compact quarter size<br>Photo only</p>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="github-link">
