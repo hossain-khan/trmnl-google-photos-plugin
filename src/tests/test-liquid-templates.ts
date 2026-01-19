@@ -252,7 +252,8 @@ describe('Template Structure Validation', (): void => {
       }
 
       // Check for essential structural elements
-      assert.ok(content.includes('<div class="layout">'), 'Should have layout div');
+      // Layout div may have background_shade class or not
+      assert.ok(content.includes('class="layout'), 'Should have layout div');
       assert.ok(content.includes('<div class="title_bar">'), 'Should have title_bar div');
       assert.ok(content.includes('flex'), 'Should use flex classes');
 

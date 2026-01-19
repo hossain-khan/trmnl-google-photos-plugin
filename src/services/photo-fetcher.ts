@@ -260,13 +260,15 @@ export function optimizePhotoUrl(
  * @param photo - Google Photo object
  * @param albumUrl - Original album URL
  * @param totalPhotos - Total number of photos in album
+ * @param analyzeImage - Whether to analyze image brightness (default: false for performance)
  * @returns PhotoData object for template rendering
  */
-export function convertToPhotoData(
+export async function convertToPhotoData(
   photo: GooglePhoto,
   albumUrl: string,
-  totalPhotos: number
-): PhotoData {
+  totalPhotos: number,
+  analyzeImage: boolean = false
+): Promise<PhotoData> {
   // Validate and sanitize all fields before creating PhotoData
   const photoUrl = optimizePhotoUrl(photo.url);
   const thumbnailUrl = optimizePhotoUrl(photo.url, 400, 300);
@@ -275,6 +277,12 @@ export function convertToPhotoData(
   const photoCount = validatePhotoCount(totalPhotos);
   const timestamp = validateTimestamp(new Date().toISOString());
 
+  // Analyze image brightness if requested (adds ~100-200ms latency)
+  let backgroundShade = undefined;
+  if (analyzeImage) {
+    backgroundShade = await analyzeImageBrightness(thumbnailUrl);
+  }
+
   const photoData: PhotoData = {
     photo_url: photoUrl,
     thumbnail_url: thumbnailUrl,
@@ -282,6 +290,7 @@ export function convertToPhotoData(
     timestamp: timestamp,
     album_name: albumName,
     photo_count: photoCount,
+    background_shade: backgroundShade,
     metadata: {
       uid: photo.uid,
       original_width: photo.width,
@@ -304,16 +313,147 @@ export function convertToPhotoData(
  *
  * @param albumUrl - The shared album URL
  * @param kv - Optional Cloudflare KV namespace for caching
+ * @param analyzeImage - Whether to analyze image brightness for background selection (default: false)
  * @returns PhotoData object ready for template rendering
  * @throws Error if fetching or processing fails
  */
-export async function fetchRandomPhoto(albumUrl: string, kv?: KVNamespace): Promise<PhotoData> {
+export async function fetchRandomPhoto(
+  albumUrl: string,
+  kv?: KVNamespace,
+  analyzeImage: boolean = false
+): Promise<PhotoData> {
   // Fetch all photos from the album (may use cache)
   const photos = await fetchAlbumPhotos(albumUrl, kv);
 
   // Select a random photo
   const selectedPhoto = selectRandomPhoto(photos);
 
-  // Convert to PhotoData format
-  return convertToPhotoData(selectedPhoto, albumUrl, photos.length);
+  // Convert to PhotoData format (with optional image analysis)
+  return await convertToPhotoData(selectedPhoto, albumUrl, photos.length, analyzeImage);
+}
+
+/**
+ * Analyze image brightness and return recommended TRMNL background shade
+ * Uses lightweight sampling of thumbnail to determine if image is predominantly light or dark
+ *
+ * Maps average brightness (0-255) to TRMNL Framework v2 background shades (17 levels)
+ * to create seamless visual continuity between image and background on e-ink displays.
+ *
+ * @param thumbnailUrl - URL of thumbnail image (smaller = faster)
+ * @returns TRMNL background class (e.g., 'bg--gray-40')
+ * @see https://usetrmnl.com/framework/background - TRMNL Framework background shades
+ */
+export async function analyzeImageBrightness(thumbnailUrl: string): Promise<string> {
+  const startTime = performance.now();
+  console.log('[Image Analysis] Starting brightness analysis...');
+
+  try {
+    // Fetch small thumbnail for analysis
+    const fetchStart = performance.now();
+    const response = await fetch(thumbnailUrl);
+    if (!response.ok) {
+      console.log('[Image Analysis] Fetch failed, no background applied');
+      return ''; // No background on fetch error
+    }
+    const fetchTime = performance.now() - fetchStart;
+    console.log(`[Image Analysis] Thumbnail fetched in ${fetchTime.toFixed(2)}ms`);
+
+    const imageData = await response.arrayBuffer();
+    const blob = new Blob([imageData]);
+
+    // Create an ImageBitmap for pixel analysis (lightweight, supported in Workers)
+    const bitmapStart = performance.now();
+    const imageBitmap = await createImageBitmap(blob);
+    const bitmapTime = performance.now() - bitmapStart;
+    console.log(
+      `[Image Analysis] ImageBitmap created in ${bitmapTime.toFixed(2)}ms (${imageBitmap.width}x${imageBitmap.height})`
+    );
+
+    // Create OffscreenCanvas for pixel sampling
+    const canvas = new OffscreenCanvas(imageBitmap.width, imageBitmap.height);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      console.log('[Image Analysis] Canvas context failed, no background applied');
+      return ''; // No background on canvas error
+    }
+
+    // Draw image to canvas
+    ctx.drawImage(imageBitmap, 0, 0);
+
+    // Sample pixels (every 10th pixel to keep it lightweight)
+    const samplingStart = performance.now();
+    const imageDataPixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageDataPixels.data;
+    let totalBrightness = 0;
+    let sampleCount = 0;
+
+    for (let i = 0; i < pixels.length; i += 40) {
+      // RGBA: i=R, i+1=G, i+2=B, i+3=A (skip every 10 pixels)
+      const r = pixels[i];
+      const g = pixels[i + 1];
+      const b = pixels[i + 2];
+
+      // Calculate relative luminance (perceptual brightness)
+      // Formula: 0.299*R + 0.587*G + 0.114*B
+      const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+      totalBrightness += brightness;
+      sampleCount++;
+    }
+
+    const avgBrightness = totalBrightness / sampleCount; // 0-255 range
+    const samplingTime = performance.now() - samplingStart;
+    console.log(
+      `[Image Analysis] Sampled ${sampleCount} pixels in ${samplingTime.toFixed(2)}ms (avg brightness: ${avgBrightness.toFixed(1)})`
+    );
+
+    // Map brightness to TRMNL background shade (17 levels: black + 14 grays + white)
+    // Uses full palette from https://usetrmnl.com/framework/background
+    let backgroundShade = '';
+    if (avgBrightness < 15) {
+      backgroundShade = 'bg--black'; // Pure black (0-15)
+    } else if (avgBrightness < 30) {
+      backgroundShade = 'bg--gray-10'; // Very dark (15-30)
+    } else if (avgBrightness < 45) {
+      backgroundShade = 'bg--gray-15'; // Dark (30-45)
+    } else if (avgBrightness < 60) {
+      backgroundShade = 'bg--gray-20'; // Dark (45-60)
+    } else if (avgBrightness < 75) {
+      backgroundShade = 'bg--gray-25'; // Dark-medium (60-75)
+    } else if (avgBrightness < 90) {
+      backgroundShade = 'bg--gray-30'; // Dark-medium (75-90)
+    } else if (avgBrightness < 105) {
+      backgroundShade = 'bg--gray-35'; // Medium-dark (90-105)
+    } else if (avgBrightness < 120) {
+      backgroundShade = 'bg--gray-40'; // Medium-dark (105-120)
+    } else if (avgBrightness < 135) {
+      backgroundShade = 'bg--gray-45'; // Medium (120-135)
+    } else if (avgBrightness < 150) {
+      backgroundShade = 'bg--gray-50'; // Medium (135-150)
+    } else if (avgBrightness < 165) {
+      backgroundShade = 'bg--gray-55'; // Medium-light (150-165)
+    } else if (avgBrightness < 180) {
+      backgroundShade = 'bg--gray-60'; // Medium-light (165-180)
+    } else if (avgBrightness < 195) {
+      backgroundShade = 'bg--gray-65'; // Light (180-195)
+    } else if (avgBrightness < 210) {
+      backgroundShade = 'bg--gray-70'; // Light (195-210)
+    } else if (avgBrightness < 225) {
+      backgroundShade = 'bg--gray-75'; // Very light (210-225)
+    } else if (avgBrightness < 240) {
+      backgroundShade = 'bg--gray-75'; // Very light (225-240)
+    } else {
+      backgroundShade = 'bg--white'; // Pure white (240-255)
+    }
+
+    const totalTime = performance.now() - startTime;
+    console.log(
+      `[Image Analysis] Complete in ${totalTime.toFixed(2)}ms - Selected: ${backgroundShade}`
+    );
+
+    return backgroundShade;
+  } catch (error) {
+    const totalTime = performance.now() - startTime;
+    console.error(`[Image Analysis] Failed after ${totalTime.toFixed(2)}ms:`, error);
+    return ''; // No background on error
+  }
 }

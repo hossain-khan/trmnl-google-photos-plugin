@@ -62,3 +62,10 @@
   default: "My Google Photos"
   optional: true
   help_text: This name appears in the plugin's title bar. Leave blank to use "My Google Photos".
+- keyname: adaptive_background
+  field_type: boolean
+  name: Adaptive Background
+  description: "Automatically adjust background color based on image brightness"
+  default: false
+  optional: true
+  help_text: When enabled, analyzes each photo to select an optimal gray background shade that blends with the image. Adds ~100-200ms processing time. Disabled by default for faster performance.

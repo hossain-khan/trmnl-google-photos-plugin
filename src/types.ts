@@ -11,6 +11,7 @@ export interface TRMNLRequest {
     plugin_settings: {
       instance_name: string;
       shared_album_url: string;
+      adaptive_background?: boolean;
     };
     screen?: {
       width: number;
@@ -38,6 +39,7 @@ export interface PhotoData {
   timestamp: string;
   album_name?: string;
   photo_count: number;
+  background_shade?: string; // Recommended TRMNL bg class (e.g., 'bg--gray-40')
   metadata?: {
     uid: string;
     original_width: number;

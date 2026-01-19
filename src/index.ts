@@ -195,7 +195,18 @@ app.get('/api/photo', async (c) => {
     let photoData;
     const fetchStartTime = Date.now();
     try {
-      photoData = await fetchRandomPhoto(urlValidation.url, c.env.PHOTOS_CACHE);
+      // Check if adaptive background is enabled (default: false)
+      // TRMNL sends plugin settings as query params in Polling strategy
+      const adaptiveBackgroundParam = c.req.query('adaptive_background');
+      const adaptiveBackground =
+        adaptiveBackgroundParam === 'true' || adaptiveBackgroundParam === '1';
+
+      logger.debug('Adaptive background setting', {
+        param: adaptiveBackgroundParam,
+        enabled: adaptiveBackground,
+      });
+
+      photoData = await fetchRandomPhoto(urlValidation.url, c.env.PHOTOS_CACHE, adaptiveBackground);
       const fetchDuration = Date.now() - fetchStartTime;
       cacheHit = fetchDuration < CACHE_HIT_THRESHOLD_MS; // Likely cached if <500ms
 
