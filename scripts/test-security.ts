@@ -20,7 +20,7 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { parseAlbumUrl } from '../lib/url-parser';
+import { parseAlbumUrl } from '../src/lib/url-parser';
 
 console.log('🔒 Security Test Suite for TRMNL Google Photos Plugin\n');
 
