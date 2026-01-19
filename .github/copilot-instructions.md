@@ -19,7 +19,7 @@ This is a TRMNL plugin that displays random photos from Google Photos shared alb
 
 **Phase 1: Project Setup** ✅ **Complete** (January 2026)
 - Project structure created with all necessary directories
-- Four Liquid templates built and tested
+- Four template layouts built and tested
 - Comprehensive documentation written
 - Settings and configuration files ready
 - URL parser implemented and tested (42 test cases)
@@ -77,7 +77,7 @@ trmnl-google-photos-plugin/
 │   ├── PRD_TRMNL_Google_Photos_Plugin.md  # Original PRD
 │   ├── PHASE_1_COMPLETE.md      # Phase 1 completion summary
 │   └── FOLLOW_UP_TASKS.md       # Phase 2-4 task breakdown
-├── templates/                    # Liquid templates for layouts
+├── templates/                    # Template layouts (uploaded to TRMNL)
 │   ├── full.liquid              # Full-screen layout
 │   ├── half_horizontal.liquid   # Half-size horizontal layout
 │   ├── half_vertical.liquid     # Half-size vertical layout
@@ -93,11 +93,11 @@ trmnl-google-photos-plugin/
 
 ## Key Files
 
-- **templates/*.liquid**: Four layout templates that adapt to different display sizes and orientations
-- **templates/preview/*.liquid**: Preview versions with hardcoded content (for testing without API)
+- **templates/*.liquid**: Four layout templates that adapt to different display sizes and orientations (uploaded to TRMNL Markup Editor)
+- **templates/preview/*.liquid**: Preview versions with hardcoded content (for local testing without API)
 - **lib/url-parser.js**: URL parser and validator for Google Photos shared albums
 - **scripts/fetch-photos.js**: Photo fetching implementation using `google-photos-album-image-url-fetch`
-- **settings.yml**: TRMNL plugin configuration (webhook strategy, refresh frequency)
+- **settings.yml**: TRMNL plugin configuration (polling strategy, refresh frequency)
 - **data.json**: Sample data for testing templates locally
 - **index.html**: Preview/testing page
 - **docs/PHASE_1_COMPLETE.md**: Summary of completed Phase 1 work
@@ -106,10 +106,10 @@ trmnl-google-photos-plugin/
 ### Template Structure and Synchronization
 
 **Main Templates** (`templates/*.liquid`) are the **source of truth**:
-- Use Liquid template variables (e.g., `{{ photo.photo_url }}`, `{{ photo.caption }}`)
+- Use template variables from JSON API (e.g., `{{ photo_url }}`, `{{ caption }}`)
 - Conditionals for handling missing data
 - Error states for unconfigured plugins
-- These are deployed to TRMNL and used in production
+- These are uploaded to TRMNL Markup Editor and used in production
 
 **Preview Templates** (`templates/preview/*.liquid`) are **synchronized mirrors**:
 - Use hardcoded content instead of template variables
@@ -575,12 +575,12 @@ Test across all TRMNL devices:
 
 ### Phase 3: TRMNL Integration 📋 (Planned)
 
-**Week 4: Integration & Jobs**
-- [ ] Implement `/markup` POST endpoint for TRMNL
-- [ ] Add webhook handlers (install/uninstall)
-- [ ] Set up Hatchet workflow for daily refresh
-- [ ] Random photo selection logic
-- [ ] Render HTML for e-ink display
+**Week 4: Integration & Testing**
+- [ ] Upload templates to TRMNL Markup Editor
+- [ ] Test Polling endpoint with TRMNL platform
+- [ ] Verify photo refresh workflow
+- [ ] Random photo selection validation
+- [ ] End-to-end testing on TRMNL devices
 
 **Week 5: Monitoring & Polish**
 - [ ] Add Sentry error tracking
@@ -613,11 +613,9 @@ Stateless workflow with Polling strategy:
 3. **Fetch Photos**: Worker fetches album data from Google Photos (checks KV cache first)
 4. **Random Selection**: Worker selects random photo from album
 5. **JSON Response**: Worker returns photo data as JSON (photo_url, caption, album_name, etc.)
-6. **TRMNL Rendering**: TRMNL platform merges JSON into Liquid templates (stored in Markup Editor)
-7. **Display**: TRMNL sends rendered HTML to device for e-ink display
+6. **TRMNL Rendering**: TRMNL platform merges JSON into templates (stored in Markup Editor)
+7. **Display**: TRMNL sends rendered content to device for e-ink display
 8. **No Storage**: No user data persisted, fully stateless
-
-**Key Difference from Webhook**: Worker returns JSON data, not HTML. TRMNL does the template rendering.
 
 ## Technical Stack
 
@@ -633,7 +631,7 @@ Stateless workflow with Polling strategy:
 
 ### Templates (TRMNL-Side)
 - **Location**: Stored in TRMNL's Markup Editor
-- **Language**: Liquid (Shopify template language)
+- **Format**: Template files (.liquid extension)
 - **Rendering**: Done by TRMNL platform, not by Worker
 - **Data**: Worker provides JSON, TRMNL merges into templates
 

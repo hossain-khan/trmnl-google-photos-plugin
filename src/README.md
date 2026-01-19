@@ -13,12 +13,10 @@ This directory contains the Cloudflare Worker implementation for the TRMNL Googl
 
 ```
 src/
-├── index.ts                      # Main entry point (Hono app, endpoints)
+├── index.ts                      # Main entry point (Hono app, JSON API endpoints)
 ├── types.ts                      # TypeScript type definitions
-├── templates.ts                  # Inlined Liquid templates
 └── services/
-    ├── photo-fetcher.ts         # Photo fetching and optimization
-    └── template-renderer.ts     # Template rendering with LiquidJS
+    └── photo-fetcher.ts         # Photo fetching and optimization
 ```
 
 ## Main Components
@@ -27,21 +25,14 @@ src/
 Main Cloudflare Worker entry point with Hono framework:
 - `GET /` - Health check endpoint
 - `GET /health` - Health check endpoint (alternative)
-- `POST /markup` - Main TRMNL endpoint for photo markup
+- `GET /api/photo` - JSON API endpoint for TRMNL Polling strategy
+- `POST /markup` - DEPRECATED (returns migration notice)
 
 ### `types.ts`
 TypeScript interfaces for:
-- TRMNL request structure
-- Photo data format
-- Template context
+- Photo data format (JSON response)
 - Google Photos API responses
-
-### `templates.ts`
-Four Liquid templates inlined as strings:
-- `full` - Full-screen layout
-- `half_horizontal` - Half-width horizontal layout
-- `half_vertical` - Half-height vertical layout
-- `quadrant` - Quarter-screen layout
+- Worker environment bindings
 
 ### `services/photo-fetcher.ts`
 Photo fetching service with:
@@ -49,13 +40,6 @@ Photo fetching service with:
 - `selectRandomPhoto()` - Random photo selection
 - `optimizePhotoUrl()` - URL optimization for e-ink
 - `fetchRandomPhoto()` - Main entry point
-
-### `services/template-renderer.ts`
-Template rendering service with:
-- `renderTemplate()` - Render Liquid template with context
-- `renderErrorTemplate()` - Render error state
-- `preloadTemplate()` - Preload template into cache
-- `getDefaultLayout()` - Select default layout based on screen size
 
 ## Development
 
@@ -79,7 +63,7 @@ This will start the worker on `http://localhost:8787` with hot reload enabled.
 
 - `GET /` - Health check and service info
 - `GET /health` - Alternative health check endpoint
-- `POST /markup` - Main TRMNL endpoint (see [MARKUP_ENDPOINT.md](../docs/MARKUP_ENDPOINT.md))
+- `GET /api/photo` - JSON API endpoint for TRMNL (Polling strategy)
 
 ### Testing Locally
 
@@ -90,15 +74,8 @@ curl http://localhost:8787/
 # Test health endpoint
 curl http://localhost:8787/health
 
-# Test /markup with valid album
-curl -X POST http://localhost:8787/markup \
-  -H "Content-Type: application/json" \
-  -d '{
-    "trmnl": {
-      "plugin_settings": {
-        "instance_name": "My Photos",
-        "shared_album_url": "https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
-      },
+# Test /api/photo with valid album
+curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"      },
       "layout": "full"
     }
   }'
@@ -158,12 +135,11 @@ Configured in `wrangler.toml`:
 
 ## API Documentation
 
-See [MARKUP_ENDPOINT.md](../docs/MARKUP_ENDPOINT.md) for complete API documentation.
+See [API_DOCUMENTATION.md](../docs/API_DOCUMENTATION.md) for complete API documentation.
 
 ## Dependencies
 
 - **hono** - Web framework for Cloudflare Workers
-- **liquidjs** - Liquid template engine
 - **google-photos-album-image-url-fetch** - Google Photos API client
 - **zod** - Schema validation (used by url-parser)
 
@@ -171,16 +147,16 @@ See [MARKUP_ENDPOINT.md](../docs/MARKUP_ENDPOINT.md) for complete API documentat
 
 - **Response Time**: <1 second (typically 200-800ms)
 - **Photo Fetch**: 200-800ms
-- **Template Render**: <50ms
+- **JSON Serialization**: <10ms
 - **Cold Start**: <1 second
 
 ## Error Handling
 
-All errors return HTML (not JSON) so TRMNL can display error messages:
-- Empty URL → Error template with instructions
-- Invalid URL → Error template with validation message
-- Album not found → Error template with 404 message
-- Photo fetch failed → Error template with error details
+All errors return JSON with appropriate error messages:
+- Empty URL → JSON error with instructions
+- Invalid URL → JSON error with validation message
+- Album not found → JSON error with 404 message
+- Photo fetch failed → JSON error with error details
 
 ## Security
 
@@ -203,4 +179,4 @@ All errors return HTML (not JSON) so TRMNL can display error messages:
 - [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
 - [Hono Framework](https://hono.dev/)
 - [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/)
-- [MARKUP Endpoint Documentation](../docs/MARKUP_ENDPOINT.md)
+- [API Documentation](../docs/API_DOCUMENTATION.md)

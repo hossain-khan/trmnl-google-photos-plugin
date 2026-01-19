@@ -161,8 +161,8 @@ After successful deployment:
 1. ✅ Verify endpoints are accessible via HTTPS
 2. ✅ Test health check returns 200 OK
 3. ✅ Confirm environment variable is set correctly
-4. ⏭️ Implement `/markup` endpoint for TRMNL integration
-5. ⏭️ Add photo fetching and rendering logic
+4. ✅ Implement `/api/photo` endpoint for TRMNL integration
+5. ✅ Add photo fetching and JSON response logic
 
 ## Resources
 
