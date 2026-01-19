@@ -377,7 +377,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 │  └──────────────────────────────────────────────────┘ │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐ │
-│  │   Optional: KV Namespace (PHOTOS_CACHE)          │ │
+│  │   KV Namespace (PHOTOS_CACHE) - Deployed        │ │
 │  │   TTL: 1 hour                                    │ │
 │  └──────────────────────────────────────────────────┘ │
 │                                                         │

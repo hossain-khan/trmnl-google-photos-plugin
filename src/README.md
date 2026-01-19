@@ -122,7 +122,7 @@ This deploys to: `https://trmnl-google-photos.gohk.xyz`
 npm run deploy:dev
 ```
 
-This deploys to: `https://trmnl-google-photos-dev.hk-c91.workers.dev`
+This deploys to a development worker subdomain for testing.
 
 ## Environment Variables
 

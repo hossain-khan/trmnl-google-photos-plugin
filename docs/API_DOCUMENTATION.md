@@ -542,7 +542,7 @@ The API provides detailed logging in Cloudflare Workers logs:
 wrangler tail
 
 # Or in Cloudflare Dashboard:
-# Workers & Pages > trmnl-google-photos > Logs
+# Workers & Pages > Your Worker Name > Logs
 ```
 
 Log entries include:
