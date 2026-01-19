@@ -1,19 +1,21 @@
-<div class="layout p--2">
-  <div class="flex flex--col gap--small h--full">
+<div class="layout">
+  <div class="flex flex--col gap--small md:gap--medium h--full">
     <!-- Photo Display Area -->
-    <div class="flex flex--center-x flex--center-y h--full">
+    <div class="flex flex--center-x flex--center-y h--full" style="flex: 1;">
+      <!-- Custom max-width/max-height ensures images fit without cut-off (handles portrait/landscape/any aspect ratio) -->
       <img src="https://picsum.photos/300/200?grayscale" 
            alt="City street at night with colorful lights" 
-           class="image image--contain image-dither">
+           class="image image--contain image-dither"
+           style="max-width: 100%; max-height: 100%; object-fit: contain;">
     </div>
     
     <!-- Caption (if available) -->
     <div class="text--center">
-      <span class="description" data-clamp="2">City street at night with colorful lights and bustling activity</span>
+      <span class="description md:title md:title--small" data-clamp="2">City street at night with colorful lights and bustling activity</span>
     </div>
   </div>
 </div>
 
 <div class="title_bar">
-  <span class="title">Google Photos Album</span>
+  <span class="title md:title--large">Google Photos Album</span>
 </div>
