@@ -210,14 +210,18 @@ log('error', 'Photo fetch failed', {
 
 ### Test Suite Summary
 
-| Test Suite         | Tests   | Coverage            |
-| ------------------ | ------- | ------------------- |
-| URL Parser         | 42      | Input validation    |
-| Security Tests     | 36      | XSS, DoS, injection |
-| Security Validator | 35      | Output validation   |
-| Cache Service      | 9       | Caching logic       |
-| Performance        | 15      | Load testing        |
-| **Total**          | **181** | **Comprehensive**   |
+| Test Suite         | Tests   | Coverage                          |
+| ------------------ | ------- | --------------------------------- |
+| URL Parser         | 42      | Input validation                  |
+| Security Tests     | 36      | XSS, DoS, injection               |
+| Security Validator | 36      | Output validation                 |
+| Cache Service      | 13      | Caching logic                     |
+| Performance        | 6       | Load testing                      |
+| Liquid Templates   | 56      | Template rendering                |
+| Bundle Size        | 1       | Bundle optimization               |
+| Fetch Tests        | 4       | API integration                   |
+| Monitoring         | 23      | Monitoring and logging            |
+| **Total**          | **217** | **Comprehensive**                 |
 
 ### Security Test Scenarios
 
