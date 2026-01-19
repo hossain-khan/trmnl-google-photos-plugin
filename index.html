@@ -435,7 +435,12 @@
                 
                 // Re-initialize TRMNL JavaScript for the new content
                 if (window.TRMNL && window.TRMNL.init) {
-                    window.TRMNL.init();
+                    try {
+                        window.TRMNL.init();
+                    } catch (initError) {
+                        console.error('Error initializing TRMNL framework:', initError);
+                        // Keep the rendered template visible even if TRMNL.init fails
+                    }
                 }
             } catch (error) {
                 console.error('Error loading template:', error);
