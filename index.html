@@ -85,15 +85,57 @@
         }
         .status-badge {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 500;
-            margin-left: 10px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 12px;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
         }
-        .status-live {
-            background: #d4edda;
-            color: #155724;
+        .status-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        .status-badge[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a202c;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 1000;
+            font-weight: 500;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .status-checking {
+            background: linear-gradient(135deg, #fbd38d 0%, #f6ad55 100%);
+            color: #744210;
+            box-shadow: 0 2px 4px rgba(251, 211, 141, 0.3);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        .status-online {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            box-shadow: 0 2px 4px rgba(72, 187, 120, 0.3);
+        }
+        .status-offline {
+            background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+            color: white;
+            box-shadow: 0 2px 4px rgba(252, 129, 129, 0.3);
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
         .demo-section {
             background: #fff;
@@ -181,6 +223,76 @@
             color: #999;
             text-align: center;
             padding: 40px;
+        }
+        .split-view {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            width: 100%;
+            align-items: start;
+        }
+        @media (max-width: 968px) {
+            .split-view {
+                grid-template-columns: 1fr;
+            }
+        }
+        .json-panel {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .json-panel h3 {
+            margin: 0;
+            padding: 1rem;
+            background: #edf2f7;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .image-preview-panel {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .image-preview-panel h3 {
+            margin: 0;
+            padding: 1rem;
+            background: #edf2f7;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .image-preview-content {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            background: #ffffff;
+        }
+        .image-preview-content img {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .image-info {
+            margin-top: 1rem;
+            padding: 0 1.5rem 1.5rem;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+        .image-info a {
+            color: #3182ce;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .image-info a:hover {
+            text-decoration: underline;
         }
         .error-message {
             background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
@@ -314,7 +426,7 @@
         <h1>
             <img src="assets/icon/google-photos-icon.png" alt="Google Photos" style="width: 48px; height: 48px; vertical-align: middle; margin-right: 12px;">
             Google Photos TRMNL Plugin
-            <span class="status-badge status-live">Live Demo</span>
+            <span id="statusBadge" class="status-badge status-checking" onclick="checkServiceStatus()" data-tooltip="Click to refresh">🟡 Checking...</span>
         </h1>
         <p class="description">
             Display random photos from your Google Photos shared albums on TRMNL devices.<br>
@@ -343,7 +455,19 @@
             <div id="errorContainer"></div>
             
             <div id="jsonOutput" class="preview-container" style="display: none;">
-                <pre id="jsonContent" style="text-align: left; padding: 20px; overflow: auto; width: 100%;"></pre>
+                <div class="split-view">
+                    <div class="json-panel">
+                        <h3>📋 JSON Response</h3>
+                        <pre id="jsonContent" style="text-align: left; padding: 20px; overflow: auto; margin: 0;"></pre>
+                    </div>
+                    <div class="image-preview-panel">
+                        <h3>🖼️ Photo Preview</h3>
+                        <div class="image-preview-content" id="imagePreviewContent">
+                            <div class="spinner"></div>
+                        </div>
+                        <div class="image-info" id="imageInfo" style="display: none;"></div>
+                    </div>
+                </div>
             </div>
             
             <div id="previewContainer" class="preview-container">
@@ -401,8 +525,69 @@
 
     <script>
         const API_URL = 'https://trmnl-google-photos.gohk.xyz/api/photo';
+        const HEALTH_URL = 'https://trmnl-google-photos.gohk.xyz/health';
+        
+        console.log('[TRMNL] Page loaded, initializing...');
+        
+        /**
+         * Check service status via /health endpoint
+         */
+        async function checkServiceStatus() {
+            console.log('[Status] Checking service health...');
+            const badge = document.getElementById('statusBadge');
+            
+            // Update to checking state
+            badge.className = 'status-badge status-checking';
+            badge.textContent = '🟡 Checking...';
+            badge.setAttribute('data-tooltip', 'Checking service status...');
+            
+            const startTime = performance.now();
+            
+            try {
+                console.log(`[Status] Fetching ${HEALTH_URL}`);
+                const response = await fetch(HEALTH_URL, {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+                
+                const endTime = performance.now();
+                const responseTime = Math.round(endTime - startTime);
+                
+                console.log(`[Status] Response received in ${responseTime}ms, status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('[Status] Health data:', data);
+                    
+                    // Update to online state
+                    badge.className = 'status-badge status-online';
+                    badge.textContent = '🟢 Online';
+                    badge.setAttribute('data-tooltip', `API healthy • ${responseTime}ms • v${data.version || '0.1.0'} • Click to refresh`);
+                    
+                    console.log(`[Status] ✓ Service is healthy (${data.status}) - ${responseTime}ms`);
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('[Status] ✗ Health check failed:', error);
+                
+                // Update to offline state
+                badge.className = 'status-badge status-offline';
+                badge.textContent = '🔴 Offline';
+                badge.setAttribute('data-tooltip', `Service unavailable • ${error.message} • Click to retry`);
+            }
+        }
+        
+        // Check status on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('[TRMNL] DOM loaded, checking service status...');
+            checkServiceStatus();
+        });
+        
+        const API_URL = 'https://trmnl-google-photos.gohk.xyz/api/photo';
         
         function useExampleUrl() {
+            console.log('[UI] Using example album URL');
             document.getElementById('albumUrl').value = 'https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8';
         }
         
@@ -414,17 +599,22 @@
             const fetchBtn = document.getElementById('fetchBtn');
             const previewContainer = document.getElementById('previewContainer');
             
+            console.log('[API] Fetch photo data requested');
+            console.log('[API] Album URL:', albumUrl);
+            
             // Clear previous messages
             errorContainer.innerHTML = '';
             
             // Validate input
             if (!albumUrl) {
+                console.warn('[API] Validation failed: No album URL provided');
                 errorContainer.innerHTML = '<div class="error-message"><strong>⚠️ Validation Error:</strong> Please enter a Google Photos album URL</div>';
                 return;
             }
             
             // Validate URL format
             if (!albumUrl.includes('photos.app.goo.gl') && !albumUrl.includes('photos.google.com')) {
+                console.warn('[API] Validation failed: Invalid URL format');
                 errorContainer.innerHTML = '<div class="error-message"><strong>⚠️ Invalid URL:</strong> Please enter a valid Google Photos shared album URL (photos.app.goo.gl/... or photos.google.com/share/...)</div>';
                 return;
             }
@@ -436,6 +626,7 @@
             jsonOutput.style.display = 'flex';
             jsonContent.innerHTML = '<div class="spinner"></div><p style="text-align: center; color: #666; margin-top: 10px;">Fetching photo data from API...</p>';
             
+            console.log('[API] Sending request to:', API_URL);
             const startTime = performance.now();
             
             try {
@@ -444,12 +635,17 @@
                 const endTime = performance.now();
                 const clientLatency = Math.round(endTime - startTime);
                 
+                console.log(`[API] Response received in ${clientLatency}ms, status: ${response.status}`);
+                
                 // Extract metadata from response headers
                 const cacheStatus = response.headers.get('x-cache-status') || 'unknown';
                 const serverTime = response.headers.get('x-response-time') || 'N/A';
                 const totalTime = serverTime !== 'N/A' ? `${serverTime} (server) + ${clientLatency}ms (network)` : `${clientLatency}ms (total)`;
                 
+                console.log(`[API] Cache status: ${cacheStatus}, Server time: ${serverTime}`);
+                
                 if (!response.ok) {
+                    console.error(`[API] HTTP error: ${response.status} ${response.statusText}`);
                     // More specific error messages based on status code
                     let errorMsg = '';
                     switch (response.status) {
@@ -478,13 +674,39 @@
                 
                 const data = await response.json();
                 
+                console.log('[API] ✓ Photo data received:', {
+                    photo_url: data.photo_url ? data.photo_url.substring(0, 50) + '...' : 'N/A',
+                    photo_count: data.photo_count,
+                    album_name: data.album_name,
+                    cache_status: cacheStatus,
+                    response_time: clientLatency + 'ms'
+                });
+                
                 // Check if data contains error information
                 if (data.error) {
+                    console.error('[API] Error in response data:', data.error);
                     throw new Error(data.error);
                 }
                 
                 // Display the JSON response
                 jsonContent.textContent = JSON.stringify(data, null, 2);
+                
+                // Display the photo preview
+                const imagePreviewContent = document.getElementById('imagePreviewContent');
+                const imageInfo = document.getElementById('imageInfo');
+                
+                if (data.photo_url) {
+                    console.log('[API] Loading photo preview...');
+                    imagePreviewContent.innerHTML = `<img src="${data.photo_url}" alt="${data.caption || 'Photo from album'}" />`;
+                    imageInfo.style.display = 'block';
+                    imageInfo.innerHTML = `
+                        <strong>Caption:</strong> ${data.caption || 'No caption'}<br>
+                        <strong>Album:</strong> ${data.album_name || 'Unknown'} (${data.photo_count || 0} photos)<br>
+                        <a href="${data.photo_url}" target="_blank">Open full size →</a>
+                    `;
+                } else {
+                    imagePreviewContent.innerHTML = '<div style="color: #999; text-align: center;">📷<br>No photo available</div>';
+                }
                 
                 // Build metadata display
                 const metadataHtml = `
@@ -542,6 +764,8 @@
             const layout = document.getElementById('layoutPreview').value;
             const templatePreview = document.getElementById('templatePreview');
             
+            console.log('[Template] Loading preview for layout:', layout);
+            
             if (!layout) {
                 templatePreview.innerHTML = '<div class="preview-empty"><div style="font-size: 48px; margin-bottom: 10px;">📐</div><p>Select a layout above to preview the template with sample data</p></div>';
                 return;
@@ -550,8 +774,12 @@
             templatePreview.innerHTML = '<div class="preview-empty"><div style="font-size: 48px;">⏳</div><p>Loading template...</p></div>';
             
             try {
-                const response = await fetch(`templates/preview/${layout}.liquid`);
+                const templateUrl = `templates/preview/${layout}.liquid`;
+                console.log('[Template] Fetching:', templateUrl);
+                const response = await fetch(templateUrl);
                 const html = await response.text();
+                
+                console.log(`[Template] ✓ Template loaded (${html.length} chars)`);
                 
                 // Determine view class based on layout using a mapping for maintainability
                 const viewClassMap = {
@@ -576,14 +804,16 @@
                 // Re-initialize TRMNL JavaScript for the new content
                 if (window.TRMNL && window.TRMNL.init) {
                     try {
+                        console.log('[Template] Initializing TRMNL framework...');
                         window.TRMNL.init();
+                        console.log('[Template] ✓ TRMNL framework initialized');
                     } catch (initError) {
-                        console.error('Error initializing TRMNL framework:', initError);
+                        console.error('[Template] ✗ Error initializing TRMNL framework:', initError);
                         // Keep the rendered template visible even if TRMNL.init fails
                     }
                 }
             } catch (error) {
-                console.error('Error loading template:', error);
+                console.error('[Template] ✗ Failed to load template:', error);
                 templatePreview.innerHTML = '<div class="preview-empty"><div style="font-size: 48px;">❌</div><p>Failed to load template</p></div>';
             }
         }
@@ -591,9 +821,12 @@
         // Allow Enter key to trigger fetch
         document.getElementById('albumUrl').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
+                console.log('[UI] Enter key pressed, triggering fetch');
                 fetchPhotoData();
             }
         });
+        
+        console.log('[TRMNL] All event listeners registered');
     </script>
 </body>
 </html>
