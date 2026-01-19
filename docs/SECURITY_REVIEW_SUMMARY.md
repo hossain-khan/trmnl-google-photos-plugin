@@ -358,9 +358,9 @@ The TRMNL Google Photos Plugin JSON API has successfully passed comprehensive se
 
 ### A. Security Test Coverage
 
-- See `scripts/test-security.ts` (36 tests)
-- See `scripts/test-security-validator.ts` (36 tests)
-- See `scripts/test-url-parser.ts` (42 tests)
+- See `src/tests/test-security.ts` (36 tests)
+- See `src/tests/test-security-validator.ts` (36 tests)
+- See `src/tests/test-url-parser.ts` (42 tests)
 
 ### B. Documentation
 

@@ -124,7 +124,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 - ✅ Global distribution
 - ✅ Free tier supports 100k requests/day
 
-### 3. URL Parser (`lib/url-parser.js`)
+### 3. URL Parser (`src/lib/url-parser.ts`)
 
 **Purpose**: Validate and extract album IDs from Google Photos URLs
 
@@ -234,7 +234,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 
 2. Worker: Validate Album URL
    - Extract album URL from query parameter
-   - Parse with lib/url-parser.js
+   - Parse with src/lib/url-parser.ts
    - Validate format with Zod schema
    - If invalid → return error JSON
 
@@ -566,7 +566,7 @@ refresh_frequency: 60 # minutes (1 hour)
 4. **Minimal Bundle Size**
    - Small dependencies (Hono, Zod, photo-fetcher)
    - TypeScript compiled to optimized JS
-   - <50KB total worker size (no template rendering)
+   - ~832KB total worker size (~144KB gzipped)
 
 ---
 
@@ -818,7 +818,7 @@ The TRMNL Google Photos Plugin architecture is designed for **simplicity, privac
 ✅ **Cost-Efficient**: $0 for MVP, <$10/month at scale  
 ✅ **Maintainable**: Minimal dependencies, clear separation of concerns
 
-The entire system fits in a single Cloudflare Worker (~100KB) and delivers random photos from Google Photos albums to TRMNL devices in <3 seconds. No databases. No servers. No complexity.
+The entire system fits in a single Cloudflare Worker (~832KB, 144KB gzipped) and delivers random photos from Google Photos albums to TRMNL devices in <3 seconds. No databases. No servers. No complexity.
 
 **It just works.** ✨
 
