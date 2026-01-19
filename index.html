@@ -412,15 +412,14 @@
                 const response = await fetch(`templates/preview/${layout}.liquid`);
                 const html = await response.text();
                 
-                // Determine view class based on layout
-                let viewClass = 'view--full';
-                if (layout === 'half_horizontal') {
-                    viewClass = 'view--half view--half-horizontal';
-                } else if (layout === 'half_vertical') {
-                    viewClass = 'view--half view--half-vertical';
-                } else if (layout === 'quadrant') {
-                    viewClass = 'view--quadrant';
-                }
+                // Determine view class based on layout using a mapping for maintainability
+                const viewClassMap = {
+                    full: 'view--full',
+                    half_horizontal: 'view--half view--half-horizontal',
+                    half_vertical: 'view--half view--half-vertical',
+                    quadrant: 'view--quadrant'
+                };
+                const viewClass = viewClassMap[layout] || 'view--full';
                 
                 // Wrap in TRMNL framework with proper structure
                 templatePreview.innerHTML = `
