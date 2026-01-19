@@ -1,11 +1,18 @@
 <div class="layout">
-  <!-- Photo Display Area -->
-  <div class="flex flex--center-x flex--center-y h--full">
-    <!-- Custom max-width/max-height ensures images fit without cut-off (handles portrait/landscape/any aspect ratio) -->
-    <img src="https://picsum.photos/300/200?grayscale" 
-         alt="Beautiful sunset at the beach with palm trees" 
-         class="image image--contain image-dither"
-         style="max-width: 100%; max-height: 100%; object-fit: contain;">
+  <div class="flex flex--col gap--small md:gap--medium h--full">
+    <!-- Photo Display Area -->
+    <div class="flex flex--center-x flex--center-y h--full">
+      <!-- Custom max-width/max-height ensures images fit without cut-off (handles portrait/landscape/any aspect ratio) -->
+      <img src="https://picsum.photos/300/200?grayscale" 
+           alt="Beautiful sunset at the beach with palm trees" 
+           class="image image--contain image-dither"
+           style="max-width: 100%; max-height: 100%; object-fit: contain;">
+    </div>
+    
+    <!-- Caption (if available) -->
+    <div class="text--center mb--small md:mb--medium">
+      <span class="description md:value md:value--small lg:value lg:value--medium" data-clamp="2">Beautiful sunset at the beach with palm trees swaying in the gentle ocean breeze</span>
+    </div>
   </div>
 </div>
 
