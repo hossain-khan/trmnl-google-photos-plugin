@@ -258,10 +258,10 @@ Test with production KV namespace:
 
 ```bash
 # Test cache miss (first request to an album)
-curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
+curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
 
 # Test cache hit (within 1 hour, same album)
-curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
+curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
 ```
 
 ## Cloudflare Limits

@@ -29,7 +29,7 @@ This is a TRMNL plugin that displays random photos from Google Photos shared alb
 - ✅ All 65 tests passing
 - ✅ Production deployment at `trmnl-google-photos.gohk.xyz`
 
-**Demo Album**: For testing and examples, use `https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8`
+**Demo Album**: For testing and examples, use `https://photos.app.goo.gl/ENK6C44K85QgVHPH8`
 
 ## Getting Started
 

@@ -78,7 +78,7 @@ Host: trmnl-google-photos.workers.dev
 **Headers:**
 
 ```http
-GET /api/photo?album_url=https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8 HTTP/1.1
+GET /api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8 HTTP/1.1
 Host: trmnl-google-photos.gohk.xyz
 ```
 
@@ -257,7 +257,7 @@ X-Request-ID: a1b2c3d4
 ### Example 1: Basic Request (JSON API)
 
 ```bash
-curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
+curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
 ```
 
 **Response:**
@@ -283,7 +283,7 @@ curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.go
 
 ```bash
 # Start local dev server first: npm run dev
-curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
+curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
 ```
 
 ---
