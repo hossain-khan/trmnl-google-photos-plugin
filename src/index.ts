@@ -270,6 +270,11 @@ app.get('/api/photo', async (c) => {
     // Send to Analytics Engine (if configured - disabled by default on free tier)
     sendAnalytics(c.env.ANALYTICS, metrics as unknown as Record<string, unknown>);
 
+    // Add custom headers for debugging and monitoring
+    c.header('X-Cache-Status', cacheHit ? 'HIT' : 'MISS');
+    c.header('X-Response-Time', `${totalDuration}ms`);
+    c.header('X-Request-ID', requestId);
+
     return c.json(response);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
