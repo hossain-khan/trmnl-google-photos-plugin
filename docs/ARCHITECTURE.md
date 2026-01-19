@@ -338,7 +338,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 - **Language**: TypeScript (compiled to JavaScript)
 - **Framework**: Hono 4.11.4
 - **Validation**: Zod 4.3.5
-- **Photo Fetcher**: google-photos-album-image-url-fetch 2.3.1
+- **Photo Fetcher**: google-photos-album-image-url-fetch 3.2.0
 - **Caching**: Cloudflare KV (PHOTOS_CACHE)
 - **HTTP Client**: Undici (built-in)
 

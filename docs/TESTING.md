@@ -323,13 +323,13 @@ This runs all test suites:
 
 ```bash
 # URL parser tests only
-tsx --test src/tests/test-url-parser.ts
+npx tsx --test src/tests/test-url-parser.ts
 
 # Cache service tests only
-tsx --test src/tests/test-cache-service.ts
+npx tsx --test src/tests/test-cache-service.ts
 
 # Performance tests only
-tsx --test src/tests/test-performance.ts
+npx tsx --test src/tests/test-performance.ts
 ```
 
 ## Next Steps
