@@ -6,7 +6,38 @@ Display random photos from your Google Photos shared albums on TRMNL e-ink displ
 
 > "Your photos deserve to be displayed, not buried in the cloud."
 
-## 🔐 Privacy First
+## � Gallery
+
+See how your photos look across different TRMNL layouts:
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="assets/demo/demo-full.png" alt="Full Layout" width="100%"/>
+      <br/><strong>Full Layout</strong>
+      <br/>Full-screen photo with caption
+    </td>
+    <td width="50%" align="center">
+      <img src="assets/demo/demo-half-horizontal.png" alt="Half Horizontal Layout" width="100%"/>
+      <br/><strong>Half Horizontal</strong>
+      <br/>Wide horizontal display
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="assets/demo/demo-half-vertical.png" alt="Half Vertical Layout" width="100%"/>
+      <br/><strong>Half Vertical</strong>
+      <br/>Tall vertical display
+    </td>
+    <td width="50%" align="center">
+      <img src="assets/demo/demo-quadrant.png" alt="Quadrant Layout" width="100%"/>
+      <br/><strong>Quadrant</strong>
+      <br/>Compact quarter display
+    </td>
+  </tr>
+</table>
+
+## �🔐 Privacy First
 
 This plugin is built with privacy at its core:
 
