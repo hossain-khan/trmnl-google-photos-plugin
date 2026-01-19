@@ -19,8 +19,7 @@
     ⏰ Automatic hourly refresh with new photos<br>
     🎨 Four optimized layouts for all TRMNL device sizes<br>
     📱 Responsive design across all e-ink displays<br>
-    💬 Caption support with smart truncation<br>
-    🏷️ Album name and photo count display
+    🖼️ Photo count display
     <br><br>
     <strong>How It Works:</strong><br>
     1. Create a shared album in Google Photos<br>
@@ -37,7 +36,7 @@
     🎨 Photography portfolios<br>
     💝 Gift displays for loved ones
     <br><br>
-    <strong>Data Privacy:</strong> This plugin prioritizes your privacy. Only album metadata (photo URLs and captions) is temporarily cached for 1 hour to improve performance—your actual photos are never stored and remain on Google's servers. Your album URL is only used to fetch photos in real-time. No cookies, no tracking, no personal data retention. Fully GDPR and privacy compliant.
+    <strong>Data Privacy:</strong> This plugin prioritizes your privacy. Only album metadata (photo URLs) is temporarily cached for 1 hour to improve performance—your actual photos are never stored and remain on Google's servers. Your album URL is only used to fetch photos in real-time. No cookies, no tracking, no personal data retention. Fully GDPR and privacy compliant.
   github_url: https://github.com/hossain-khan/trmnl-google-photos-plugin
   learn_more_url: https://hossain-khan.github.io/trmnl-google-photos-plugin/
   email_address: trmnl@hossain.dev
