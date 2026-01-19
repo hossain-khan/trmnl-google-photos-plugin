@@ -175,12 +175,34 @@ Content-Type: application/json
 
 #### Response Headers
 
+**Standard Headers:**
+
 ```http
 Content-Type: application/json
 Access-Control-Allow-Origin: https://hossain-khan.github.io, https://usetrmnl.com
 Access-Control-Allow-Methods: GET, OPTIONS
 Access-Control-Max-Age: 86400
 ```
+
+**Custom Monitoring Headers:**
+
+```http
+X-Cache-Status: HIT
+X-Response-Time: 67ms
+X-Request-ID: a1b2c3d4
+```
+
+| Header            | Description                                         | Example    |
+| ----------------- | --------------------------------------------------- | ---------- |
+| `X-Cache-Status`  | Cache status: `HIT` (cached) or `MISS` (not cached) | `HIT`      |
+| `X-Response-Time` | Total server processing time                        | `67ms`     |
+| `X-Request-ID`    | Unique request identifier for debugging and tracing | `a1b2c3d4` |
+
+**Use Cases:**
+
+- **X-Cache-Status**: Monitor cache hit rate (target: >80%)
+- **X-Response-Time**: Track API performance and identify slow requests
+- **X-Request-ID**: Correlate client requests with server logs for debugging
 
 #### Performance Characteristics
 
