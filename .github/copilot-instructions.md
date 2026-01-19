@@ -44,7 +44,6 @@ For developers working on this project:
 3. **Quick Start**: See `docs/QUICKSTART.md` for setup and development
 4. **Deployment**: See `docs/DEPLOYMENT.md` for production deployment
 5. **Test Templates**: Open `index.html` in a browser to preview layouts
-6. **Modify Data**: Edit `data.json` to test with different photo data
 
 ## Project Structure
 
@@ -74,7 +73,6 @@ trmnl-google-photos-plugin/
 │   └── index.ts                 # Main worker entry point
 ├── scripts/                      # Build and automation scripts
 │   └── fetch-photos.js          # Photo fetching implementation
-├── data.json                     # Sample photo data for templates
 ├── index.html                    # Preview/testing page
 ├── settings.yml                  # Plugin settings configuration
 ├── wrangler.toml                 # Cloudflare Worker configuration
@@ -91,7 +89,6 @@ trmnl-google-photos-plugin/
 - **scripts/fetch-photos.js**: Photo fetching implementation using `google-photos-album-image-url-fetch`
 - **settings.yml**: TRMNL plugin configuration (polling strategy, refresh frequency)
 - **wrangler.toml**: Cloudflare Worker configuration (production deployment)
-- **data.json**: Sample data for testing templates locally
 - **index.html**: Preview/testing page
 
 ### Template Structure and Synchronization
