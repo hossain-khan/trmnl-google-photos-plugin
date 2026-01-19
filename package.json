@@ -7,7 +7,7 @@
   "scripts": {
     "fetch": "node scripts/fetch-photos.js",
     "investigate": "node scripts/investigate-api.js",
-    "test": "node --test scripts/test-bundle-size.js scripts/test-cache-service.js scripts/test-fetch.js scripts/test-url-parser.js scripts/test-performance.js",
+    "test": "node --test scripts/test-bundle-size.js scripts/test-cache-service.js scripts/test-fetch.js scripts/test-url-parser.js scripts/test-performance.js scripts/test-liquid-templates.js",
     "test:load": "node scripts/test-load.js",
     "test:all": "node --test scripts/test-*.js",
     "dev": "wrangler dev",
@@ -36,6 +36,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260118.0",
     "@types/node": "^25.0.9",
+    "liquidjs": "^10.24.0",
     "typescript": "^5.9.3",
     "wrangler": "^4.59.2"
   }
