@@ -17,6 +17,18 @@
 import { z } from 'zod';
 
 /**
+ * Parse result interface for album URL validation
+ */
+export interface ParseResult {
+  valid: boolean;
+  url?: string;
+  albumId?: string;
+  urlType?: 'short' | 'full';
+  error?: string;
+  errors?: string[];
+}
+
+/**
  * Regular expression patterns for Google Photos shared album URLs
  */
 const URL_PATTERNS = {
@@ -57,14 +69,8 @@ export const AlbumUrlSchema = z.string()
 /**
  * Parse and validate a Google Photos shared album URL
  * 
- * @param {string} url - The album URL to parse
- * @returns {Object} Parsed result with validation status
- * @returns {boolean} result.valid - Whether the URL is valid
- * @returns {string} [result.url] - The validated URL (if valid)
- * @returns {string} [result.albumId] - Extracted album ID (if valid)
- * @returns {string} [result.urlType] - Type of URL ('short' or 'full')
- * @returns {string} [result.error] - Error message (if invalid)
- * @returns {Array<string>} [result.errors] - Detailed validation errors (if invalid)
+ * @param url - The album URL to parse
+ * @returns Parsed result with validation status
  * 
  * @example
  * // Valid short URL
@@ -76,7 +82,7 @@ export const AlbumUrlSchema = z.string()
  * const result = parseAlbumUrl('https://invalid-url.com');
  * // { valid: false, error: '...', errors: [...] }
  */
-export function parseAlbumUrl(url) {
+export function parseAlbumUrl(url: string | null | undefined): ParseResult {
   // Handle null, undefined, or non-string inputs
   if (url === null || url === undefined) {
     return {
@@ -124,8 +130,8 @@ export function parseAlbumUrl(url) {
 /**
  * Extract album ID from a Google Photos URL
  * 
- * @param {string} url - The album URL
- * @returns {string|null} The extracted album ID, or null if not found
+ * @param url - The album URL
+ * @returns The extracted album ID, or null if not found
  * 
  * @example
  * extractAlbumId('https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5')
@@ -135,7 +141,7 @@ export function parseAlbumUrl(url) {
  * extractAlbumId('https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF')
  * // Returns: 'AF1QipMZNuJ5JH6n3yF'
  */
-export function extractAlbumId(url) {
+export function extractAlbumId(url: string | null | undefined): string | null {
   if (!url) return null;
 
   // Try short URL pattern first
@@ -156,8 +162,8 @@ export function extractAlbumId(url) {
 /**
  * Check if a URL is a valid Google Photos shared album URL
  * 
- * @param {string} url - The URL to validate
- * @returns {boolean} True if valid, false otherwise
+ * @param url - The URL to validate
+ * @returns True if valid, false otherwise
  * 
  * @example
  * isValidAlbumUrl('https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5')
@@ -167,7 +173,7 @@ export function extractAlbumId(url) {
  * isValidAlbumUrl('https://invalid-url.com')
  * // Returns: false
  */
-export function isValidAlbumUrl(url) {
+export function isValidAlbumUrl(url: string | null | undefined): boolean {
   const result = parseAlbumUrl(url);
   return result.valid;
 }
@@ -175,16 +181,16 @@ export function isValidAlbumUrl(url) {
 /**
  * Normalize a Google Photos URL (remove query parameters, trailing slashes, etc.)
  * 
- * @param {string} url - The URL to normalize
- * @returns {string|null} The normalized URL, or null if invalid
+ * @param url - The URL to normalize
+ * @returns The normalized URL, or null if invalid
  * 
  * @example
  * normalizeAlbumUrl('https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF?key=value')
  * // Returns: 'https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF'
  */
-export function normalizeAlbumUrl(url) {
+export function normalizeAlbumUrl(url: string | null | undefined): string | null {
   const result = parseAlbumUrl(url);
-  if (!result.valid) return null;
+  if (!result.valid || !result.url) return null;
 
   // For short URLs, return as-is
   if (result.urlType === 'short') {
@@ -199,10 +205,10 @@ export function normalizeAlbumUrl(url) {
 /**
  * Get a user-friendly error message for an invalid URL
  * 
- * @param {string} url - The invalid URL
- * @returns {string} User-friendly error message
+ * @param url - The invalid URL
+ * @returns User-friendly error message
  */
-export function getErrorMessage(url) {
+export function getErrorMessage(url: string | null | undefined): string {
   const result = parseAlbumUrl(url);
   return result.error || 'Unknown error';
 }

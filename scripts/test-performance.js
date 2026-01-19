@@ -66,7 +66,7 @@ async function measureTime(name, fn) {
  */
 async function testUrlParsing() {
   // Load URL parser
-  const { parseAlbumUrl } = await import(join(projectRoot, 'lib', 'url-parser.js'));
+  const { parseAlbumUrl } = await import(join(projectRoot, 'lib', 'url-parser.ts'));
 
   const testUrls = [
     'https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8',

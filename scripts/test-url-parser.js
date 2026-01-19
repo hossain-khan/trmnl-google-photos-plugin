@@ -26,7 +26,7 @@ import {
   isValidAlbumUrl,
   normalizeAlbumUrl,
   getErrorMessage
-} from '../lib/url-parser.js';
+} from '../lib/url-parser.ts';
 
 console.log('🧪 Testing Google Photos Album URL Parser\n');
 

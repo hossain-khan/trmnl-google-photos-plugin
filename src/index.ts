@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { parseAlbumUrl } from '../lib/url-parser.js';
+import { parseAlbumUrl } from '../lib/url-parser';
 import { fetchRandomPhoto } from './services/photo-fetcher';
 import type { TRMNLRequest } from './types';
 

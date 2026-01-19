@@ -124,7 +124,7 @@ function estimateBundleSize() {
     'src/services/photo-fetcher.ts',
     'src/services/template-renderer.ts',
     'src/services/cache-service.ts',
-    'lib/url-parser.js',
+    'lib/url-parser.ts',
   ];
 
   sourceFiles.forEach(file => {
