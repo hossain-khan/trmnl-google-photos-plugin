@@ -13,6 +13,12 @@ Place plugin icons in this directory:
 - PNG format with transparency
 - Related to photography/albums theme
 
-## Placeholder
+## TRMNL Google Photos - Design Rationale
 
-Currently using placeholder. Design actual icon before marketplace submission.
+The `trmnl-google-photos.svg` logo combines TRMNL's signature radial shutter design with Google Photos' brand colors to create a cohesive visual identity that represents both platforms.
+
+**Color Palette**: Uses Google Photos' signature colors with smooth transitions:
+- **Blue** (#4285F4), **Red** (#EA4335), **Yellow** (#FBBC04), **Green** (#34A853)
+- Three intermediate colors create a flowing gradient: Purple (#966495), Orange (#F2801C), Yellow-Green (#98B22B)
+
+**Design**: The 7-segment radial pattern creates a dynamic, circular flow suggesting photo rotation and updates, while the color gradient evokes the Google Photos brand identity. The monochrome-to-color transformation makes it suitable for both e-ink displays and color contexts.
