@@ -103,7 +103,8 @@
 
 import * as GooglePhotosAlbum from 'google-photos-album-image-url-fetch';
 import type { GooglePhoto, PhotoData } from '../types';
-import { getCachedAlbum, setCachedAlbum, extractAlbumId } from './cache-service';
+import { getCachedAlbum, setCachedAlbum } from './cache-service';
+import { extractAlbumId } from '../lib/url-parser';
 import {
   isValidPhotoUrl,
   sanitizeCaption,
@@ -123,6 +124,11 @@ import {
  */
 export async function fetchAlbumPhotos(albumUrl: string, kv?: KVNamespace): Promise<GooglePhoto[]> {
   const albumId = extractAlbumId(albumUrl);
+
+  // Validate album ID extraction
+  if (!albumId) {
+    throw new Error('Invalid album URL: Could not extract album ID');
+  }
 
   // Try to get from cache first (if KV is configured)
   if (kv) {
