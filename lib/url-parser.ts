@@ -44,6 +44,14 @@ const URL_PATTERNS = {
 };
 
 /**
+ * Security constants for URL validation
+ */
+const SECURITY_LIMITS = {
+  MAX_URL_LENGTH: 2048, // Maximum URL length (RFC 2616 recommends 2048)
+  MAX_ALBUM_ID_LENGTH: 200, // Maximum album ID length (Google Photos IDs are ~50-100 chars)
+};
+
+/**
  * Error messages for validation failures
  */
 const ERROR_MESSAGES = {
@@ -53,6 +61,8 @@ const ERROR_MESSAGES = {
   INVALID_DOMAIN: 'URL must be from Google Photos (photos.app.goo.gl or photos.google.com)',
   MALFORMED: 'Malformed URL. Please check the URL and try again.',
   ALBUM_ID_MISSING: 'Could not extract album ID from URL',
+  URL_TOO_LONG: `URL exceeds maximum length (${SECURITY_LIMITS.MAX_URL_LENGTH} characters). Please check the URL.`,
+  ALBUM_ID_TOO_LONG: `Album ID exceeds maximum length (${SECURITY_LIMITS.MAX_ALBUM_ID_LENGTH} characters). Invalid URL format.`,
 };
 
 /**
@@ -61,6 +71,7 @@ const ERROR_MESSAGES = {
 export const AlbumUrlSchema = z
   .string()
   .min(1, ERROR_MESSAGES.REQUIRED)
+  .max(SECURITY_LIMITS.MAX_URL_LENGTH, ERROR_MESSAGES.URL_TOO_LONG)
   .url(ERROR_MESSAGES.MALFORMED)
   .refine((url) => {
     // Check if URL matches one of the known patterns (which includes domain validation)
@@ -116,6 +127,15 @@ export function parseAlbumUrl(url: string | null | undefined): ParseResult {
       valid: false,
       error: ERROR_MESSAGES.ALBUM_ID_MISSING,
       errors: [ERROR_MESSAGES.ALBUM_ID_MISSING],
+    };
+  }
+
+  // Validate album ID length (DoS prevention)
+  if (albumId.length > SECURITY_LIMITS.MAX_ALBUM_ID_LENGTH) {
+    return {
+      valid: false,
+      error: ERROR_MESSAGES.ALBUM_ID_TOO_LONG,
+      errors: [ERROR_MESSAGES.ALBUM_ID_TOO_LONG],
     };
   }
 

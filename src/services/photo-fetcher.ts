@@ -7,6 +7,14 @@
 import * as GooglePhotosAlbum from 'google-photos-album-image-url-fetch';
 import type { GooglePhoto, PhotoData } from '../types';
 import { getCachedAlbum, setCachedAlbum, extractAlbumId } from './cache-service';
+import {
+  isValidPhotoUrl,
+  sanitizeCaption,
+  sanitizeAlbumName,
+  validatePhotoCount,
+  validateTimestamp,
+  validatePhotoData,
+} from './security-validator';
 
 /**
  * Fetch photos from a Google Photos shared album
@@ -90,6 +98,13 @@ export function optimizePhotoUrl(
   width: number = 800,
   height: number = 480
 ): string {
+  // Validate photo URL before optimization
+  if (!isValidPhotoUrl(baseUrl)) {
+    throw new Error(
+      'Invalid photo URL: URL must be from Google Photos CDN (googleusercontent.com)'
+    );
+  }
+
   // Google Photos URL parameters for resizing
   return `${baseUrl}=w${width}-h${height}`;
 }
@@ -107,21 +122,36 @@ export function convertToPhotoData(
   albumUrl: string,
   totalPhotos: number
 ): PhotoData {
-  return {
-    photo_url: optimizePhotoUrl(photo.url),
-    thumbnail_url: optimizePhotoUrl(photo.url, 400, 300),
-    caption: null, // Google Photos shared albums don't expose captions
-    timestamp: new Date().toISOString(),
-    album_name: 'Google Photos Shared Album',
-    photo_count: totalPhotos,
+  // Validate and sanitize all fields before creating PhotoData
+  const photoUrl = optimizePhotoUrl(photo.url);
+  const thumbnailUrl = optimizePhotoUrl(photo.url, 400, 300);
+  const caption = sanitizeCaption(null); // Google Photos API doesn't expose captions
+  const albumName = sanitizeAlbumName('Google Photos Shared Album');
+  const photoCount = validatePhotoCount(totalPhotos);
+  const timestamp = validateTimestamp(new Date().toISOString());
+
+  const photoData: PhotoData = {
+    photo_url: photoUrl,
+    thumbnail_url: thumbnailUrl,
+    caption: caption,
+    timestamp: timestamp,
+    album_name: albumName,
+    photo_count: photoCount,
     metadata: {
       uid: photo.uid,
       original_width: photo.width,
       original_height: photo.height,
-      image_update_date: new Date(photo.imageUpdateDate).toISOString(),
-      album_add_date: new Date(photo.albumAddDate).toISOString(),
+      image_update_date: validateTimestamp(new Date(photo.imageUpdateDate).toISOString()),
+      album_add_date: validateTimestamp(new Date(photo.albumAddDate).toISOString()),
     },
   };
+
+  // Final security validation
+  if (!validatePhotoData(photoData)) {
+    throw new Error('Security validation failed: Photo data contains invalid or unsafe values');
+  }
+
+  return photoData;
 }
 
 /**
