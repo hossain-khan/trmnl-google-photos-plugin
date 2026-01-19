@@ -32,7 +32,7 @@ app.use(
 // Add security headers middleware
 app.use('/*', async (c, next) => {
   await next();
-  
+
   // Security headers
   c.header('X-Content-Type-Options', 'nosniff');
   c.header('X-Frame-Options', 'DENY');

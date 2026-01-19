@@ -100,7 +100,9 @@ export function optimizePhotoUrl(
 ): string {
   // Validate photo URL before optimization
   if (!isValidPhotoUrl(baseUrl)) {
-    throw new Error('Invalid photo URL: URL must be from Google Photos CDN (googleusercontent.com)');
+    throw new Error(
+      'Invalid photo URL: URL must be from Google Photos CDN (googleusercontent.com)'
+    );
   }
 
   // Google Photos URL parameters for resizing

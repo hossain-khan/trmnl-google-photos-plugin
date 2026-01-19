@@ -45,9 +45,7 @@ describe('XSS Prevention - Album URL Validation', (): void => {
   });
 
   it('should reject URL with encoded script tags', (): void => {
-    const result = parseAlbumUrl(
-      'https://photos.app.goo.gl/%3Cscript%3Ealert("xss")%3C/script%3E'
-    );
+    const result = parseAlbumUrl('https://photos.app.goo.gl/%3Cscript%3Ealert("xss")%3C/script%3E');
     assert.strictEqual(result.valid, false);
     assert.ok(result.error);
   });

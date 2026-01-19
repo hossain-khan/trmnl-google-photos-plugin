@@ -2,7 +2,7 @@
 
 /**
  * Security Validator Service Tests
- * 
+ *
  * Tests for security validation functions that protect the JSON API
  */
 
