@@ -38,6 +38,7 @@ app.use(
     ],
     allowMethods: ['GET', 'OPTIONS'],
     allowHeaders: ['Content-Type'],
+    exposeHeaders: ['X-Cache-Status', 'X-Response-Time', 'X-Request-ID'], // Expose custom headers
     maxAge: 86400, // 24 hours
   })
 );
