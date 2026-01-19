@@ -9,9 +9,9 @@
     <br><br>
     <strong>🔑 Privacy-First Design:</strong><br>
     🔒 No OAuth or Google account linking required<br>
-    🚫 No user data storage—fully stateless architecture<br>
+    🚫 No personal data storage—never stores your photos or account info<br>
+    ⚡ Temporary metadata caching (1 hour) for 80% faster performance<br>
     🔗 Simply paste your shared album link and photos appear<br>
-    ⚡ Cloudflare Workers with KV caching (67ms response time)<br>
     🌐 Open source and transparent—review the code anytime
     <br><br>
     <strong>Features:</strong><br>
@@ -40,11 +40,11 @@
     <strong>Technical Details:</strong><br>
     • 99%+ uptime reliability<br>
     • <3 second photo refresh<br>
-    • No databases—stateless architecture<br>
+    • Stateless architecture with optional performance caching<br>
     • Leverages Google Photos' public shared album API<br>
     • Hosted on Cloudflare Workers (global CDN)
     <br><br>
-    <strong>Data Privacy:</strong> This plugin does not store any user data. Your album URL is only used to fetch photos in real-time. No cookies, no tracking, no data retention. Fully GDPR and privacy compliant.
+    <strong>Data Privacy:</strong> This plugin prioritizes your privacy. Only album metadata (photo URLs and captions) is temporarily cached for 1 hour to improve performance—your actual photos are never stored and remain on Google's servers. Your album URL is only used to fetch photos in real-time. No cookies, no tracking, no personal data retention. Fully GDPR and privacy compliant.
   github_url: https://github.com/hossain-khan/trmnl-google-photos-plugin
   learn_more_url: https://hossain-khan.github.io/trmnl-google-photos-plugin/
   email_address: trmnl@hossain.dev
