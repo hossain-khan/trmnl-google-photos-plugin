@@ -8,7 +8,7 @@ This document describes the testing strategy and results for the TRMNL Google Ph
 - **Library**: `google-photos-album-image-url-fetch` v3.2.0
 - **Test Runner**: tsx (TypeScript test runner)
 - **Last Test Run**: January 19, 2026
-- **Status**: ✅ All 65 tests passing
+- **Status**: ✅ All 217 tests passing
 
 ## Test Suites
 
@@ -83,8 +83,8 @@ Validates template rendering with sample data.
 
 ## Test Summary
 
-**Total Tests**: 65  
-**Passing**: 65 ✅  
+**Total Tests**: 217  
+**Passing**: 217 ✅  
 **Failing**: 0 ❌  
 **Status**: All tests passing
 
@@ -323,13 +323,13 @@ This runs all test suites:
 
 ```bash
 # URL parser tests only
-tsx --test src/tests/test-url-parser.ts
+npx tsx --test src/tests/test-url-parser.ts
 
 # Cache service tests only
-tsx --test src/tests/test-cache-service.ts
+npx tsx --test src/tests/test-cache-service.ts
 
 # Performance tests only
-tsx --test src/tests/test-performance.ts
+npx tsx --test src/tests/test-performance.ts
 ```
 
 ## Next Steps
