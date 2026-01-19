@@ -109,7 +109,7 @@ We follow strict TypeScript and code quality standards:
 5. **Linting** - Code must pass ESLint checks (`npm run lint`)
 6. **Tests** - All tests must pass (`npm test`)
 
-See [QUICKSTART.md](QUICKSTART.md) for detailed development instructions.
+See [QUICKSTART.md](docs/QUICKSTART.md) for detailed development instructions.
 
 ## ⚠️ Important Notes
 

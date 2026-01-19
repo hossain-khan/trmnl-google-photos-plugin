@@ -41,8 +41,8 @@ For developers working on this project:
    - `docs/ARCHITECTURE.md` - System architecture and design
    - `docs/API_DOCUMENTATION.md` - Complete API reference
    - `docs/TESTING.md` - Testing strategy and guidelines
-3. **Quick Start**: See `QUICKSTART.md` for setup and development
-4. **Deployment**: See `DEPLOYMENT.md` for production deployment
+3. **Quick Start**: See `docs/QUICKSTART.md` for setup and development
+4. **Deployment**: See `docs/DEPLOYMENT.md` for production deployment
 5. **Test Templates**: Open `index.html` in a browser to preview layouts
 6. **Modify Data**: Edit `data.json` to test with different photo data
 
@@ -60,7 +60,9 @@ trmnl-google-photos-plugin/
 ├── docs/                         # Documentation
 │   ├── ARCHITECTURE.md          # System architecture and design
 │   ├── API_DOCUMENTATION.md     # Complete API reference
-│   └── TESTING.md               # Testing strategy and guidelines
+│   ├── TESTING.md               # Testing strategy and guidelines
+│   ├── QUICKSTART.md            # Quick start guide
+│   └── DEPLOYMENT.md            # Deployment instructions
 ├── templates/                    # Template layouts (uploaded to TRMNL)
 │   ├── full.liquid              # Full-screen layout
 │   ├── half_horizontal.liquid   # Half-size horizontal layout
@@ -76,8 +78,6 @@ trmnl-google-photos-plugin/
 ├── index.html                    # Preview/testing page
 ├── settings.yml                  # Plugin settings configuration
 ├── wrangler.toml                 # Cloudflare Worker configuration
-├── QUICKSTART.md                 # Quick start guide
-├── DEPLOYMENT.md                 # Deployment instructions
 ├── LICENSE                       # MIT License
 └── .gitignore                    # Git ignore patterns
 ```

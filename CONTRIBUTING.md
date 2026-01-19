@@ -96,7 +96,7 @@ All submissions require code review. We'll review:
 If you have questions, please:
 
 1. Check existing issues and discussions
-2. Read the [QUICKSTART.md](QUICKSTART.md) guide
+2. Read the [QUICKSTART.md](docs/QUICKSTART.md) guide
 3. Open a new issue with your question
 
 Thank you for contributing! 🎉
