@@ -1,4 +1,4 @@
-# TRMNL Google Photos Worker
+# <img src="../assets/icon/trmnl-google-photos.svg" width=30> TRMNL Google Photos Worker
 
 This directory contains the Cloudflare Worker implementation for the TRMNL Google Photos Plugin.
 
