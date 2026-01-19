@@ -1,8 +1,8 @@
-uuid: PLACEHOLDER_UUID  # TRMNL will generate this upon plugin submission
+uuid: 45ce2102-0b73-47ac-8a32-a1a6ccbcc1c1  # TRMNL will generate this upon plugin submission (Use this to make Webhook API requests.)
 name: Google Photos Shared Album
 author: Hossain Khan
-author_email: hossain.khan@gmail.com
-homepage: https://github.com/hossain-khan/trmnl-google-photos-plugin
+author_email: trmnl@hossain.dev
+homepage: https://hossain-khan.github.io/trmnl-google-photos-plugin/
 description: Display random photos from your Google Photos shared albums on TRMNL
 markup_version: 1
 strategy: polling  # TRMNL polls Cloudflare Worker for JSON photo data
