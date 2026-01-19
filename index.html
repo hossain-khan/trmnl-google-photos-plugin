@@ -82,6 +82,42 @@
         }
         .setup-info ol {
             line-height: 1.8;
+            padding-left: 1.5rem;
+            counter-reset: step-counter;
+            list-style: none;
+        }
+        .setup-info ol li {
+            counter-increment: step-counter;
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+            color: #2d3748;
+        }
+        .setup-info ol li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .setup-info .status-badge-inline {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            margin-left: 0.5rem;
         }
         .status-badge {
             display: inline-block;
@@ -500,8 +536,9 @@
             </div>
         </div>
 
-        <div class="setup-info">
+        <div class="demo-section setup-info">
             <h2>🚀 Setup Instructions</h2>
+            <p>Get started with the Google Photos TRMNL plugin in just a few simple steps:</p>
             <ol>
                 <li>Create a shared album in Google Photos</li>
                 <li>Get the shared album link (photos.app.goo.gl/...)</li>
@@ -509,8 +546,11 @@
                 <li>Paste your shared album URL in the plugin settings</li>
                 <li>Add to your TRMNL playlist</li>
             </ol>
-            <p><strong>Status:</strong> JSON API is live! Worker returns photo data as JSON. TRMNL platform renders templates stored in Markup Editor.</p>
-            <p><strong>Architecture:</strong> Polling strategy (GET /api/photo) - Worker returns JSON, not HTML. TRMNL handles all template rendering.</p>
+            <div style="background: #f7fafc; border-left: 4px solid #48bb78; padding: 1rem 1.25rem; border-radius: 8px; margin-top: 1.5rem;">
+                <p style="margin: 0 0 0.5rem 0;"><strong>📡 Current Status</strong> <span class="status-badge-inline">✓ Live</span></p>
+                <p style="margin: 0 0 0.5rem 0; font-size: 0.95rem;">JSON API is operational! Worker returns photo data as JSON. TRMNL platform renders templates stored in Markup Editor.</p>
+                <p style="margin: 0; font-size: 0.9rem; color: #718096;"><strong>Architecture:</strong> Polling strategy (GET /api/photo) - Worker returns JSON, not HTML. TRMNL handles all template rendering.</p>
+            </div>
         </div>
 
         <div class="github-link">
