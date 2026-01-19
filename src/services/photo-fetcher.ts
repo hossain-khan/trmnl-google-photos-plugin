@@ -11,6 +11,7 @@ import {
   setCachedAlbum,
   extractAlbumId,
 } from './cache-service';
+import { fetchPhotosWithCaptions } from './caption-extractor';
 
 /**
  * Fetch photos from a Google Photos shared album
@@ -39,7 +40,20 @@ export async function fetchAlbumPhotos(
   console.log(`Fetching photos from Google Photos API for album ${albumId}`);
   
   try {
-    const photos = await GooglePhotosAlbum.fetchImageUrls(albumUrl);
+    // Try to fetch with captions first
+    let photos: GooglePhoto[];
+    try {
+      photos = await fetchPhotosWithCaptions(albumUrl);
+      console.log(`✓ Fetched ${photos.length} photos with caption extraction`);
+    } catch (captionError) {
+      // Fallback to original library if caption extraction fails
+      console.log('⚠️  Caption extraction failed, falling back to standard fetch');
+      const standardPhotos = await GooglePhotosAlbum.fetchImageUrls(albumUrl);
+      if (!standardPhotos) {
+        throw new Error('No photos found in album');
+      }
+      photos = standardPhotos;
+    }
     
     if (!photos || photos.length === 0) {
       throw new Error('No photos found in album. Ensure the album is publicly shared and contains photos (not videos).');
@@ -115,7 +129,7 @@ export function convertToPhotoData(
   return {
     photo_url: optimizePhotoUrl(photo.url),
     thumbnail_url: optimizePhotoUrl(photo.url, 400, 300),
-    caption: null, // Google Photos shared albums don't expose captions
+    caption: photo.caption || null, // Use caption from photo if available
     timestamp: new Date().toISOString(),
     album_name: 'Google Photos Shared Album',
     photo_count: totalPhotos,

@@ -58,6 +58,7 @@ export interface GooglePhoto {
   height: number;
   imageUpdateDate: number;
   albumAddDate: number;
+  caption?: string; // Added: caption extracted from photo metadata
 }
 
 /**
