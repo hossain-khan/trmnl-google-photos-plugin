@@ -1,24 +1,12 @@
 <div class="layout">
   {% if photo_url and photo_url != '' %}
-  <div class="flex flex--row gap--medium md:gap--large portrait:flex--col portrait:gap--small flex--center-y h--full">
-    <!-- Photo Display -->
-    <div class="flex flex--center-x flex--center-y h--full" style="flex: 1;">
-      <!-- Custom max-width/max-height ensures images fit without cut-off (handles portrait/landscape/any aspect ratio) -->
-      <img src="{{ photo_url }}" 
-           alt="{{ caption }}" 
-           class="image image--contain image-dither"
-           style="max-width: 100%; max-height: 100%; object-fit: contain;">
-    </div>
-    
-    <!-- Caption (if available) -->
-    {% if caption %}
-    <div class="flex flex--col gap--xsmall md:gap--small w--40 md:w--52 portrait:w--full">
-      <span class="description md:title md:title--small lg:title lg:title--medium" data-clamp="4">{{ caption }}</span>
-      {% if photo_count and photo_count > 0 %}
-      <span class="label label--small md:description">{{ photo_count }} photos in album</span>
-      {% endif %}
-    </div>
-    {% endif %}
+  <!-- Photo Display -->
+  <div class="flex flex--center-x flex--center-y h--full">
+    <!-- Custom max-width/max-height ensures images fit without cut-off (handles portrait/landscape/any aspect ratio) -->
+    <img src="{{ photo_url }}" 
+         alt="{{ caption }}" 
+         class="image image--contain image-dither"
+         style="max-width: 100%; max-height: 100%; object-fit: contain;">
   </div>
   {% else %}
   <!-- No Photo Available -->
