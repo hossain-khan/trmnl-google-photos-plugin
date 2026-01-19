@@ -16,12 +16,12 @@ This document describes the testing strategy and results for the TRMNL Google Ph
 
 Comprehensive validation of Google Photos URL parsing and validation.
 
-| Test Category        | Test Count | Status   | Coverage                          |
-| -------------------- | ---------- | -------- | --------------------------------- |
-| Valid URL formats    | 15         | ✅ Pass  | Short URLs, full URLs, variations |
-| Invalid URLs         | 12         | ✅ Pass  | Wrong domains, malformed URLs     |
-| Edge cases           | 8          | ✅ Pass  | Empty strings, special characters |
-| Album ID extraction  | 7          | ✅ Pass  | Different URL patterns            |
+| Test Category       | Test Count | Status  | Coverage                          |
+| ------------------- | ---------- | ------- | --------------------------------- |
+| Valid URL formats   | 15         | ✅ Pass | Short URLs, full URLs, variations |
+| Invalid URLs        | 12         | ✅ Pass | Wrong domains, malformed URLs     |
+| Edge cases          | 8          | ✅ Pass | Empty strings, special characters |
+| Album ID extraction | 7          | ✅ Pass | Different URL patterns            |
 
 **Key Test Cases:**
 
@@ -37,11 +37,11 @@ Comprehensive validation of Google Photos URL parsing and validation.
 
 Tests photo fetching, optimization, and selection logic.
 
-| Test Category        | Test Count | Status   | Coverage                    |
-| -------------------- | ---------- | -------- | --------------------------- |
-| Album fetching       | 3          | ✅ Pass  | Valid/invalid URLs          |
-| Image optimization   | 3          | ✅ Pass  | Size constraints, aspect ratios |
-| Random selection     | 2          | ✅ Pass  | Randomness, uniqueness      |
+| Test Category      | Test Count | Status  | Coverage                        |
+| ------------------ | ---------- | ------- | ------------------------------- |
+| Album fetching     | 3          | ✅ Pass | Valid/invalid URLs              |
+| Image optimization | 3          | ✅ Pass | Size constraints, aspect ratios |
+| Random selection   | 2          | ✅ Pass | Randomness, uniqueness          |
 
 **Result**: ✅ All 8 tests passing
 
@@ -49,12 +49,12 @@ Tests photo fetching, optimization, and selection logic.
 
 Validates KV caching behavior and error handling.
 
-| Test Category        | Test Count | Status   | Coverage                       |
-| -------------------- | ---------- | -------- | ------------------------------ |
-| Cache key generation | 3          | ✅ Pass  | Different URL formats          |
-| Album ID extraction  | 3          | ✅ Pass  | Short/full URLs                |
-| Cache behavior       | 2          | ✅ Pass  | Hit/miss scenarios             |
-| Error handling       | 2          | ✅ Pass  | Graceful degradation           |
+| Test Category        | Test Count | Status  | Coverage              |
+| -------------------- | ---------- | ------- | --------------------- |
+| Cache key generation | 3          | ✅ Pass | Different URL formats |
+| Album ID extraction  | 3          | ✅ Pass | Short/full URLs       |
+| Cache behavior       | 2          | ✅ Pass | Hit/miss scenarios    |
+| Error handling       | 2          | ✅ Pass | Graceful degradation  |
 
 **Result**: ✅ All 10 tests passing
 
@@ -62,11 +62,11 @@ Validates KV caching behavior and error handling.
 
 Measures response times and validates performance targets.
 
-| Benchmark            | Target     | Actual   | Status   |
-| -------------------- | ---------- | -------- | -------- |
-| Cache HIT            | <500ms     | 67ms     | ✅ Pass  |
-| Cache MISS           | <2s        | 1.35s    | ✅ Pass  |
-| URL parsing          | <10ms      | <5ms     | ✅ Pass  |
+| Benchmark   | Target | Actual | Status  |
+| ----------- | ------ | ------ | ------- |
+| Cache HIT   | <500ms | 67ms   | ✅ Pass |
+| Cache MISS  | <2s    | 1.35s  | ✅ Pass |
+| URL parsing | <10ms  | <5ms   | ✅ Pass |
 
 **Result**: ✅ All benchmarks meet or exceed targets
 
@@ -74,10 +74,10 @@ Measures response times and validates performance targets.
 
 Validates template rendering with sample data.
 
-| Test Category        | Test Count | Status   | Coverage                       |
-| -------------------- | ---------- | -------- | ------------------------------ |
-| Template rendering   | 1          | ✅ Pass  | Full layout with photo data    |
-| Error states         | 1          | ✅ Pass  | Missing photo URL              |
+| Test Category      | Test Count | Status  | Coverage                    |
+| ------------------ | ---------- | ------- | --------------------------- |
+| Template rendering | 1          | ✅ Pass | Full layout with photo data |
+| Error states       | 1          | ✅ Pass | Missing photo URL           |
 
 **Result**: ✅ All 2 tests passing
 
@@ -312,6 +312,7 @@ npm test
 ```
 
 This runs all test suites:
+
 - URL parser tests
 - Cache service tests
 - Photo fetcher tests

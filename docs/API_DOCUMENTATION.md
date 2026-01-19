@@ -84,9 +84,9 @@ Host: trmnl-google-photos.gohk.xyz
 
 **Query Parameters:**
 
-| Parameter    | Type   | Required | Description                                |
-| ------------ | ------ | -------- | ------------------------------------------ |
-| `album_url`  | string | Yes      | Google Photos shared album URL             |
+| Parameter   | Type   | Required | Description                    |
+| ----------- | ------ | -------- | ------------------------------ |
+| `album_url` | string | Yes      | Google Photos shared album URL |
 
 **Supported Album URL Formats:**
 
@@ -116,14 +116,14 @@ Content-Type: application/json
 
 **Response Fields:**
 
-| Field           | Type   | Description                              |
-| --------------- | ------ | ---------------------------------------- |
-| `photo_url`     | string | Full-resolution photo URL (optimized)    |
-| `thumbnail_url` | string | Lower resolution version                 |
-| `caption`       | string \| null | Photo caption (if available)     |
-| `timestamp`     | string | ISO 8601 timestamp                       |
-| `album_name`    | string | Album name                               |
-| `photo_count`   | number | Total photos in album                    |
+| Field           | Type           | Description                           |
+| --------------- | -------------- | ------------------------------------- |
+| `photo_url`     | string         | Full-resolution photo URL (optimized) |
+| `thumbnail_url` | string         | Lower resolution version              |
+| `caption`       | string \| null | Photo caption (if available)          |
+| `timestamp`     | string         | ISO 8601 timestamp                    |
+| `album_name`    | string         | Album name                            |
+| `photo_count`   | number         | Total photos in album                 |
 
 **Error: Missing URL (400 Bad Request):**
 
@@ -184,21 +184,21 @@ Access-Control-Max-Age: 86400
 
 #### Performance Characteristics
 
-| Metric                   | Value      |
-| ------------------------ | ---------- |
-| Response Time (cached)   | 67ms       |
-| Response Time (uncached) | 1-2s       |
-| JSON Size                | 300-500B   |
-| CPU Time                 | <50ms      |
+| Metric                   | Value    |
+| ------------------------ | -------- |
+| Response Time (cached)   | 67ms     |
+| Response Time (uncached) | 1-2s     |
+| JSON Size                | 300-500B |
+| CPU Time                 | <50ms    |
 
 #### Error Codes
 
-| Code | Meaning               | Cause                                                   |
-| ---- | --------------------- | ------------------------------------------------------- |
-| 200  | Success               | Photo data returned successfully                        |
-| 400  | Bad Request           | Missing or invalid album URL                            |
-| 404  | Not Found             | Album not found or inaccessible                         |
-| 500  | Internal Server Error | Photo fetch failed or server error                      |
+| Code | Meaning               | Cause                              |
+| ---- | --------------------- | ---------------------------------- |
+| 200  | Success               | Photo data returned successfully   |
+| 400  | Bad Request           | Missing or invalid album URL       |
+| 404  | Not Found             | Album not found or inaccessible    |
+| 500  | Internal Server Error | Photo fetch failed or server error |
 
 #### Common Error Messages
 
@@ -300,7 +300,7 @@ In `settings.yml`:
 strategy: polling
 polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}
 polling_verb: GET
-refresh_frequency: 3600  # 1 hour
+refresh_frequency: 3600 # 1 hour
 ```
 
 ---
@@ -546,6 +546,7 @@ wrangler tail
 ```
 
 Log entries include:
+
 - Request ID (for tracing)
 - Duration metrics (parse, fetch, total)
 - Album URL (truncated for privacy)

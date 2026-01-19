@@ -15,6 +15,7 @@ The cache service:
 ## Status
 
 ✅ **Deployed and Operational** (January 2026)
+
 - Production deployment with KV namespace configured
 - Cache hit response time: 67ms average
 - 80%+ cache hit rate in production
