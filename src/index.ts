@@ -184,7 +184,7 @@ app.get('/api/photo', async (c) => {
       );
     }
 
-    // Return JSON response (flat structure for TRMNL Liquid templates)
+    // Return JSON response (flat structure for TRMNL templates)
     // TRMNL templates access these directly: {{ photo_url }}, {{ caption }}
     const response = {
       photo_url: photoData.photo_url,

@@ -32,10 +32,10 @@ Display random photos from your Google Photos shared albums on TRMNL e-ink displ
   - Basic health check endpoints (/ and /health)
   - Development environment with hot reload
   - Deployment scripts ready
-- [x] ✅ **Build /markup endpoint** (Issue 4 - Complete!)
-  - POST /markup endpoint with TRMNL integration
+- [x] ✅ **Build JSON API endpoint** (Issue 4 - Complete!)
+  - GET /api/photo endpoint with TRMNL Polling strategy
   - Fetches random photos from Google Photos albums
-  - Renders all four Liquid templates (full, half, quadrant)
+  - Returns JSON data for all four template layouts
   - Comprehensive error handling and validation
   - Works with 95%+ of valid shared album URLs
 - [x] ✅ **Optional KV caching for performance** (Issue 5 - Complete!)
@@ -157,7 +157,7 @@ npm run deploy:dev
 **Worker Endpoints:**
 - `GET /` - Service information and health status
 - `GET /health` - Health check endpoint
-- `POST /markup` - _(Coming soon)_ TRMNL markup endpoint
+- `GET /api/photo` - JSON API for TRMNL (Polling strategy)
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions and [src/README.md](src/README.md) for worker architecture details.
 
