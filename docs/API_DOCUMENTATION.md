@@ -5,7 +5,7 @@ Complete API reference for the TRMNL Google Photos Plugin Cloudflare Worker.
 ## Base URL
 
 - **Development**: `http://localhost:8787`
-- **Production**: `https://trmnl-google-photos.your-worker.workers.dev`
+- **Production**: `https://trmnl-google-photos.gohk.xyz`
 
 ## Authentication
 
@@ -69,49 +69,24 @@ Host: trmnl-google-photos.workers.dev
 
 ---
 
-### 3. POST `/markup` - TRMNL Photo Display
+### 3. GET `/api/photo` - TRMNL JSON API (Polling Strategy)
 
-**Primary endpoint** for TRMNL devices. Fetches a random photo from a Google Photos shared album and returns rendered HTML.
+**Primary endpoint** for TRMNL devices. Fetches a random photo from a Google Photos shared album and returns JSON data.
 
 #### Request
 
 **Headers:**
 
 ```http
-POST /markup HTTP/1.1
-Host: trmnl-google-photos.workers.dev
-Content-Type: application/json
+GET /api/photo?album_url=https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8 HTTP/1.1
+Host: trmnl-google-photos.gohk.xyz
 ```
 
-**Body:**
+**Query Parameters:**
 
-```json
-{
-  "trmnl": {
-    "plugin_settings": {
-      "instance_name": "My Photos",
-      "shared_album_url": "https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
-    },
-    "screen": {
-      "width": 800,
-      "height": 480,
-      "bit_depth": 1
-    },
-    "layout": "full"
-  }
-}
-```
-
-**Request Body Schema:**
-
-| Field                                    | Type   | Required | Description                                                         |
-| ---------------------------------------- | ------ | -------- | ------------------------------------------------------------------- |
-| `trmnl.plugin_settings.instance_name`    | string | Yes      | Display name for the plugin instance                                |
-| `trmnl.plugin_settings.shared_album_url` | string | Yes      | Google Photos shared album URL                                      |
-| `trmnl.screen.width`                     | number | No       | Screen width in pixels (default: 800)                               |
-| `trmnl.screen.height`                    | number | No       | Screen height in pixels (default: 480)                              |
-| `trmnl.screen.bit_depth`                 | number | No       | Bit depth (1, 2, or 4) (default: 1)                                 |
-| `trmnl.layout`                           | string | No       | Layout type: `full`, `half_horizontal`, `half_vertical`, `quadrant` |
+| Parameter    | Type   | Required | Description                                |
+| ------------ | ------ | -------- | ------------------------------------------ |
+| `album_url`  | string | Yes      | Google Photos shared album URL             |
 
 **Supported Album URL Formats:**
 
@@ -123,34 +98,46 @@ Content-Type: application/json
 
 **Success (200 OK):**
 
-Returns HTML markup optimized for e-ink display.
+Returns JSON with photo data that TRMNL merges into Liquid templates.
 
 ```http
 HTTP/1.1 200 OK
-Content-Type: text/html; charset=utf-8
+Content-Type: application/json
 
-<div class="flex flex--col gap--small h--full">
-  <div class="flex flex--center-x flex--center-y" style="flex: 1;">
-    <img src="https://lh3.googleusercontent.com/...=w800-h480"
-         alt=""
-         class="image image--contain"
-         style="max-width: 100%; max-height: 100%; object-fit: contain;">
-  </div>
-</div>
+{
+  "photo_url": "https://lh3.googleusercontent.com/...=w800-h480",
+  "thumbnail_url": "https://lh3.googleusercontent.com/...=w400-h300",
+  "caption": null,
+  "timestamp": "2026-01-19T09:00:00.000Z",
+  "album_name": "Google Photos Shared Album",
+  "photo_count": 142
+}
 ```
 
-**Error: Missing URL (200 OK):**
+**Response Fields:**
 
-Returns error template when album URL is not configured.
+| Field           | Type   | Description                              |
+| --------------- | ------ | ---------------------------------------- |
+| `photo_url`     | string | Full-resolution photo URL (optimized)    |
+| `thumbnail_url` | string | Lower resolution version                 |
+| `caption`       | string \| null | Photo caption (if available)     |
+| `timestamp`     | string | ISO 8601 timestamp                       |
+| `album_name`    | string | Album name                               |
+| `photo_count`   | number | Total photos in album                    |
 
-```html
-<div class="flex flex--col flex--center-x flex--center-y gap--medium h--full">
-  <div class="value value--large text--center">📷</div>
-  <div class="title title--medium text--center">No Photos Available</div>
-  <div class="description text--center">
-    Please configure your Google Photos shared album URL in the plugin settings.
-  </div>
-</div>
+**Error: Missing URL (400 Bad Request):**
+
+Returns when album_url parameter is missing.
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "error": "Bad Request",
+  "message": "Missing required parameter: album_url",
+  "example": "/api/photo?album_url=https://photos.app.goo.gl/..."
+}
 ```
 
 **Error: Invalid URL (400 Bad Request):**
@@ -159,36 +146,39 @@ Returns when URL format is invalid.
 
 ```http
 HTTP/1.1 400 Bad Request
-Content-Type: text/html; charset=utf-8
+Content-Type: application/json
 
-<div class="flex flex--col flex--center-x flex--center-y">
-  <div class="value value--large">❌</div>
-  <div class="title title--medium">Error</div>
-  <div class="description">Invalid album URL: Must be a Google Photos URL</div>
-</div>
+{
+  "error": "Bad Request",
+  "message": "Invalid album URL: Must be a Google Photos URL",
+  "validFormats": [
+    "https://photos.app.goo.gl/...",
+    "https://photos.google.com/share/..."
+  ]
+}
 ```
 
-**Error: Photo Fetch Failed (500 Internal Server Error):**
+**Error: Photo Fetch Failed (404/500):**
 
 Returns when photo fetching fails.
 
 ```http
-HTTP/1.1 500 Internal Server Error
-Content-Type: text/html; charset=utf-8
+HTTP/1.1 404 Not Found
+Content-Type: application/json
 
-<div class="flex flex--col flex--center-x flex--center-y">
-  <div class="value value--large">❌</div>
-  <div class="title title--medium">Error</div>
-  <div class="description">Failed to fetch photos: Album not found</div>
-</div>
+{
+  "error": "Not Found",
+  "message": "Album not found. The album may have been deleted or made private.",
+  "timestamp": "2026-01-19T09:00:00.000Z"
+}
 ```
 
 #### Response Headers
 
 ```http
-Content-Type: text/html; charset=utf-8
-Access-Control-Allow-Origin: https://usetrmnl.com
-Access-Control-Allow-Methods: GET, POST, OPTIONS
+Content-Type: application/json
+Access-Control-Allow-Origin: https://hossain-khan.github.io, https://usetrmnl.com
+Access-Control-Allow-Methods: GET, OPTIONS
 Access-Control-Max-Age: 86400
 ```
 
@@ -196,26 +186,27 @@ Access-Control-Max-Age: 86400
 
 | Metric                   | Value      |
 | ------------------------ | ---------- |
-| Response Time (cached)   | 50-300ms   |
-| Response Time (uncached) | 200-2000ms |
-| HTML Size                | 1-5 KB     |
+| Response Time (cached)   | 67ms       |
+| Response Time (uncached) | 1-2s       |
+| JSON Size                | 300-500B   |
 | CPU Time                 | <50ms      |
 
 #### Error Codes
 
-| Code | Meaning               | Cause                                                          |
-| ---- | --------------------- | -------------------------------------------------------------- |
-| 200  | Success               | Photo rendered successfully or error template displayed        |
-| 400  | Bad Request           | Invalid album URL format                                       |
-| 500  | Internal Server Error | Photo fetch failed, template rendering failed, or server error |
+| Code | Meaning               | Cause                                                   |
+| ---- | --------------------- | ------------------------------------------------------- |
+| 200  | Success               | Photo data returned successfully                        |
+| 400  | Bad Request           | Missing or invalid album URL                            |
+| 404  | Not Found             | Album not found or inaccessible                         |
+| 500  | Internal Server Error | Photo fetch failed or server error                      |
 
 #### Common Error Messages
 
 **User-Friendly Error Messages:**
 
-1. **"No album URL configured"**
-   - Cause: `shared_album_url` is empty or missing
-   - Action: Add album URL in plugin settings
+1. **"Missing required parameter: album_url"**
+   - Cause: `album_url` query parameter is missing
+   - Action: Add album_url to request
 
 2. **"Invalid album URL: Must be a Google Photos URL"**
    - Cause: URL doesn't match Google Photos format
@@ -241,74 +232,82 @@ Access-Control-Max-Age: 86400
 
 ## Request Examples
 
-### Example 1: Basic Request (Full Layout)
+### Example 1: Basic Request (JSON API)
 
 ```bash
-curl -X POST https://trmnl-google-photos.workers.dev/markup \
-  -H "Content-Type: application/json" \
-  -d '{
-    "trmnl": {
-      "plugin_settings": {
-        "instance_name": "Family Photos",
-        "shared_album_url": "https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
-      },
-      "screen": {
-        "width": 800,
-        "height": 480,
-        "bit_depth": 1
-      },
-      "layout": "full"
-    }
-  }'
+curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
 ```
 
-### Example 2: Half Horizontal Layout
+**Response:**
 
-```bash
-curl -X POST https://trmnl-google-photos.workers.dev/markup \
-  -H "Content-Type: application/json" \
-  -d '{
-    "trmnl": {
-      "plugin_settings": {
-        "instance_name": "Vacation Photos",
-        "shared_album_url": "https://photos.google.com/share/AF1QipMZN..."
-      },
-      "screen": {
-        "width": 800,
-        "height": 480,
-        "bit_depth": 2
-      },
-      "layout": "half_horizontal"
-    }
-  }'
+```json
+{
+  "photo_url": "https://lh3.googleusercontent.com/...=w800-h480",
+  "thumbnail_url": "https://lh3.googleusercontent.com/...=w400-h300",
+  "caption": null,
+  "timestamp": "2026-01-19T09:00:00.000Z",
+  "album_name": "Google Photos Shared Album",
+  "photo_count": 142
+}
 ```
 
-### Example 3: TRMNL V2 Device (High Resolution)
+### Example 2: With Different Album
 
 ```bash
-curl -X POST https://trmnl-google-photos.workers.dev/markup \
-  -H "Content-Type: application/json" \
-  -d '{
-    "trmnl": {
-      "plugin_settings": {
-        "instance_name": "Art Gallery",
-        "shared_album_url": "https://photos.app.goo.gl/..."
-      },
-      "screen": {
-        "width": 1024,
-        "height": 758,
-        "bit_depth": 4
-      },
-      "layout": "full"
-    }
-  }'
+curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.google.com/share/AF1QipMZN..."
+```
+
+### Example 3: Testing Locally
+
+```bash
+# Start local dev server first: npm run dev
+curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
+```
+
+---
+
+## TRMNL Integration
+
+### How It Works
+
+1. **TRMNL Polls Worker**: TRMNL platform makes GET request to `/api/photo`
+2. **Worker Returns JSON**: Worker fetches random photo and returns JSON data
+3. **TRMNL Renders Templates**: TRMNL merges JSON into Liquid templates (stored in Markup Editor)
+4. **Display on Device**: TRMNL sends rendered HTML to e-ink device
+
+### Template Access to JSON Data
+
+Templates in TRMNL Markup Editor access JSON fields directly:
+
+```liquid
+<!-- Access photo URL -->
+<img src="{{ photo_url }}" alt="{{ caption }}" class="image image--contain">
+
+<!-- Display caption if available -->
+{% if caption %}
+<div class="description" data-clamp="2">{{ caption }}</div>
+{% endif %}
+
+<!-- Show album info -->
+<div class="label">{{ photo_count }} photos in {{ album_name }}</div>
+```
+
+### Polling Configuration
+
+In `settings.yml`:
+
+```yaml
+strategy: polling
+polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}
+polling_verb: GET
+refresh_frequency: 3600  # 1 hour
 ```
 
 ---
 
 ## Layouts
 
-The worker supports four responsive layouts optimized for different screen sizes and orientations:
+Templates are stored in TRMNL Markup Editor and render JSON data from the API. The worker supports four responsive layouts optimized for different screen sizes and orientations:
 
 ### 1. Full Layout (`full`)
 
@@ -408,26 +407,34 @@ Supported TRMNL devices:
 
 ## Caching
 
-### KV Cache (Optional)
+### KV Cache
 
-When configured, the worker uses Cloudflare KV for album data caching:
+The worker uses Cloudflare KV for album data caching:
 
 **Cache Key Format**: `album:{albumId}`
 
 **Cache Behavior**:
 
 - TTL: 3600 seconds (1 hour)
-- Cache Hit: 50-200ms response time
-- Cache Miss: 200-2000ms response time (fetches from Google Photos)
+- Cache Hit: 67ms response time (average)
+- Cache Miss: 1-2s response time (fetches from Google Photos)
 - Shared: Multiple users share cache for same album
 
 **Benefits**:
 
 - 80%+ reduction in Google Photos API calls
-- Faster response times
+- 20x faster response times for cached albums
 - Lower API rate limit impact
 
-**Setup**: Configure KV namespace in `wrangler.toml` under `[[kv_namespaces]]` binding. See [Cloudflare KV Documentation](https://developers.cloudflare.com/kv/) for setup instructions.
+**Configuration**: KV namespace configured in `wrangler.toml`:
+
+```toml
+[[kv_namespaces]]
+binding = "PHOTOS_CACHE"
+id = "737dfeaef9a142689b8896ed818fb615"
+```
+
+See [README_CACHE.md](../src/services/README_CACHE.md) for detailed cache documentation.
 
 ---
 
@@ -528,19 +535,22 @@ wrangler tail
 
 ### Debug Mode
 
-To enable debug logging:
+The API provides detailed logging in Cloudflare Workers logs:
 
-```json
-{
-  "trmnl": {
-    "plugin_settings": {
-      "instance_name": "Debug Test",
-      "shared_album_url": "https://photos.app.goo.gl/...",
-      "debug": true
-    }
-  }
-}
+```bash
+# View real-time logs
+wrangler tail
+
+# Or in Cloudflare Dashboard:
+# Workers & Pages > trmnl-google-photos > Logs
 ```
+
+Log entries include:
+- Request ID (for tracing)
+- Duration metrics (parse, fetch, total)
+- Album URL (truncated for privacy)
+- Error details (if any)
+- Cache hit/miss status
 
 ---
 
