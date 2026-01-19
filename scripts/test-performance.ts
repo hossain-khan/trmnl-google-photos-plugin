@@ -123,7 +123,7 @@ async function measureTime<T>(
  */
 async function testUrlParsing(): Promise<MeasurementResult<unknown>[]> {
   // Load URL parser
-  const { parseAlbumUrl } = await import(join(projectRoot, 'lib', 'url-parser'));
+  const { parseAlbumUrl } = await import(join(projectRoot, 'src', 'lib', 'url-parser'));
 
   const testUrls: string[] = [
     'https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8',
