@@ -17,7 +17,7 @@ import {
 type Bindings = {
   ENVIRONMENT?: string;
   PHOTOS_CACHE?: KVNamespace; // Optional KV namespace for caching album data
-  ANALYTICS?: AnalyticsEngineDataset; // Optional Analytics Engine for monitoring
+  ANALYTICS?: AnalyticsEngineDataset; // Optional Analytics Engine (disabled on free tier)
 };
 
 // Constants
@@ -255,7 +255,7 @@ app.get('/api/photo', async (c) => {
     };
     trackPerformance(metrics);
 
-    // Send to Analytics Engine (if configured)
+    // Send to Analytics Engine (if configured - disabled by default on free tier)
     sendAnalytics(c.env.ANALYTICS, metrics);
 
     return c.json(response);
@@ -283,7 +283,7 @@ app.get('/api/photo', async (c) => {
     };
     trackError(errorContext);
 
-    // Send to Analytics Engine (if configured)
+    // Send to Analytics Engine (if configured - disabled by default on free tier)
     sendAnalytics(c.env.ANALYTICS, {
       requestId,
       endpoint: '/api/photo',

@@ -224,13 +224,15 @@ export function trackError(context: ErrorContext): void {
 
 /**
  * Send metrics to Cloudflare Analytics Engine (if configured)
+ * Note: Analytics Engine is disabled by default (free tier compatible)
+ * The monitoring system uses console.log for structured logging instead
  */
 export function sendAnalytics(
   analytics: AnalyticsEngineDataset | undefined,
   dataPoint: Record<string, unknown>
 ): void {
   if (!analytics) {
-    return; // Analytics not configured
+    return; // Analytics not configured - using console.log fallback
   }
 
   try {
