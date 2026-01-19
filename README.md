@@ -37,6 +37,16 @@ See how your photos look across different TRMNL layouts:
   </tr>
 </table>
 
+<p align="right">
+  <a href="#-installation">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="assets/trmnl-brand/trmnl-badge-works-with-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="assets/trmnl-brand/trmnl-badge-works-with-light.svg">
+      <img alt="Show it on TRMNL" src="assets/trmnl-brand/trmnl-badge-show-it-on-dark.svg" height="40">
+    </picture>
+  </a>
+</p>
+
 ## 🔐 Privacy First
 
 This plugin is built with privacy at its core:
