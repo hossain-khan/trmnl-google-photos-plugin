@@ -8,7 +8,8 @@
     <meta property="og:image" content="assets/icon/google-photos-icon.png">
     <meta property="og:title" content="Google Photos TRMNL Plugin">
     <meta property="og:description" content="Display random photos from your Google Photos shared albums on TRMNL e-ink displays">
-    <link rel="stylesheet" href="https://usetrmnl.com/css/framework.css">
+    <link rel="stylesheet" href="https://usetrmnl.com/css/latest/plugins.css">
+    <script src="https://usetrmnl.com/js/latest/plugins.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -142,6 +143,7 @@
             align-items: center;
             justify-content: center;
             overflow: auto;
+            padding: 20px;
         }
         .preview-container.loading {
             background: #f8f9fa;
@@ -410,13 +412,35 @@
                 const response = await fetch(`templates/preview/${layout}.liquid`);
                 const html = await response.text();
                 
-                // Wrap in TRMNL framework
+                // Determine view class based on layout using a mapping for maintainability
+                const viewClassMap = {
+                    full: 'view--full',
+                    half_horizontal: 'view--half view--half-horizontal',
+                    half_vertical: 'view--half view--half-vertical',
+                    quadrant: 'view--quadrant'
+                };
+                const viewClass = viewClassMap[layout] || 'view--full';
+                
+                // Wrap in TRMNL framework with proper structure
                 templatePreview.innerHTML = `
-                    <link rel="stylesheet" href="https://usetrmnl.com/css/framework.css">
-                    <div style="max-width: 800px; width: 100%;">
-                        ${html}
+                    <div class="environment trmnl" style="max-width: 800px; width: 100%; margin: 0 auto;">
+                        <div class="screen">
+                            <div class="view ${viewClass}">
+                                ${html}
+                            </div>
+                        </div>
                     </div>
                 `;
+                
+                // Re-initialize TRMNL JavaScript for the new content
+                if (window.TRMNL && window.TRMNL.init) {
+                    try {
+                        window.TRMNL.init();
+                    } catch (initError) {
+                        console.error('Error initializing TRMNL framework:', initError);
+                        // Keep the rendered template visible even if TRMNL.init fails
+                    }
+                }
             } catch (error) {
                 console.error('Error loading template:', error);
                 templatePreview.innerHTML = '<div class="preview-empty"><div style="font-size: 48px;">❌</div><p>Failed to load template</p></div>';
