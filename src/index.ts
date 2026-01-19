@@ -224,7 +224,7 @@ app.get('/api/photo', async (c) => {
           message: errorMessage,
           timestamp: new Date().toISOString(),
         },
-        statusCode
+        statusCode as 404 | 500
       );
     }
 
@@ -256,7 +256,7 @@ app.get('/api/photo', async (c) => {
     trackPerformance(metrics);
 
     // Send to Analytics Engine (if configured - disabled by default on free tier)
-    sendAnalytics(c.env.ANALYTICS, metrics);
+    sendAnalytics(c.env.ANALYTICS, metrics as unknown as Record<string, unknown>);
 
     return c.json(response);
   } catch (error) {

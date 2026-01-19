@@ -3,6 +3,8 @@
  * Tests logging, error classification, and analytics tracking
  */
 
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
+
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import {
@@ -122,7 +124,8 @@ describe('Logger', () => {
 
     const parsed = JSON.parse(logOutput);
     assert.ok(parsed.timestamp);
-    assert.ok(new Date(parsed.timestamp).getTime() > 0);
+    assert.ok(typeof parsed.timestamp === 'string');
+    assert.ok(new Date(parsed.timestamp as string).getTime() > 0);
   });
 
   it('should include duration in logs', () => {
@@ -267,7 +270,8 @@ describe('Performance Tracking', () => {
 
     const parsed = JSON.parse(logOutput);
     assert.ok(parsed.timestamp);
-    assert.ok(new Date(parsed.timestamp).getTime() > 0);
+    assert.ok(typeof parsed.timestamp === 'string');
+    assert.ok(new Date(parsed.timestamp as string).getTime() > 0);
   });
 });
 
