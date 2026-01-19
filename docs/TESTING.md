@@ -181,7 +181,7 @@ Integration tests validate the library integration with real albums:
 
 #### Test Album
 
-- **URL**: `https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8` (demo album)
+- **URL**: `https://photos.app.goo.gl/ENK6C44K85QgVHPH8` (demo album)
 - **Expected**: Array of ImageInfo objects
 - **Status**: ✅ Working with production deployment
 
@@ -228,7 +228,7 @@ To test locally:
 npm run dev
 
 # Test endpoint
-curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
+curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
 ```
 
 ## Error Handling Tests

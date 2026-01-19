@@ -56,7 +56,7 @@ interface SuccessCriteria {
 // Configuration
 const DEFAULT_WORKER_URL = 'http://localhost:8787';
 const DEFAULT_NUM_REQUESTS = 50;
-const VALID_ALBUM_URL = 'https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8';
+const VALID_ALBUM_URL = 'https://photos.app.goo.gl/ENK6C44K85QgVHPH8';
 
 // Parse command line arguments
 const workerUrl = process.argv[2] || DEFAULT_WORKER_URL;

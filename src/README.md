@@ -80,7 +80,7 @@ curl http://localhost:8787/
 curl http://localhost:8787/health
 
 # Test /api/photo with valid album
-curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
+curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
 ```
 
 ### Type Checking

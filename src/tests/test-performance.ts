@@ -126,7 +126,7 @@ async function testUrlParsing(): Promise<MeasurementResult<unknown>[]> {
   const { parseAlbumUrl } = await import(join(projectRoot, 'src', 'lib', 'url-parser'));
 
   const testUrls: string[] = [
-    'https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8',
+    'https://photos.app.goo.gl/ENK6C44K85QgVHPH8',
     'https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF',
     'https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF?key=value',
   ];
