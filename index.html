@@ -31,6 +31,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            padding-top: 2rem;
         }
         h1 {
             text-align: center;
@@ -131,6 +132,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
+            vertical-align: middle;
         }
         .status-badge:hover {
             transform: translateY(-1px);
@@ -455,6 +457,10 @@
             color: #ffc107;
             font-weight: 600;
         }
+        .environment .view {
+            border: 2px dashed #cbd5e0;
+            box-shadow: 0 0 0 4px rgba(203, 213, 224, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -485,7 +491,7 @@
             
             <div class="example-urls">
                 <strong>Demo album:</strong> <a onclick="useExampleUrl()">Use example album</a> | 
-                <strong>API Docs:</strong> <a href="https://github.com/hossain-khan/trmnl-google-photos-plugin#api" target="_blank">View documentation</a>
+                <strong>API Docs:</strong> <a href="https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/docs/API_DOCUMENTATION.md" target="_blank">View documentation</a>
             </div>
             
             <div id="errorContainer"></div>
@@ -566,6 +572,9 @@
     <script>
         const API_URL = 'https://trmnl-google-photos.gohk.xyz/api/photo';
         const HEALTH_URL = 'https://trmnl-google-photos.gohk.xyz/health';
+        
+        // Session cache for fetched photo data
+        let cachedPhotoData = null;
         
         console.log('[TRMNL] Page loaded, initializing...');
         
@@ -712,6 +721,10 @@
                 
                 const data = await response.json();
                 
+                // Cache photo data for layout previews
+                cachedPhotoData = data;
+                console.log('[API] Photo data cached for layout previews');
+                
                 console.log('[API] ✓ Photo data received:', {
                     photo_url: data.photo_url ? data.photo_url.substring(0, 50) + '...' : 'N/A',
                     photo_count: data.photo_count,
@@ -818,6 +831,14 @@
                 const html = await response.text();
                 
                 console.log(`[Template] ✓ Template loaded (${html.length} chars)`);
+                
+                // Replace placeholder with cached photo if available
+                if (cachedPhotoData && cachedPhotoData.photo_url) {
+                    console.log('[Template] Injecting cached photo data into template');
+                    html = html.replace(/https:\/\/picsum\.photos\/[^\s"']*/g, cachedPhotoData.photo_url);
+                    html = html.replace(/Google Photos Album/g, cachedPhotoData.album_name || 'Google Photos Album');
+                    html = html.replace(/142 photos/g, `${cachedPhotoData.photo_count || 142} photos`);
+                }
                 
                 // Determine view class based on layout using a mapping for maintainability
                 const viewClassMap = {
