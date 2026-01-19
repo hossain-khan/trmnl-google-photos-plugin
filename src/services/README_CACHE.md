@@ -5,6 +5,7 @@ This service provides optional KV caching for Google Photos album data to improv
 ## Overview
 
 The cache service is designed to:
+
 - Cache album photo lists in Cloudflare KV for 1 hour
 - Reduce Google Photos API calls by 80%+
 - Improve response times from ~2-3s to <500ms for cached albums
@@ -14,7 +15,7 @@ The cache service is designed to:
 ## Architecture
 
 ```
-Request → Check KV Cache → Cache Hit? 
+Request → Check KV Cache → Cache Hit?
                               ↓ Yes: Return cached photos
                               ↓ No:  Fetch from Google Photos API
                                      ↓
@@ -51,8 +52,8 @@ The cache is automatically used when the `PHOTOS_CACHE` KV namespace is configur
 ```typescript
 // In index.ts
 const photoData = await fetchRandomPhoto(
-  urlValidation.url, 
-  c.env.PHOTOS_CACHE  // Optional KV namespace
+  urlValidation.url,
+  c.env.PHOTOS_CACHE // Optional KV namespace
 );
 ```
 
@@ -63,13 +64,16 @@ const photoData = await fetchRandomPhoto(
 Get cached album data from KV.
 
 **Parameters:**
+
 - `kv: KVNamespace | undefined` - Cloudflare KV namespace
 - `albumId: string` - Album identifier
 
 **Returns:**
+
 - `CachedAlbumData | null` - Cached data or null if not found/expired
 
 **Behavior:**
+
 - Returns `null` if KV is undefined (cache disabled)
 - Returns `null` on cache miss
 - Returns `null` on errors (graceful fallback)
@@ -80,14 +84,17 @@ Get cached album data from KV.
 Store album data in KV cache.
 
 **Parameters:**
+
 - `kv: KVNamespace | undefined` - Cloudflare KV namespace
 - `albumId: string` - Album identifier
 - `photos: GooglePhoto[]` - Array of photos to cache
 
 **Returns:**
+
 - `Promise<void>`
 
 **Behavior:**
+
 - Skips caching if KV is undefined
 - Stores data with 1-hour TTL
 - Logs cache storage success
@@ -98,12 +105,15 @@ Store album data in KV cache.
 Extract album ID from Google Photos URL.
 
 **Parameters:**
+
 - `url: string` - Google Photos album URL
 
 **Returns:**
+
 - `string` - Album ID for cache key
 
 **Behavior:**
+
 - Handles short URLs (`photos.app.goo.gl`)
 - Handles full URLs (`photos.google.com/share`)
 - Handles album URLs (`photos.google.com/u/0/album`)
@@ -114,9 +124,11 @@ Extract album ID from Google Photos URL.
 Generate cache key for an album.
 
 **Parameters:**
+
 - `albumId: string` - Album identifier
 
 **Returns:**
+
 - `string` - Cache key in format `album:{albumId}`
 
 ## Configuration
@@ -186,16 +198,17 @@ Cache lookup error for album:ABC123XYZ: KV timeout
 
 ### Expected Performance
 
-| Scenario | Response Time | API Calls | Cache Hit Rate |
-|----------|---------------|-----------|----------------|
-| Cache Hit | <500ms | 0 | - |
-| Cache Miss | 2-3s | 1 | - |
-| Overall (with caching) | <1s average | 20% of requests | 80%+ |
-| Overall (without caching) | 2-3s average | 100% of requests | N/A |
+| Scenario                  | Response Time | API Calls        | Cache Hit Rate |
+| ------------------------- | ------------- | ---------------- | -------------- |
+| Cache Hit                 | <500ms        | 0                | -              |
+| Cache Miss                | 2-3s          | 1                | -              |
+| Overall (with caching)    | <1s average   | 20% of requests  | 80%+           |
+| Overall (without caching) | 2-3s average  | 100% of requests | N/A            |
 
 ### Monitoring
 
 Check cache performance in worker logs:
+
 - Count "Cache HIT" vs "Cache MISS" occurrences
 - Monitor response times for cached vs uncached requests
 - Track KV read/write usage in Cloudflare dashboard
@@ -222,6 +235,7 @@ npm test scripts/test-cache-service.js
 ```
 
 Tests cover:
+
 - Cache key generation
 - Album ID extraction
 - Cache behavior validation
@@ -259,6 +273,7 @@ curl -X POST https://your-worker.workers.dev/markup \
 - **Storage**: 1 GB
 
 **Estimated capacity:**
+
 - ~50,000 TRMNL requests per day (with 80% cache hit rate)
 - ~1,000 unique albums cached per day
 - Millions of photo metadata entries in storage
@@ -274,6 +289,7 @@ curl -X POST https://your-worker.workers.dev/markup \
 ### No User Data
 
 Cache contains only:
+
 - Album photo metadata (URLs, dimensions)
 - Public album information
 - No user identifiers
@@ -282,6 +298,7 @@ Cache contains only:
 ### Shared Cache
 
 Multiple users with the same album URL share the same cache entry:
+
 - **Efficient**: Reduces redundant API calls
 - **Privacy-safe**: Only public shared album data
 - **GDPR compliant**: No personal data stored
@@ -302,12 +319,14 @@ wrangler kv:key delete --binding=PHOTOS_CACHE "album:ABC123"
 **Symptom**: All requests show "Cache MISS"
 
 **Check:**
+
 1. KV namespaces created: `wrangler kv:namespace list`
 2. IDs in wrangler.toml match created namespaces
 3. Worker deployed after wrangler.toml update
 4. KV binding available: Check worker logs for "KV cache not configured"
 
 **Solution:**
+
 ```bash
 # Verify namespaces exist
 wrangler kv:namespace list
@@ -321,11 +340,13 @@ wrangler deploy
 **Symptom**: >30% cache misses
 
 **Causes:**
+
 1. Different users using different album URLs (expected)
 2. TTL expired between requests (expected if >1 hour apart)
 3. Cache keys not matching due to URL format variations
 
 **Solution:**
+
 - Monitor for 24 hours to establish baseline
 - Verify same album URL format is used consistently
 - Consider increasing TTL if needed (edit `CACHE_TTL_SECONDS` in cache-service.ts)
@@ -335,11 +356,13 @@ wrangler deploy
 **Symptom**: "Cache lookup error" or "Cache storage error" in logs
 
 **Causes:**
+
 1. KV namespace rate limits exceeded
 2. Network issues
 3. KV namespace misconfigured
 
 **Solution:**
+
 - Check Cloudflare dashboard for KV usage and errors
 - Verify namespace IDs are correct
 - Check KV namespace status in Cloudflare dashboard

@@ -22,20 +22,26 @@ src/
 ## Main Components
 
 ### `index.ts`
+
 Main Cloudflare Worker entry point with Hono framework:
+
 - `GET /` - Health check endpoint
 - `GET /health` - Health check endpoint (alternative)
 - `GET /api/photo` - JSON API endpoint for TRMNL Polling strategy
 - `POST /markup` - DEPRECATED (returns migration notice)
 
 ### `types.ts`
+
 TypeScript interfaces for:
+
 - Photo data format (JSON response)
 - Google Photos API responses
 - Worker environment bindings
 
 ### `services/photo-fetcher.ts`
+
 Photo fetching service with:
+
 - `fetchAlbumPhotos()` - Fetch all photos from shared album
 - `selectRandomPhoto()` - Random photo selection
 - `optimizePhotoUrl()` - URL optimization for e-ink
@@ -99,6 +105,7 @@ npm test
 ### First-time Setup
 
 1. Login to Cloudflare:
+
    ```bash
    npm run cf:login
    ```
@@ -153,6 +160,7 @@ See [API_DOCUMENTATION.md](../docs/API_DOCUMENTATION.md) for complete API docume
 ## Error Handling
 
 All errors return JSON with appropriate error messages:
+
 - Empty URL → JSON error with instructions
 - Invalid URL → JSON error with validation message
 - Album not found → JSON error with 404 message

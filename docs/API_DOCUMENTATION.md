@@ -18,12 +18,14 @@ No authentication required. The worker is designed to work with publicly shared 
 Returns basic information about the service.
 
 **Request:**
+
 ```http
 GET / HTTP/1.1
 Host: trmnl-google-photos.workers.dev
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "status": "ok",
@@ -44,12 +46,14 @@ Host: trmnl-google-photos.workers.dev
 Dedicated health check endpoint for monitoring.
 
 **Request:**
+
 ```http
 GET /health HTTP/1.1
 Host: trmnl-google-photos.workers.dev
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "status": "healthy",
@@ -72,6 +76,7 @@ Host: trmnl-google-photos.workers.dev
 #### Request
 
 **Headers:**
+
 ```http
 POST /markup HTTP/1.1
 Host: trmnl-google-photos.workers.dev
@@ -79,6 +84,7 @@ Content-Type: application/json
 ```
 
 **Body:**
+
 ```json
 {
   "trmnl": {
@@ -98,16 +104,17 @@ Content-Type: application/json
 
 **Request Body Schema:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `trmnl.plugin_settings.instance_name` | string | Yes | Display name for the plugin instance |
-| `trmnl.plugin_settings.shared_album_url` | string | Yes | Google Photos shared album URL |
-| `trmnl.screen.width` | number | No | Screen width in pixels (default: 800) |
-| `trmnl.screen.height` | number | No | Screen height in pixels (default: 480) |
-| `trmnl.screen.bit_depth` | number | No | Bit depth (1, 2, or 4) (default: 1) |
-| `trmnl.layout` | string | No | Layout type: `full`, `half_horizontal`, `half_vertical`, `quadrant` |
+| Field                                    | Type   | Required | Description                                                         |
+| ---------------------------------------- | ------ | -------- | ------------------------------------------------------------------- |
+| `trmnl.plugin_settings.instance_name`    | string | Yes      | Display name for the plugin instance                                |
+| `trmnl.plugin_settings.shared_album_url` | string | Yes      | Google Photos shared album URL                                      |
+| `trmnl.screen.width`                     | number | No       | Screen width in pixels (default: 800)                               |
+| `trmnl.screen.height`                    | number | No       | Screen height in pixels (default: 480)                              |
+| `trmnl.screen.bit_depth`                 | number | No       | Bit depth (1, 2, or 4) (default: 1)                                 |
+| `trmnl.layout`                           | string | No       | Layout type: `full`, `half_horizontal`, `half_vertical`, `quadrant` |
 
 **Supported Album URL Formats:**
+
 - Short URL: `https://photos.app.goo.gl/{shortcode}`
 - Full URL: `https://photos.google.com/share/{albumId}`
 - Full URL with params: `https://photos.google.com/share/{albumId}?key=value`
@@ -124,8 +131,8 @@ Content-Type: text/html; charset=utf-8
 
 <div class="flex flex--col gap--small h--full">
   <div class="flex flex--center-x flex--center-y" style="flex: 1;">
-    <img src="https://lh3.googleusercontent.com/...=w800-h480" 
-         alt="" 
+    <img src="https://lh3.googleusercontent.com/...=w800-h480"
+         alt=""
          class="image image--contain"
          style="max-width: 100%; max-height: 100%; object-fit: contain;">
   </div>
@@ -187,20 +194,20 @@ Access-Control-Max-Age: 86400
 
 #### Performance Characteristics
 
-| Metric | Value |
-|--------|-------|
-| Response Time (cached) | 50-300ms |
+| Metric                   | Value      |
+| ------------------------ | ---------- |
+| Response Time (cached)   | 50-300ms   |
 | Response Time (uncached) | 200-2000ms |
-| HTML Size | 1-5 KB |
-| CPU Time | <50ms |
+| HTML Size                | 1-5 KB     |
+| CPU Time                 | <50ms      |
 
 #### Error Codes
 
-| Code | Meaning | Cause |
-|------|---------|-------|
-| 200 | Success | Photo rendered successfully or error template displayed |
-| 400 | Bad Request | Invalid album URL format |
-| 500 | Internal Server Error | Photo fetch failed, template rendering failed, or server error |
+| Code | Meaning               | Cause                                                          |
+| ---- | --------------------- | -------------------------------------------------------------- |
+| 200  | Success               | Photo rendered successfully or error template displayed        |
+| 400  | Bad Request           | Invalid album URL format                                       |
+| 500  | Internal Server Error | Photo fetch failed, template rendering failed, or server error |
 
 #### Common Error Messages
 
@@ -308,6 +315,7 @@ The worker supports four responsive layouts optimized for different screen sizes
 **Best For**: Full-screen display, single large photo
 
 **Characteristics**:
+
 - Photo fills 90% of screen height
 - Optional caption below (truncated to 2 lines)
 - Photo count badge in title area
@@ -320,6 +328,7 @@ The worker supports four responsive layouts optimized for different screen sizes
 **Best For**: Half-size horizontal display, landscape orientation
 
 **Characteristics**:
+
 - Photo on left, caption on right
 - Side-by-side layout
 - Vertical centering
@@ -332,6 +341,7 @@ The worker supports four responsive layouts optimized for different screen sizes
 **Best For**: Half-size vertical display, portrait orientation
 
 **Characteristics**:
+
 - Photo on top (85% height)
 - Caption below (compact, 2 lines)
 - Minimal padding
@@ -344,6 +354,7 @@ The worker supports four responsive layouts optimized for different screen sizes
 **Best For**: Quarter-size display, compact view
 
 **Characteristics**:
+
 - Photo only, no caption
 - Minimal padding
 - Photo fills entire space
@@ -357,14 +368,15 @@ The worker supports four responsive layouts optimized for different screen sizes
 
 Supported TRMNL devices:
 
-| Device | Width | Height | Bit Depth | Display Type |
-|--------|-------|--------|-----------|--------------|
-| TRMNL OG | 800px | 480px | 1-bit | Monochrome (2 shades) |
-| TRMNL OG V2 | 800px | 480px | 2-bit | Grayscale (4 shades) |
-| TRMNL V2 | 1024px | 758px | 4-bit | Grayscale (16 shades) |
-| Kindle 2024 | 600px | 800px | 4-bit | Grayscale (16 shades) |
+| Device      | Width  | Height | Bit Depth | Display Type          |
+| ----------- | ------ | ------ | --------- | --------------------- |
+| TRMNL OG    | 800px  | 480px  | 1-bit     | Monochrome (2 shades) |
+| TRMNL OG V2 | 800px  | 480px  | 2-bit     | Grayscale (4 shades)  |
+| TRMNL V2    | 1024px | 758px  | 4-bit     | Grayscale (16 shades) |
+| Kindle 2024 | 600px  | 800px  | 4-bit     | Grayscale (16 shades) |
 
 **Photo Optimization**:
+
 - Photos are automatically optimized for e-ink displays
 - URL parameter: `=w800-h480` (or appropriate dimensions)
 - Maintains aspect ratio
@@ -375,16 +387,19 @@ Supported TRMNL devices:
 ## Rate Limits
 
 **Cloudflare Workers Free Tier**:
+
 - 100,000 requests per day
 - 50ms CPU time per request
 - 1MB bundle size limit
 
 **Google Photos API**:
+
 - No official rate limits documented
 - May throttle aggressive requests
 - Recommended: <100 requests/minute per album
 
 **Best Practices**:
+
 - Enable KV caching to reduce Google Photos API calls
 - Cache hit reduces response time by 80%
 - Shared cache across all users for same album
@@ -400,12 +415,14 @@ When configured, the worker uses Cloudflare KV for album data caching:
 **Cache Key Format**: `album:{albumId}`
 
 **Cache Behavior**:
+
 - TTL: 3600 seconds (1 hour)
 - Cache Hit: 50-200ms response time
 - Cache Miss: 200-2000ms response time (fetches from Google Photos)
 - Shared: Multiple users share cache for same album
 
 **Benefits**:
+
 - 80%+ reduction in Google Photos API calls
 - Faster response times
 - Lower API rate limit impact
@@ -435,12 +452,14 @@ All requests generate structured JSON logs:
 ```
 
 **Log Levels**:
+
 - `info`: Normal operations
 - `debug`: Detailed debugging information
 - `warn`: Warning conditions
 - `error`: Error conditions
 
 **Key Metrics Logged**:
+
 - Request ID (for tracing)
 - Duration (total, parse, fetch, render)
 - Album URL (truncated)
@@ -451,11 +470,13 @@ All requests generate structured JSON logs:
 ### Accessing Logs
 
 **Cloudflare Dashboard**:
+
 1. Go to Workers & Pages
 2. Select your worker
 3. Click "Logs" → "Real-time Logs"
 
 **Wrangler CLI**:
+
 ```bash
 wrangler tail
 ```
@@ -490,15 +511,19 @@ wrangler tail
 ### Common Issues
 
 **Issue**: "Album not found"
+
 - **Solution**: Verify album URL, ensure it's shared publicly
 
 **Issue**: "Album access denied"
+
 - **Solution**: Enable link sharing for the album in Google Photos
 
 **Issue**: Slow response times
+
 - **Solution**: Enable KV caching, wait for cache to warm up
 
 **Issue**: "No photos found"
+
 - **Solution**: Add photos to album (videos not supported)
 
 ### Debug Mode
@@ -522,6 +547,7 @@ To enable debug logging:
 ## Support
 
 For issues or questions:
+
 - **GitHub Issues**: https://github.com/hossain-khan/trmnl-google-photos-plugin/issues
 - **Documentation**: See `docs/` directory
 - **Testing**: Run `npm test` for comprehensive test suite

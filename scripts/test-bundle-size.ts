@@ -2,19 +2,19 @@
 
 /**
  * Bundle Size Checker
- * 
+ *
  * Checks if the Cloudflare Worker bundle stays within the 1MB limit
- * 
+ *
  * Cloudflare Workers Limits:
  * - Free tier: 1MB compressed bundle size
  * - Paid tier: 10MB compressed bundle size
  * - Recommended: Stay well under limit for fast cold starts
- * 
+ *
  * Usage:
  *   node scripts/test-bundle-size.ts
  */
 
-import { readFileSync, statSync, existsSync } from 'node:fs';
+import { statSync, existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -63,11 +63,11 @@ interface LimitCheck {
  */
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 Bytes';
-  
+
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
@@ -83,7 +83,7 @@ function calculatePercentage(size: number, limit: number): string {
  */
 function checkBundleSize(): BundleInfo {
   console.log('🔨 Building worker bundle...\n');
-  
+
   try {
     // Run wrangler deploy --dry-run to get bundle info
     // Note: This requires wrangler CLI to be installed
@@ -96,11 +96,7 @@ function checkBundleSize(): BundleInfo {
     console.log(result);
 
     // Look for bundle file in .wrangler-output directory
-    const bundlePaths = [
-      '.wrangler-output/index.js',
-      '.wrangler/deploy/index.js',
-      'dist/index.js',
-    ];
+    const bundlePaths = ['.wrangler-output/index.js', '.wrangler/deploy/index.js', 'dist/index.js'];
 
     let bundleSize = 0;
     let bundlePath: string | null = null;
@@ -125,7 +121,6 @@ function checkBundleSize(): BundleInfo {
       path: bundlePath,
       method: 'actual',
     };
-
   } catch (error) {
     console.log('⚠️  Could not build bundle with wrangler. Estimating from source...');
     console.log(`   Error: ${(error as Error).message}`);
@@ -138,7 +133,7 @@ function checkBundleSize(): BundleInfo {
  */
 function estimateBundleSize(): BundleInfo {
   console.log('📊 Estimating bundle size from source files...\n');
-  
+
   let totalSize = 0;
   const files: FileInfo[] = [];
 
@@ -193,7 +188,7 @@ function estimateBundleSize(): BundleInfo {
 function displayAnalysis(bundleInfo: BundleInfo): void {
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('📦 Bundle Size Analysis\n');
-  
+
   if (bundleInfo.method === 'actual') {
     console.log(`Bundle path:          ${bundleInfo.path}`);
     console.log(`Bundle size:          ${formatBytes(bundleInfo.size)}`);
@@ -228,9 +223,11 @@ function displayAnalysis(bundleInfo: BundleInfo): void {
     const icon = check.pass ? '✅' : '❌';
     const percentage = calculatePercentage(bundleInfo.size, check.limit);
     const bar = '█'.repeat(Math.min(20, Math.round(parseFloat(percentage) / 5)));
-    
+
     console.log(`${icon} ${check.name}`);
-    console.log(`   ${formatBytes(bundleInfo.size)} / ${formatBytes(check.limit)} (${percentage}%)`);
+    console.log(
+      `   ${formatBytes(bundleInfo.size)} / ${formatBytes(check.limit)} (${percentage}%)`
+    );
     console.log(`   ${bar}`);
     console.log('');
   });
@@ -239,10 +236,10 @@ function displayAnalysis(bundleInfo: BundleInfo): void {
   if (bundleInfo.files && bundleInfo.files.length > 0) {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('📄 File Breakdown:\n');
-    
+
     // Sort by size (largest first)
     const sortedFiles = [...bundleInfo.files].sort((a, b) => b.size - a.size);
-    
+
     sortedFiles.forEach(({ file, size, estimated }: FileInfo): void => {
       const sizeStr = formatBytes(size).padEnd(10);
       const estMarker = estimated ? '(est)' : '';
@@ -277,8 +274,12 @@ function provideRecommendations(bundleInfo: BundleInfo): void {
   }
 
   console.log('\n📚 Resources:');
-  console.log('   - Cloudflare Workers Limits: https://developers.cloudflare.com/workers/platform/limits/');
-  console.log('   - Bundle size optimization: https://developers.cloudflare.com/workers/platform/limits/#worker-size');
+  console.log(
+    '   - Cloudflare Workers Limits: https://developers.cloudflare.com/workers/platform/limits/'
+  );
+  console.log(
+    '   - Bundle size optimization: https://developers.cloudflare.com/workers/platform/limits/#worker-size'
+  );
 }
 
 /**
@@ -298,7 +299,6 @@ function main(): void {
 
     console.log('\n✅ Bundle size check PASSED');
     process.exit(0);
-
   } catch (error) {
     console.error('❌ Bundle size check failed:', (error as Error).message);
     console.error((error as Error).stack);

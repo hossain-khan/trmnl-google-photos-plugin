@@ -2,13 +2,10 @@
 
 /**
  * Test script for fetch-photos.js
- * 
+ *
  * This creates a mock test to validate the photo fetching logic
  * without requiring actual network access.
  */
-
-import { writeFile } from 'fs/promises';
-import { resolve } from 'path';
 
 interface MockPhoto {
   uid: string;
@@ -44,29 +41,29 @@ interface OutputData {
 // Mock photo data that simulates what google-photos-album-image-url-fetch would return
 const mockPhotos: MockPhoto[] = [
   {
-    uid: "AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_",
-    url: "https://lh3.googleusercontent.com/Pt3C6874cqkfeuIVL0XZ-UCsC6zLzeQmxq7T9-sDiPhyAgvJiKl_SCrvrMMkpuWuZ1TFkU65ilaZJrCbePRYo1q1qGTYvFV6J8gbYfZhhxQuXm2zXx6QDQkj0K-uBBUzozw7YLYQ5g",
+    uid: 'AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_',
+    url: 'https://lh3.googleusercontent.com/Pt3C6874cqkfeuIVL0XZ-UCsC6zLzeQmxq7T9-sDiPhyAgvJiKl_SCrvrMMkpuWuZ1TFkU65ilaZJrCbePRYo1q1qGTYvFV6J8gbYfZhhxQuXm2zXx6QDQkj0K-uBBUzozw7YLYQ5g',
     width: 640,
     height: 480,
     imageUpdateDate: 1317552314000,
-    albumAddDate: 1564229558506
+    albumAddDate: 1564229558506,
   },
   {
-    uid: "AF1QipNcKcm3bkXUXl3tNYFNTlBDZfKUqvvV3JJi8MVJ",
-    url: "https://lh3.googleusercontent.com/Sl8wPPURFbFINwqgcEywOnpUk8sksgGKJI25Wtl885abhMoGHrxZh_qEe26bQmfv1OAG4ZX8qkz1svnLSJJZjh317TuU4cTk1vN04MbucjU8mlX7uDy0CPxVe8gggL-ftx6VgqWYxA",
+    uid: 'AF1QipNcKcm3bkXUXl3tNYFNTlBDZfKUqvvV3JJi8MVJ',
+    url: 'https://lh3.googleusercontent.com/Sl8wPPURFbFINwqgcEywOnpUk8sksgGKJI25Wtl885abhMoGHrxZh_qEe26bQmfv1OAG4ZX8qkz1svnLSJJZjh317TuU4cTk1vN04MbucjU8mlX7uDy0CPxVe8gggL-ftx6VgqWYxA',
     width: 4000,
     height: 3000,
     imageUpdateDate: 1535348376000,
-    albumAddDate: 1565370026893
+    albumAddDate: 1565370026893,
   },
   {
-    uid: "AF1QipNxMqbkMWKWOYGGwFwE4X9vOoGsn-L8BlwArcOQ",
-    url: "https://lh3.googleusercontent.com/i9DN1Lz7ft-oo-_Ubrprm8m4XyrI0sDpd5QFBlsNCV2FrWR2KYE95zLgPYSWcqdodGkCMEv7QZOIvRgfRqjlYLrfHQmGlQosTlvfYV8LcpyllenyOpJcgY-qRFN1wTjfZ-yQ-mzqjw",
+    uid: 'AF1QipNxMqbkMWKWOYGGwFwE4X9vOoGsn-L8BlwArcOQ',
+    url: 'https://lh3.googleusercontent.com/i9DN1Lz7ft-oo-_Ubrprm8m4XyrI0sDpd5QFBlsNCV2FrWR2KYE95zLgPYSWcqdodGkCMEv7QZOIvRgfRqjlYLrfHQmGlQosTlvfYV8LcpyllenyOpJcgY-qRFN1wTjfZ-yQ-mzqjw',
     width: 128,
     height: 128,
     imageUpdateDate: 1542123494000,
-    albumAddDate: 1565369489286
-  }
+    albumAddDate: 1565369489286,
+  },
 ];
 
 console.log('🧪 Testing photo fetching logic...\n');
@@ -77,30 +74,32 @@ const testUrls: string[] = [
   'https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5',
   'https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF',
   'https://invalid-url.com',
-  ''
+  '',
 ];
 
 function validateAlbumUrl(url: string): ValidationResult {
   if (!url) {
     return { valid: false, error: 'URL is required' };
   }
-  
+
   const shortUrlPattern = /^https:\/\/photos\.app\.goo\.gl\/[A-Za-z0-9_-]+$/;
   const fullUrlPattern = /^https:\/\/photos\.google\.com\/share\/[A-Za-z0-9_-]+/;
-  
+
   if (shortUrlPattern.test(url) || fullUrlPattern.test(url)) {
     return { valid: true, url };
   }
-  
-  return { 
-    valid: false, 
-    error: 'Invalid Google Photos URL' 
+
+  return {
+    valid: false,
+    error: 'Invalid Google Photos URL',
   };
 }
 
 testUrls.forEach((url: string): void => {
   const result = validateAlbumUrl(url);
-  console.log(`  ${result.valid ? '✓' : '✗'} ${url || '(empty)'} - ${result.valid ? 'Valid' : result.error}`);
+  console.log(
+    `  ${result.valid ? '✓' : '✗'} ${url || '(empty)'} - ${result.valid ? 'Valid' : result.error}`
+  );
 });
 
 // Test image optimization
@@ -111,9 +110,9 @@ const EINK_HEIGHT = 480;
 function optimizeForEink(baseUrl: string, originalWidth: number, originalHeight: number): string {
   const aspectRatio = originalWidth / originalHeight;
   const einkAspectRatio = EINK_WIDTH / EINK_HEIGHT;
-  
+
   let targetWidth: number, targetHeight: number;
-  
+
   if (aspectRatio > einkAspectRatio) {
     targetWidth = EINK_WIDTH;
     targetHeight = Math.round(EINK_WIDTH / aspectRatio);
@@ -121,7 +120,7 @@ function optimizeForEink(baseUrl: string, originalWidth: number, originalHeight:
     targetHeight = EINK_HEIGHT;
     targetWidth = Math.round(EINK_HEIGHT * aspectRatio);
   }
-  
+
   return `${baseUrl}=w${targetWidth}-h${targetHeight}`;
 }
 
@@ -129,7 +128,9 @@ mockPhotos.forEach((photo: MockPhoto, idx: number): void => {
   const optimized = optimizeForEink(photo.url, photo.width, photo.height);
   const sizeMatch = optimized.match(/=w(\d+)-h(\d+)/);
   if (sizeMatch) {
-    console.log(`  Photo ${idx + 1}: ${photo.width}x${photo.height} → ${sizeMatch[1]}x${sizeMatch[2]}`);
+    console.log(
+      `  Photo ${idx + 1}: ${photo.width}x${photo.height} → ${sizeMatch[1]}x${sizeMatch[2]}`
+    );
   }
 });
 
@@ -168,8 +169,8 @@ const outputData: OutputData = {
     original_width: selectedPhoto.width,
     original_height: selectedPhoto.height,
     image_update_date: new Date(selectedPhoto.imageUpdateDate).toISOString(),
-    album_add_date: new Date(selectedPhoto.albumAddDate).toISOString()
-  }
+    album_add_date: new Date(selectedPhoto.albumAddDate).toISOString(),
+  },
 };
 
 console.log('  ✓ Generated output data structure:');

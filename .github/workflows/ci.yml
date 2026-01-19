@@ -56,6 +56,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      - name: Check code formatting
+        run: npm run format:check
+      
+      - name: Run ESLint
+        run: npm run lint
+      
       - name: Check for common issues
         run: |
           echo "Checking for console.log statements in src/"

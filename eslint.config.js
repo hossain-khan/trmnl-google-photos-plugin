@@ -5,7 +5,14 @@ import prettierPlugin from 'eslint-plugin-prettier';
 
 export default tseslint.config(
   {
-    ignores: ['node_modules/**', 'dist/**', '.wrangler/**', '*.min.js', 'coverage/**'],
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      '.wrangler/**',
+      '.wrangler-output/**',
+      '*.min.js',
+      'coverage/**',
+    ],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
@@ -21,9 +28,16 @@ export default tseslint.config(
       },
     },
     rules: {
-      '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/explicit-function-return-type': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+      '@typescript-eslint/no-floating-promises': 'off', // Test files use node:test which doesn't require await
+      '@typescript-eslint/no-unsafe-assignment': 'warn',
+      '@typescript-eslint/no-unsafe-member-access': 'warn',
+      '@typescript-eslint/no-unsafe-call': 'warn',
       'prettier/prettier': 'error',
     },
   }

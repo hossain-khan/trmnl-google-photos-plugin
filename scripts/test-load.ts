@@ -2,18 +2,18 @@
 
 /**
  * Load Testing Script for /markup Endpoint
- * 
+ *
  * Simulates concurrent requests to test worker performance under load
- * 
+ *
  * Tests:
  * - Response time under concurrent load
  * - Error rate under load
  * - Memory usage
  * - CPU time per request
- * 
+ *
  * Usage:
  *   node scripts/test-load.js [workerUrl] [numRequests]
- * 
+ *
  * Example:
  *   node scripts/test-load.js http://localhost:8787 50
  *   node scripts/test-load.js https://trmnl-google-photos.gohk.xyz 100
@@ -92,10 +92,10 @@ function createTRMNLRequest(albumUrl: string = VALID_ALBUM_URL, layout: string =
  */
 async function makeRequest(requestId: number, layout: string = 'full'): Promise<RequestResult> {
   const startTime = performance.now();
-  
+
   try {
     const request = createTRMNLRequest(VALID_ALBUM_URL, layout);
-    
+
     const response = await fetch(`${workerUrl}/markup`, {
       method: 'POST',
       headers: {
@@ -165,16 +165,16 @@ async function runLoadTest(): Promise<{ results: RequestResult[]; totalDuration:
 function calculateStats(results: RequestResult[], totalDuration: number): Stats {
   const successfulRequests = results.filter((r: RequestResult) => r.success && !r.isError);
   const failedRequests = results.filter((r: RequestResult) => !r.success || r.isError);
-  
-  const durations = successfulRequests.map(r => r.duration);
+
+  const durations = successfulRequests.map((r) => r.duration);
   durations.sort((a: number, b: number) => a - b);
 
   const avgDuration = durations.reduce((a, b) => a + b, 0) / durations.length || 0;
   const minDuration = durations[0] || 0;
   const maxDuration = durations[durations.length - 1] || 0;
-  
+
   // Percentiles
-  const p50 = durations[Math.floor(durations.length * 0.50)] || 0;
+  const p50 = durations[Math.floor(durations.length * 0.5)] || 0;
   const p95 = durations[Math.floor(durations.length * 0.95)] || 0;
   const p99 = durations[Math.floor(durations.length * 0.99)] || 0;
 
@@ -204,7 +204,9 @@ function displayResults(stats: Stats): void {
   console.log('📊 Load Test Results\n');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log(`Total Requests:       ${stats.total}`);
-  console.log(`Successful:           ${stats.successful} (${(stats.successful/stats.total*100).toFixed(1)}%)`);
+  console.log(
+    `Successful:           ${stats.successful} (${((stats.successful / stats.total) * 100).toFixed(1)}%)`
+  );
   console.log(`Failed:               ${stats.failed} (${stats.errorRate}%)`);
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('\n⏱️  Response Times (ms):\n');
@@ -226,7 +228,7 @@ function displayResults(stats: Stats): void {
  */
 function evaluateResults(stats: Stats): boolean {
   console.log('\n✅ Success Criteria:\n');
-  
+
   const checks = [
     {
       name: 'Response time <3s (95th percentile)',
@@ -261,7 +263,7 @@ function evaluateResults(stats: Stats): boolean {
   });
 
   const allPassed = checks.every((c: SuccessCriteria) => c.pass);
-  
+
   if (allPassed) {
     console.log('\n🎉 All success criteria met!');
   } else {
@@ -306,7 +308,6 @@ async function main() {
 
     // Exit with appropriate code
     process.exit(passed ? 0 : 1);
-
   } catch (error) {
     console.error('❌ Load test failed:', (error as Error).message);
     console.error((error as Error).stack);

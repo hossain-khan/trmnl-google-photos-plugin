@@ -1,8 +1,8 @@
 /**
  * Tests for Cache Service
- * 
+ *
  * Run with: node --test scripts/test-cache-service.ts
- * 
+ *
  * Note: This test file tests the logic without actually importing TypeScript files.
  * The cache service will be tested in integration tests when the worker is deployed.
  */
@@ -58,7 +58,10 @@ describe('Cache Service', (): void => {
     it('should handle various album ID formats', (): void => {
       const testCases: Array<{ input: string; expected: string }> = [
         { input: 'ABC123', expected: 'album:ABC123' },
-        { input: 'AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_', expected: 'album:AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_' },
+        {
+          input: 'AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_',
+          expected: 'album:AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_',
+        },
         { input: 'short-id', expected: 'album:short-id' },
       ];
 
@@ -82,7 +85,8 @@ describe('Cache Service', (): void => {
     });
 
     it('should extract album ID from album URL', (): void => {
-      const url = 'https://photos.google.com/u/0/album/AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_';
+      const url =
+        'https://photos.google.com/u/0/album/AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_';
       const albumId = extractAlbumId(url);
       assert.strictEqual(albumId, 'AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_');
     });
@@ -138,20 +142,20 @@ describe('Cache Service', (): void => {
     it('should create unique keys for different albums', (): void => {
       const url1 = 'https://photos.app.goo.gl/ABC123';
       const url2 = 'https://photos.app.goo.gl/XYZ789';
-      
+
       const key1 = getCacheKey(extractAlbumId(url1));
       const key2 = getCacheKey(extractAlbumId(url2));
-      
+
       assert.notStrictEqual(key1, key2, 'Different albums should have different keys');
     });
 
     it('should create same key for same album (shared cache)', (): void => {
       const url1 = 'https://photos.app.goo.gl/ABC123';
       const url2 = 'https://photos.app.goo.gl/ABC123';
-      
+
       const key1 = getCacheKey(extractAlbumId(url1));
       const key2 = getCacheKey(extractAlbumId(url2));
-      
+
       assert.strictEqual(key1, key2, 'Same album should have same cache key');
     });
   });

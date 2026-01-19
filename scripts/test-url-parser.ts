@@ -2,7 +2,7 @@
 
 /**
  * Comprehensive test suite for Google Photos Album URL Parser
- * 
+ *
  * This test file validates all functionality of the URL parser including:
  * - Valid URL formats (short and full)
  * - Invalid URL formats
@@ -10,10 +10,10 @@
  * - Album ID extraction
  * - Error messages
  * - URL normalization
- * 
+ *
  * Usage:
  *   npm test
- * 
+ *
  * Or directly:
  *   node scripts/test-url-parser.ts
  */
@@ -25,7 +25,7 @@ import {
   extractAlbumId,
   isValidAlbumUrl,
   normalizeAlbumUrl,
-  getErrorMessage
+  getErrorMessage,
 } from '../lib/url-parser';
 
 console.log('🧪 Testing Google Photos Album URL Parser\n');
@@ -63,7 +63,9 @@ describe('Valid Full URLs', (): void => {
   });
 
   it('should accept full URL with very long album ID', (): void => {
-    const result = parseAlbumUrl('https://photos.google.com/share/AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_');
+    const result = parseAlbumUrl(
+      'https://photos.google.com/share/AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_'
+    );
     assert.strictEqual(result.valid, true);
     assert.strictEqual(result.albumId, 'AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_');
   });
@@ -75,7 +77,9 @@ describe('Valid Full URLs', (): void => {
   });
 
   it('should accept full URL with multiple query parameters', (): void => {
-    const result = parseAlbumUrl('https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF?key=value&foo=bar');
+    const result = parseAlbumUrl(
+      'https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF?key=value&foo=bar'
+    );
     assert.strictEqual(result.valid, true);
   });
 
@@ -169,6 +173,7 @@ describe('Edge Cases', (): void => {
   });
 
   it('should handle numeric input by converting to string', (): void => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
     const result = parseAlbumUrl(12345 as any);
     assert.strictEqual(result.valid, false);
   });
@@ -214,7 +219,10 @@ describe('isValidAlbumUrl Helper', (): void => {
   });
 
   it('should return true for valid full URL', (): void => {
-    assert.strictEqual(isValidAlbumUrl('https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF'), true);
+    assert.strictEqual(
+      isValidAlbumUrl('https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF'),
+      true
+    );
   });
 
   it('should return false for invalid URL', (): void => {
@@ -234,7 +242,9 @@ describe('URL Normalization', (): void => {
   });
 
   it('should normalize full URL by removing query params', (): void => {
-    const normalized = normalizeAlbumUrl('https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF?key=value');
+    const normalized = normalizeAlbumUrl(
+      'https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF?key=value'
+    );
     assert.strictEqual(normalized, 'https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF');
   });
 
@@ -271,19 +281,19 @@ describe('Error Messages', (): void => {
 describe('Integration Test', (): void => {
   it('should handle complete workflow for valid URL', (): void => {
     const url = 'https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5';
-    
+
     // Parse URL
     const parsed = parseAlbumUrl(url);
     assert.strictEqual(parsed.valid, true);
     assert.strictEqual(parsed.albumId, 'QKGRYqfdS15bj8Kr5');
-    
+
     // Validate
     assert.strictEqual(isValidAlbumUrl(url), true);
-    
+
     // Extract ID
     const albumId = extractAlbumId(url);
     assert.strictEqual(albumId, 'QKGRYqfdS15bj8Kr5');
-    
+
     // Normalize
     const normalized = normalizeAlbumUrl(url);
     assert.strictEqual(normalized, url);
@@ -291,23 +301,23 @@ describe('Integration Test', (): void => {
 
   it('should handle complete workflow for invalid URL', (): void => {
     const url = 'https://invalid-url.com';
-    
+
     // Parse URL
     const parsed = parseAlbumUrl(url);
     assert.strictEqual(parsed.valid, false);
     assert.ok(parsed.error);
-    
+
     // Validate
     assert.strictEqual(isValidAlbumUrl(url), false);
-    
+
     // Extract ID
     const albumId = extractAlbumId(url);
     assert.strictEqual(albumId, null);
-    
+
     // Normalize
     const normalized = normalizeAlbumUrl(url);
     assert.strictEqual(normalized, null);
-    
+
     // Get error message
     const error = getErrorMessage(url);
     assert.ok(error.length > 0);

@@ -82,11 +82,13 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 ### 1. TRMNL Device & Platform
 
 **TRMNL Device**
+
 - E-ink display (multiple sizes supported)
 - Polls TRMNL platform hourly for content updates
 - Renders HTML provided by plugins
 
 **TRMNL Platform**
+
 - Stores plugin configuration (album URL in custom form fields)
 - Polls plugin API endpoints (GET requests)
 - Passes form field values as URL parameters
@@ -102,17 +104,20 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 **Framework**: Hono (lightweight web framework)
 
 **Runtime**: Cloudflare Workers (Edge Computing)
+
 - Deployed to 300+ data centers globally
 - <50ms cold start time
 - Automatic scaling
 - Pay-per-request pricing
 
 **Endpoints**:
+
 - `GET /` - Health check
 - `GET /health` - Alternative health check
 - `GET /api/photo` - **Main endpoint** (returns JSON photo data for TRMNL Polling strategy)
 
 **Why Cloudflare Workers?**
+
 - ✅ Edge computing = ultra-low latency
 - ✅ No server management
 - ✅ Stateless by design
@@ -126,6 +131,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 **Technology**: Zod (TypeScript-first schema validation)
 
 **Supported Formats**:
+
 - Short URLs: `https://photos.app.goo.gl/ABC123`
 - Full URLs: `https://photos.google.com/share/AF1QipM...`
 
@@ -136,18 +142,21 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 ### 4. Photo Fetcher
 
 **Library**: `google-photos-album-image-url-fetch` (NPM)
+
 - Battle-tested since 2019
 - 95%+ success rate
 - No authentication required
 - Works with shared albums only
 
 **Process**:
+
 1. Receives validated album URL
 2. Fetches album metadata from Google Photos
 3. Retrieves list of photo URLs
 4. Returns array of photo objects
 
 **Image Optimization**:
+
 - Appends size parameters: `=w800-h480`
 - Optimized for e-ink displays
 - Reduces bandwidth usage
@@ -159,12 +168,14 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 **Location**: Stored in TRMNL's Markup Editor (not in Worker)
 
 **Templates** (`templates/` directory - for Recipe publishing):
+
 - `full.liquid` - Full-screen layout
 - `half_horizontal.liquid` - Half-size horizontal
 - `half_vertical.liquid` - Half-size vertical
 - `quadrant.liquid` - Quarter-size layout
 
 **JSON Data Structure** (returned by Worker API):
+
 ```json
 {
   "photo_url": "https://lh3.googleusercontent.com/...",
@@ -176,6 +187,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 ```
 
 **Template Access Pattern**:
+
 ```liquid
 <!-- In TRMNL's Markup Editor -->
 <img src="{{ photo_url }}" alt="{{ caption }}" class="image image--contain">
@@ -190,12 +202,14 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 **Technology**: Cloudflare KV (Key-Value Store)
 
 **Strategy**:
+
 - Key: `album:{albumId}`
 - Value: Array of photo URLs
 - TTL: 1 hour
 - Shared across all users with same album
 
 **Benefits**:
+
 - Reduces API calls by 80%+
 - Faster response times (<500ms for cached albums)
 - Lower Google Photos API load
@@ -211,7 +225,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 ```
 1. TRMNL Platform → Cloudflare Worker
    GET https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/ABC123
-   
+
    Query Parameters:
    - album_url: Google Photos shared album URL (from form field)
    - (optional) device: Device type for photo optimization
@@ -262,6 +276,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 ```
 
 **Total Latency Target**: <3 seconds (95th percentile)
+
 - URL validation: <10ms (✅ achieved: <5ms)
 - Photo fetch (cached): <500ms (✅ achieved: 67ms)
 - Photo fetch (uncached): <2s (✅ achieved: 1.35s)
@@ -269,6 +284,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 - Network overhead: <500ms
 
 **Achieved Performance** (January 2026):
+
 - Cache HIT: **67ms** (20x faster than target)
 - Cache MISS: **1.35s** (33% faster than target)
 
@@ -278,16 +294,17 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 
 ### What Gets Stored Where
 
-| Data | Location | Duration | Purpose |
-|------|----------|----------|---------|
-| Album URL | TRMNL Platform | Permanent | User's plugin settings |
-| Album Photo List | Cloudflare KV (optional) | 1 hour | Performance optimization |
-| Request Logs | Cloudflare Analytics | 24 hours | Monitoring & debugging |
-| None | Plugin Database | N/A | **We store nothing!** |
+| Data             | Location                 | Duration  | Purpose                  |
+| ---------------- | ------------------------ | --------- | ------------------------ |
+| Album URL        | TRMNL Platform           | Permanent | User's plugin settings   |
+| Album Photo List | Cloudflare KV (optional) | 1 hour    | Performance optimization |
+| Request Logs     | Cloudflare Analytics     | 24 hours  | Monitoring & debugging   |
+| None             | Plugin Database          | N/A       | **We store nothing!**    |
 
 ### Privacy Architecture
 
 **Zero PII Storage**:
+
 - ✅ No user accounts
 - ✅ No authentication tokens
 - ✅ No album URLs stored by plugin
@@ -295,6 +312,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 - ✅ No analytics on user behavior
 
 **Data Flow**:
+
 - Album URL: TRMNL → Worker (per request, not stored)
 - Photos: Google → Worker → TRMNL (ephemeral)
 - Cache: Album data only (shared, not user-specific)
@@ -306,11 +324,13 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 ## Technical Stack
 
 ### Frontend (Templates)
+
 - **Language**: Liquid (template language)
 - **Framework**: TRMNL Framework v2
 - **Styling**: TRMNL utility classes (mobile-first, responsive)
 
 ### Backend (Worker)
+
 - **Runtime**: Cloudflare Workers
 - **Language**: TypeScript (compiled to JavaScript)
 - **Framework**: Hono 4.11.4
@@ -320,15 +340,18 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 - **HTTP Client**: Undici (built-in)
 
 ### External Services
+
 - **Google Photos**: Unofficial API (via shared album links)
 - **TRMNL Platform**: Polling integration (GET requests)
 
 ### GitHub Pages Demo (Optional)
+
 - **Runtime**: Client-side JavaScript
 - **Data Source**: Same JSON API endpoint
 - **UI**: Vanilla JS + CSS (no server-side rendering)
 
 ### Development Tools
+
 - **CLI**: Wrangler 4.59.2 (Cloudflare Workers CLI)
 - **Testing**: Node.js native test runner
 - **Version Control**: Git + GitHub
@@ -363,6 +386,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 ```
 
 **Deployment Process**:
+
 1. Local development: `npm run dev` (localhost:8787)
 2. Test changes locally
 3. Deploy to production: `npm run deploy`
@@ -370,6 +394,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 5. Zero downtime deployment
 
 **Monitoring**:
+
 - Cloudflare Workers Analytics (requests, errors, latency)
 - Real-time logs: `wrangler tail`
 - Dashboard: Cloudflare Workers UI
@@ -377,6 +402,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 ### CI/CD (Future)
 
 Planned GitHub Actions workflow:
+
 - Run tests on PR
 - Deploy to staging on merge
 - Manual approval for production
@@ -391,6 +417,7 @@ Planned GitHub Actions workflow:
 **Decision**: No databases, no persistent storage
 
 **Rationale**:
+
 - TRMNL provides album URL with every request
 - No need to store user data
 - Simplifies infrastructure
@@ -398,6 +425,7 @@ Planned GitHub Actions workflow:
 - Eliminates privacy concerns
 
 **Trade-offs**:
+
 - ✅ Pro: Zero data liability
 - ✅ Pro: Infinite scalability
 - ✅ Pro: No database maintenance
@@ -409,6 +437,7 @@ Planned GitHub Actions workflow:
 **Decision**: Edge computing over traditional servers
 
 **Rationale**:
+
 - Global distribution (low latency for all users)
 - Auto-scaling (no capacity planning)
 - Pay-per-request (cost-efficient)
@@ -416,6 +445,7 @@ Planned GitHub Actions workflow:
 - Stateless by design
 
 **Alternatives Considered**:
+
 - ❌ Vercel Serverless: More expensive, US-centric
 - ❌ AWS Lambda: Complex setup, cold starts
 - ❌ Traditional VPS: Over-engineered for stateless use case
@@ -425,6 +455,7 @@ Planned GitHub Actions workflow:
 **Decision**: Use shared album links instead of authenticated API
 
 **Rationale**:
+
 - Matches Apple Photos plugin UX (paste link)
 - No OAuth flow = better UX
 - No token management
@@ -432,6 +463,7 @@ Planned GitHub Actions workflow:
 - Works with any Google account
 
 **Limitations**:
+
 - Only works with shared albums
 - Cannot access private albums
 - No album creation/management
@@ -441,6 +473,7 @@ Planned GitHub Actions workflow:
 **Decision**: Polling instead of Webhook or merge_tag
 
 **Rationale**:
+
 - ✅ Simpler architecture (GET requests vs POST webhooks)
 - ✅ TRMNL handles template rendering (templates stored in Markup Editor)
 - ✅ Worker only returns JSON data (faster, smaller responses)
@@ -450,13 +483,15 @@ Planned GitHub Actions workflow:
 - ✅ Can implement KV caching for performance
 
 **TRMNL Integration** (`settings.yml`):
+
 ```yaml
 strategy: polling
 polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}
-refresh_frequency: 60  # minutes (1 hour)
+refresh_frequency: 60 # minutes (1 hour)
 ```
 
 **Why Not Webhook?**
+
 - Webhook requires Worker to render HTML (adds complexity)
 - Webhook requires POST endpoint (less cacheable)
 - TRMNL can render Liquid templates itself (no need for server-side rendering)
@@ -467,24 +502,28 @@ refresh_frequency: 60  # minutes (1 hour)
 ## Security Considerations
 
 ### Input Validation
+
 - ✅ URL validation with Zod schema
 - ✅ Whitelist only photos.app.goo.gl and photos.google.com
 - ✅ Reject malformed URLs
 - ✅ Sanitize JSON output (prevent XSS in photo URLs/captions)
 
 ### API Security
+
 - ✅ HTTPS only (enforced by Cloudflare)
 - ✅ No API keys stored (stateless)
 - ✅ Rate limiting (Cloudflare free tier: 100k req/day)
 - ✅ No CORS needed (server-to-server)
 
 ### Error Handling
+
 - ✅ Graceful fallbacks for invalid URLs
 - ✅ User-friendly error messages
 - ✅ No stack traces exposed
 - ✅ Logging for debugging (no PII logged)
 
 ### Dependency Security
+
 - ✅ NPM packages vetted and minimal
 - ✅ Regular updates via Dependabot
 - ✅ No known vulnerabilities
@@ -495,14 +534,14 @@ refresh_frequency: 60  # minutes (1 hour)
 
 ### Latency Targets
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| Worker Cold Start | <50ms | ~20ms ✅ |
-| URL Validation | <10ms | <5ms ✅ |
-| Photo Fetch (cached) | <500ms | 67ms ✅ (20x faster) |
-| Photo Fetch (uncached) | <2s | 1.35s ✅ |
-| JSON Serialization | <10ms | <5ms ✅ |
-| Total Response (95th %ile) | <3s | <2s ✅ |
+| Metric                     | Target | Current              |
+| -------------------------- | ------ | -------------------- |
+| Worker Cold Start          | <50ms  | ~20ms ✅             |
+| URL Validation             | <10ms  | <5ms ✅              |
+| Photo Fetch (cached)       | <500ms | 67ms ✅ (20x faster) |
+| Photo Fetch (uncached)     | <2s    | 1.35s ✅             |
+| JSON Serialization         | <10ms  | <5ms ✅              |
+| Total Response (95th %ile) | <3s    | <2s ✅               |
 
 ### Optimization Strategies
 
@@ -532,14 +571,14 @@ refresh_frequency: 60  # minutes (1 hour)
 
 ### Error Scenarios
 
-| Error | Cause | Handling |
-|-------|-------|----------|
-| Invalid URL | Malformed album URL | Return error JSON with message |
-| Album Not Found | Deleted or private album | Return error JSON: "Album unavailable" |
-| Album Empty | 0 photos in album | Return error JSON: "No photos in album" |
-| Google API Down | Network issues | Retry 3x, then return cached photo (if available) |
-| Worker Timeout | Slow photo fetch | Return after 10s with error JSON |
-| KV Cache Error | Cache read/write failure | Fall back to API call, log error |
+| Error           | Cause                    | Handling                                          |
+| --------------- | ------------------------ | ------------------------------------------------- |
+| Invalid URL     | Malformed album URL      | Return error JSON with message                    |
+| Album Not Found | Deleted or private album | Return error JSON: "Album unavailable"            |
+| Album Empty     | 0 photos in album        | Return error JSON: "No photos in album"           |
+| Google API Down | Network issues           | Retry 3x, then return cached photo (if available) |
+| Worker Timeout  | Slow photo fetch         | Return after 10s with error JSON                  |
+| KV Cache Error  | Cache read/write failure | Fall back to API call, log error                  |
 
 ### Retry Logic
 
@@ -578,17 +617,20 @@ async function fetchPhotosWithRetry(url, maxRetries = 3) {
 ### Scaling Strategy
 
 **Phase 1-3 (MVP)**:
+
 - Free tier sufficient for 1,000+ users
 - Average 2 requests/user/day = 50,000 requests/day
 - Headroom: 2x capacity
 
 **Phase 4+ (Growth)**:
+
 - Upgrade to Workers Paid ($5/month)
 - 10 million requests/month included
 - Additional $0.50 per million requests
 - Supports 100,000+ users
 
 **Bottlenecks**:
+
 - Google Photos API rate limits (unknown, but high)
 - KV write limits on free tier (solvable with paid tier)
 
@@ -631,17 +673,20 @@ async function fetchPhotosWithRetry(url, maxRetries = 3) {
 ### Current Test Coverage
 
 **URL Parser**: 42 tests ✅
+
 - Valid/invalid URL formats
 - Album ID extraction
 - Error messages
 - Edge cases
 
 **Photo Fetcher**: Basic smoke tests ✅
+
 - URL validation
 - Image optimization
 - Random selection
 
 **Worker Endpoints**: Not yet implemented
+
 - `/markup` endpoint tests (Phase 2)
 - Error handling tests
 - Integration tests
@@ -661,16 +706,19 @@ async function fetchPhotosWithRetry(url, maxRetries = 3) {
 ### Metrics Tracked
 
 **Performance**:
+
 - Request latency (p50, p95, p99)
 - Worker CPU time
 - Cache hit rate
 
 **Reliability**:
+
 - Error rate
 - Google Photos API failures
 - Template rendering errors
 
 **Usage**:
+
 - Total requests per day
 - Unique albums accessed
 - Layout distribution
@@ -678,6 +726,7 @@ async function fetchPhotosWithRetry(url, maxRetries = 3) {
 ### Logging
 
 **What Gets Logged**:
+
 - ✅ Request start/end
 - ✅ Error messages
 - ✅ Performance metrics
@@ -693,22 +742,22 @@ async function fetchPhotosWithRetry(url, maxRetries = 3) {
 
 ### Current Costs (Free Tier)
 
-| Service | Cost | Limit |
-|---------|------|-------|
-| Cloudflare Workers | $0 | 100k req/day |
-| Cloudflare KV | $0 | 100k reads/day |
-| Google Photos API | $0 | Unlimited (unofficial) |
-| Domain | $0 | workers.dev subdomain |
-| **Total** | **$0/month** | Supports 1,000+ users |
+| Service            | Cost         | Limit                  |
+| ------------------ | ------------ | ---------------------- |
+| Cloudflare Workers | $0           | 100k req/day           |
+| Cloudflare KV      | $0           | 100k reads/day         |
+| Google Photos API  | $0           | Unlimited (unofficial) |
+| Domain             | $0           | workers.dev subdomain  |
+| **Total**          | **$0/month** | Supports 1,000+ users  |
 
 ### Paid Tier Costs (If Needed)
 
-| Service | Cost | Limit |
-|---------|------|-------|
-| Workers Paid | $5/month | 10M req/month |
-| KV Storage | $0.50/GB/month | Unlimited |
-| Custom Domain | $10/year | Optional |
-| **Total** | **~$5-10/month** | Supports 100k+ users |
+| Service       | Cost             | Limit                |
+| ------------- | ---------------- | -------------------- |
+| Workers Paid  | $5/month         | 10M req/month        |
+| KV Storage    | $0.50/GB/month   | Unlimited            |
+| Custom Domain | $10/year         | Optional             |
+| **Total**     | **~$5-10/month** | Supports 100k+ users |
 
 **Cost per User**: <$0.0001/month (negligible)
 
@@ -717,6 +766,7 @@ async function fetchPhotosWithRetry(url, maxRetries = 3) {
 ## Deployment Checklist
 
 ### Phase 2 (Backend Development) ✅ COMPLETE
+
 - ✅ Cloudflare Worker deployed to production
 - ✅ Health check endpoints working
 - ✅ URL parser integrated (42 tests passing)
@@ -727,6 +777,7 @@ async function fetchPhotosWithRetry(url, maxRetries = 3) {
 - ✅ All 65 tests passing
 
 ### Phase 3 (TRMNL Integration) - Next Up
+
 - ⏳ Update settings.yml to Polling strategy
 - ⏳ Upload Liquid templates to TRMNL Markup Editor
 - ⏳ Test on TRMNL device/simulator
@@ -735,6 +786,7 @@ async function fetchPhotosWithRetry(url, maxRetries = 3) {
 - ⏳ Write user guide
 
 ### Phase 4 (Launch)
+
 - ⏳ Beta testing (10 users)
 - ⏳ Monitoring dashboard
 - ⏳ Error tracking
@@ -751,7 +803,7 @@ The TRMNL Google Photos Plugin architecture is designed for **simplicity, privac
 ✅ **Fast**: Edge computing, optional caching  
 ✅ **Scalable**: Auto-scales to millions of requests  
 ✅ **Cost-Efficient**: $0 for MVP, <$10/month at scale  
-✅ **Maintainable**: Minimal dependencies, clear separation of concerns  
+✅ **Maintainable**: Minimal dependencies, clear separation of concerns
 
 The entire system fits in a single Cloudflare Worker (~100KB) and delivers random photos from Google Photos albums to TRMNL devices in <3 seconds. No databases. No servers. No complexity.
 

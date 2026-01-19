@@ -2,16 +2,16 @@
 
 /**
  * Google Photos API Investigation Script
- * 
+ *
  * This script investigates how Google Photos shared albums work by:
  * 1. Following redirects from short URLs (photos.app.goo.gl)
  * 2. Analyzing the HTML structure of shared album pages
  * 3. Extracting photo URLs and metadata from the page
  * 4. Documenting API endpoints and data structures
- * 
+ *
  * Usage:
  *   tsx scripts/investigate-api.ts <album-url>
- * 
+ *
  * Example:
  *   tsx scripts/investigate-api.ts https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5
  */
@@ -21,7 +21,8 @@ import * as cheerio from 'cheerio';
 import { writeFile } from 'fs/promises';
 
 // Configuration
-const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+const USER_AGENT =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
 interface ApiEndpoint {
   type?: string;
@@ -68,7 +69,7 @@ interface PhotoUrlAnalysis {
 async function investigateAlbum(albumUrl: string): Promise<Findings> {
   console.log('📷 Google Photos API Investigation Tool\n');
   console.log(`Investigating album: ${albumUrl}\n`);
-  
+
   const findings: Findings = {
     timestamp: new Date().toISOString(),
     inputUrl: albumUrl,
@@ -78,7 +79,7 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
     photoUrls: [],
     metadata: {},
     apiEndpoints: [],
-    rawResponse: null
+    rawResponse: null,
   };
 
   try {
@@ -87,19 +88,20 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
     const response: AxiosResponse<string> = await axios.get(albumUrl, {
       headers: {
         'User-Agent': USER_AGENT,
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.5',
         'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1'
+        Connection: 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
       },
       maxRedirects: 5,
-      validateStatus: (status) => status < 400
+      validateStatus: (status) => status < 400,
     });
 
-    findings.redirectedUrl = (response.request.res as { responseUrl?: string }).responseUrl || albumUrl;
+    findings.redirectedUrl =
+      (response.request.res as { responseUrl?: string }).responseUrl || albumUrl;
     console.log(`✓ Final URL: ${findings.redirectedUrl}`);
-    
+
     // Step 2: Extract album ID from URL
     console.log('\n🔍 Step 2: Extracting album ID...');
     const albumIdMatch = findings.redirectedUrl.match(/\/share\/([A-Za-z0-9_-]+)/);
@@ -113,40 +115,38 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
     // Step 3: Parse HTML and extract data
     console.log('\n🔍 Step 3: Parsing HTML structure...');
     const $ = cheerio.load(response.data);
-    
+
     // Look for script tags that might contain data
     const scripts = $('script').toArray();
     console.log(`✓ Found ${scripts.length} script tags`);
-    
-    let dataFound = false;
+
     for (const script of scripts) {
       const scriptContent = $(script).html();
-      
+
       // Look for common data patterns
       if (scriptContent && scriptContent.includes('AF_initDataCallback')) {
         console.log('✓ Found AF_initDataCallback data structure');
         findings.apiEndpoints.push({
           type: 'AF_initDataCallback',
-          description: 'Google Photos uses AF_initDataCallback to pass data to the frontend'
+          description: 'Google Photos uses AF_initDataCallback to pass data to the frontend',
         });
-        
+
         // Try to extract photo URLs
         const urlPattern = /https:\/\/lh3\.googleusercontent\.com\/[a-zA-Z0-9_-]+/g;
         const urls = scriptContent.match(urlPattern);
         if (urls) {
           findings.photoUrls = [...new Set(urls)].slice(0, 20); // Dedupe and limit to first 20
           console.log(`✓ Extracted ${findings.photoUrls.length} unique photo URLs`);
-          dataFound = true;
         }
       }
-      
+
       // Look for JSON-LD structured data
       if ($(script).attr('type') === 'application/ld+json') {
         console.log('✓ Found JSON-LD structured data');
         try {
           const jsonData = JSON.parse($(script).html() || '{}');
           findings.metadata.jsonLd = jsonData;
-        } catch (e) {
+        } catch {
           console.log('⚠️  Failed to parse JSON-LD data');
         }
       }
@@ -154,14 +154,14 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
 
     // Step 4: Extract metadata from HTML
     console.log('\n🔍 Step 4: Extracting metadata...');
-    
+
     // Page title
     const title = $('title').text();
     if (title) {
       findings.metadata.title = title;
       console.log(`✓ Album title: ${title}`);
     }
-    
+
     // Meta tags
     const metaTags = $('meta').toArray();
     findings.metadata.metaTags = {};
@@ -178,21 +178,21 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
 
     // Step 5: Look for API endpoints in network requests
     console.log('\n🔍 Step 5: Analyzing potential API endpoints...');
-    
+
     // Check for common Google Photos API patterns
     const apiPatterns = [
       '/photos.google.com/share/',
       '/photosdata/',
       '/data/batchexecute',
-      '/_/PhotosUi/data/'
+      '/_/PhotosUi/data/',
     ];
-    
+
     for (const pattern of apiPatterns) {
       if (response.data.includes(pattern)) {
         findings.apiEndpoints.push({
           pattern: pattern,
           found: true,
-          description: 'Potential API endpoint found in page source'
+          description: 'Potential API endpoint found in page source',
         });
         console.log(`✓ Found potential endpoint pattern: ${pattern}`);
       }
@@ -234,13 +234,12 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
     }
 
     return findings;
-
   } catch (error) {
     console.error('\n❌ Error during investigation:');
-    
+
     if (error instanceof Error) {
       console.error(error.message);
-      
+
       // Type guard for axios error
       if ('response' in error && error.response) {
         const axiosError = error as { response: { status: number; headers: unknown } };
@@ -250,7 +249,7 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
     } else {
       console.error('An unknown error occurred');
     }
-    
+
     throw error;
   }
 }
@@ -261,18 +260,18 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
 function analyzePhotoUrl(url: string): PhotoUrlAnalysis {
   console.log(`\n🔬 Analyzing photo URL structure:`);
   console.log(`URL: ${url}`);
-  
+
   // Google Photos URLs typically have parameters like =w2400-h1600
   const paramsMatch = url.match(/=([wh]\d+-?)+/g);
   if (paramsMatch) {
     console.log(`✓ Found size parameters: ${paramsMatch.join(', ')}`);
     console.log(`  This allows us to request different image sizes!`);
   }
-  
+
   return {
     url: url,
     parameters: paramsMatch,
-    notes: 'Google Photos URLs support size modifiers like =w800-h600'
+    notes: 'Google Photos URLs support size modifiers like =w800-h600',
   };
 }
 
@@ -282,7 +281,9 @@ const albumUrl = process.argv[2];
 if (!albumUrl) {
   console.error('❌ Error: Please provide a Google Photos shared album URL');
   console.error('Usage: tsx scripts/investigate-api.ts <album-url>');
-  console.error('Example: tsx scripts/investigate-api.ts https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5');
+  console.error(
+    'Example: tsx scripts/investigate-api.ts https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5'
+  );
   process.exit(1);
 }
 
@@ -296,15 +297,15 @@ if (!albumUrl.includes('photos.app.goo.gl') && !albumUrl.includes('photos.google
 investigateAlbum(albumUrl)
   .then((findings) => {
     console.log('\n✅ Investigation completed successfully!');
-    
+
     // Analyze a sample photo URL if we found any
     if (findings.photoUrls.length > 0) {
       analyzePhotoUrl(findings.photoUrls[0]);
     }
-    
+
     process.exit(0);
   })
-  .catch((error) => {
+  .catch((_error) => {
     console.error('\n❌ Investigation failed');
     process.exit(1);
   });

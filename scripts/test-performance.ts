@@ -2,21 +2,20 @@
 
 /**
  * Performance Monitoring Test
- * 
+ *
  * Tests CPU time and execution time for various operations
  * Ensures the worker stays within Cloudflare's 50ms CPU limit (free tier)
- * 
+ *
  * Note: Cloudflare Workers CPU time limit:
  * - Free tier: 50ms per request
  * - Paid tier: 50ms per request (same limit, but with higher throughput)
  * - Wall time: ~30 seconds maximum (for long-running operations)
- * 
+ *
  * Usage:
  *   node scripts/test-performance.ts
  */
 
 import { performance } from 'node:perf_hooks';
-import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -93,7 +92,10 @@ const TARGETS: Targets = {
 /**
  * Measure execution time of a function
  */
-async function measureTime<T>(name: string, fn: () => T | Promise<T>): Promise<MeasurementResult<T>> {
+async function measureTime<T>(
+  name: string,
+  fn: () => T | Promise<T>
+): Promise<MeasurementResult<T>> {
   const startTime = performance.now();
   let result: T | undefined;
   let error: Error | null = null;
@@ -119,7 +121,7 @@ async function measureTime<T>(name: string, fn: () => T | Promise<T>): Promise<M
 /**
  * Test URL parsing performance
  */
-async function testUrlParsing(): Promise<MeasurementResult[]> {
+async function testUrlParsing(): Promise<MeasurementResult<unknown>[]> {
   // Load URL parser
   const { parseAlbumUrl } = await import(join(projectRoot, 'lib', 'url-parser'));
 
@@ -129,10 +131,11 @@ async function testUrlParsing(): Promise<MeasurementResult[]> {
     'https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF?key=value',
   ];
 
-  const results: MeasurementResult[] = [];
+  const results: MeasurementResult<unknown>[] = [];
 
   for (const url of testUrls) {
     const result = await measureTime(`Parse: ${url.substring(0, 40)}...`, () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return parseAlbumUrl(url);
     });
     results.push(result);
@@ -185,10 +188,12 @@ async function testDataTransformation(): Promise<MeasurementResult[]> {
   results.push(convertResult);
 
   // Test random selection
-  const photos = Array(100).fill(null).map((_, i) => ({
-    uid: `photo-${i}`,
-    url: `https://example.com/photo-${i}`,
-  }));
+  const photos = Array(100)
+    .fill(null)
+    .map((_, i) => ({
+      uid: `photo-${i}`,
+      url: `https://example.com/photo-${i}`,
+    }));
 
   const selectionResult = await measureTime('Random photo selection (100 photos)', () => {
     const randomIndex = Math.floor(Math.random() * photos.length);
@@ -210,13 +215,13 @@ function displayResults(category: string, results: MeasurementResult[]): void {
     const icon = result.success ? '✅' : '❌';
     const duration = `${result.duration}ms`.padEnd(10);
     const name = result.name.padEnd(40);
-    
+
     console.log(`${icon} ${name} ${duration}`);
-    
+
     if (result.htmlSize) {
       console.log(`   HTML size: ${result.htmlSize} bytes`);
     }
-    
+
     if (result.error) {
       console.log(`   Error: ${result.error}`);
     }
@@ -225,8 +230,9 @@ function displayResults(category: string, results: MeasurementResult[]): void {
 
 /**
  * Calculate total CPU time estimate
+ * (Currently unused but kept for future performance analysis)
  */
-function calculateTotalCPUTime(allResults: MeasurementResult[][]): number {
+function _calculateTotalCPUTime(allResults: MeasurementResult[][]): number {
   let totalTime = 0;
 
   allResults.forEach((categoryResults: MeasurementResult[]): void => {
@@ -248,8 +254,11 @@ function evaluatePerformance(allResults: AllResults): boolean {
   console.log('📊 Performance Summary\n');
 
   // Calculate average times by category
-  const urlParseAvg = allResults.urlParse.reduce((sum, r) => sum + r.duration, 0) / allResults.urlParse.length;
-  const dataTransformAvg = allResults.dataTransform.reduce((sum, r) => sum + r.duration, 0) / allResults.dataTransform.length;
+  const urlParseAvg =
+    allResults.urlParse.reduce((sum, r) => sum + r.duration, 0) / allResults.urlParse.length;
+  const dataTransformAvg =
+    allResults.dataTransform.reduce((sum, r) => sum + r.duration, 0) /
+    allResults.dataTransform.length;
 
   const checks: PerformanceCheck[] = [
     {
@@ -270,7 +279,9 @@ function evaluatePerformance(allResults: AllResults): boolean {
 
   checks.forEach((check: PerformanceCheck): void => {
     const icon = check.pass ? '✅' : '⚠️';
-    console.log(`${icon} ${check.name}: ${check.value}${check.unit} (target: <${check.target}${check.unit})`);
+    console.log(
+      `${icon} ${check.name}: ${check.value}${check.unit} (target: <${check.target}${check.unit})`
+    );
   });
 
   console.log('\n💡 Estimated Request Breakdown:\n');
@@ -280,7 +291,9 @@ function evaluatePerformance(allResults: AllResults): boolean {
   console.log(`   JSON serialization:   ~1-2ms`);
   console.log('   ────────────────────────────────');
   console.log(`   Total (excl. network): ~${(urlParseAvg + dataTransformAvg + 2).toFixed(0)}ms`);
-  console.log(`   Total (with network):  ~${(urlParseAvg + dataTransformAvg + 2 + 200).toFixed(0)}-${(urlParseAvg + dataTransformAvg + 2 + 2000).toFixed(0)}ms`);
+  console.log(
+    `   Total (with network):  ~${(urlParseAvg + dataTransformAvg + 2 + 200).toFixed(0)}-${(urlParseAvg + dataTransformAvg + 2 + 2000).toFixed(0)}ms`
+  );
 
   const allPassed = checks.every((c: PerformanceCheck) => c.pass);
 
@@ -329,7 +342,6 @@ async function main(): Promise<void> {
     console.log('   - TRMNL handles template rendering on their platform');
 
     process.exit(passed ? 0 : 1);
-
   } catch (error) {
     console.error('❌ Performance test failed:', (error as Error).message);
     console.error((error as Error).stack);

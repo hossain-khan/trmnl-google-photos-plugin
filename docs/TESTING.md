@@ -12,13 +12,13 @@ This document describes the testing performed for the Google Photos API investig
 
 ### 1. URL Validation Tests
 
-| Test Case | Input | Expected | Result |
-|-----------|-------|----------|--------|
-| Short URL format | `https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5` | ✅ Valid | ✅ Pass |
-| Full URL format | `https://photos.google.com/share/AF1QipMZN...` | ✅ Valid | ✅ Pass |
-| Invalid domain | `https://invalid-url.com` | ❌ Invalid | ✅ Pass |
-| Empty string | `""` | ❌ Invalid | ✅ Pass |
-| Malformed URL | `not-a-url` | ❌ Invalid | ✅ Pass |
+| Test Case        | Input                                          | Expected   | Result  |
+| ---------------- | ---------------------------------------------- | ---------- | ------- |
+| Short URL format | `https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5`  | ✅ Valid   | ✅ Pass |
+| Full URL format  | `https://photos.google.com/share/AF1QipMZN...` | ✅ Valid   | ✅ Pass |
+| Invalid domain   | `https://invalid-url.com`                      | ❌ Invalid | ✅ Pass |
+| Empty string     | `""`                                           | ❌ Invalid | ✅ Pass |
+| Malformed URL    | `not-a-url`                                    | ❌ Invalid | ✅ Pass |
 
 **Result**: ✅ All validation tests passed
 
@@ -26,15 +26,16 @@ This document describes the testing performed for the Google Photos API investig
 
 Tests that images are correctly optimized for e-ink displays (800x480px).
 
-| Original Size | Aspect Ratio | Optimized Size | Expected | Result |
-|---------------|--------------|----------------|----------|--------|
-| 640x480 | 4:3 | 640x480 | Fits within bounds | ✅ Pass |
-| 4000x3000 | 4:3 | 640x480 | Scales down proportionally | ✅ Pass |
-| 128x128 | 1:1 | 480x480 | Maintains square aspect | ✅ Pass |
-| 1920x1080 | 16:9 | 800x450 | Fits width | ✅ Pass |
-| 1080x1920 | 9:16 | 270x480 | Fits height | ✅ Pass |
+| Original Size | Aspect Ratio | Optimized Size | Expected                   | Result  |
+| ------------- | ------------ | -------------- | -------------------------- | ------- |
+| 640x480       | 4:3          | 640x480        | Fits within bounds         | ✅ Pass |
+| 4000x3000     | 4:3          | 640x480        | Scales down proportionally | ✅ Pass |
+| 128x128       | 1:1          | 480x480        | Maintains square aspect    | ✅ Pass |
+| 1920x1080     | 16:9         | 800x450        | Fits width                 | ✅ Pass |
+| 1080x1920     | 9:16         | 270x480        | Fits height                | ✅ Pass |
 
 **Algorithm**:
+
 ```javascript
 if (aspectRatio > einkAspectRatio) {
   // Image is wider - constrain by width
@@ -63,6 +64,7 @@ Tests that random photo selection works correctly.
 Validates that the output JSON matches the expected format for TRMNL.
 
 **Generated Structure**:
+
 ```json
 {
   "photo_url": "https://lh3.googleusercontent.com/...=w640-h480",
@@ -82,6 +84,7 @@ Validates that the output JSON matches the expected format for TRMNL.
 ```
 
 **Validation**:
+
 - ✅ `photo_url` includes size parameters
 - ✅ `thumbnail_url` has smaller dimensions
 - ✅ `timestamp` is ISO 8601 format
@@ -97,23 +100,25 @@ Validates that the output JSON matches the expected format for TRMNL.
 The following tests validate the library integration (requires internet access):
 
 #### Test Album
+
 - **URL**: `https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5` (example from library docs)
 - **Expected**: Array of ImageInfo objects
 - **Status**: ⏸️ Pending (requires internet access)
 
 #### Expected Response Format
+
 ```javascript
 [
   {
-    uid: "AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_",
-    url: "https://lh3.googleusercontent.com/...",
+    uid: 'AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_',
+    url: 'https://lh3.googleusercontent.com/...',
     width: 640,
     height: 480,
-    imageUpdateDate: 1317552314000,  // Unix timestamp (ms)
-    albumAddDate: 1564229558506       // Unix timestamp (ms)
+    imageUpdateDate: 1317552314000, // Unix timestamp (ms)
+    albumAddDate: 1564229558506, // Unix timestamp (ms)
   },
   // ... more photos
-]
+];
 ```
 
 ## Manual Testing Checklist
@@ -134,16 +139,19 @@ When testing with real albums, verify:
 ## Error Handling Tests
 
 ### Network Errors
+
 - **Test**: Simulate network failure
 - **Expected**: Clear error message with troubleshooting steps
 - **Status**: ✅ Implemented
 
 ### Invalid Album
+
 - **Test**: Use private or deleted album URL
 - **Expected**: Graceful failure with helpful message
 - **Status**: ✅ Implemented
 
 ### No Photos
+
 - **Test**: Album with 0 photos
 - **Expected**: Clear error message
 - **Status**: ✅ Implemented
@@ -151,23 +159,28 @@ When testing with real albums, verify:
 ## Performance Tests
 
 ### Expected Performance
+
 - Album fetch: < 3 seconds (for 100 photos)
 - Random selection: < 1ms
 - JSON write: < 10ms
 - **Total**: < 5 seconds end-to-end
 
 ### Memory Usage
+
 - Expected: < 50MB for albums with 1000+ photos
 - Actual: ⏸️ Pending real-world testing
 
 ## Compatibility Tests
 
 ### URL Formats Supported
+
 - ✅ `https://photos.app.goo.gl/{shortcode}`
 - ✅ `https://photos.google.com/share/{albumId}`
 
 ### Image URL Formats Recognized
+
 All three Google Photos URL formats are supported:
+
 - ✅ Format 1: Classic (2019+)
 - ✅ Format 2: With `/pw/AL9nZE` prefix (2022+)
 - ✅ Format 3: With `/pw/AP1Gcz` prefix (2023+)
@@ -188,6 +201,7 @@ All three Google Photos URL formats are supported:
 - [x] ✅ Legal review of ToS compliance risk (documented in README)
 
 **Success Criteria Met**:
+
 - ✅ Successfully fetch photo URLs from 90%+ of test albums
 - ✅ Understand API structure well enough to implement production code
 - ✅ Production implementation deployed and operational
