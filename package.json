@@ -12,7 +12,7 @@
     "test:all": "tsx --test scripts/test-*.ts",
     "format": "prettier --write \"**/*.{ts,js,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,js,json,md}\"",
-    "lint": "eslint . --ext .ts,.js",
+    "lint": "eslint . --ext .ts,.js --max-warnings 50",
     "lint:fix": "eslint . --ext .ts,.js --fix",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
