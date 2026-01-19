@@ -118,12 +118,22 @@ trmnl-google-photos-plugin/
 
 ### Device Specifications
 
-| Device      | Width  | Height | Bit Depth | Display Type          |
-| ----------- | ------ | ------ | --------- | --------------------- |
-| TRMNL OG    | 800px  | 480px  | 1-bit     | Monochrome (2 shades) |
-| TRMNL OG V2 | 800px  | 480px  | 2-bit     | Grayscale (4 shades)  |
-| TRMNL V2    | 1024px | 758px  | 4-bit     | Grayscale (16 shades) |
-| Kindle 2024 | 600px  | 800px  | 4-bit     | Grayscale (16 shades) |
+> **Note**: Dimensions shown are **logical CSS dimensions** (scaled for consistent rendering).
+> Physical resolutions differ. See `src/services/photo-fetcher.ts` for complete device profiles.
+
+| Device      | Width  | Height | Bit Depth | Display Type           | Breakpoint |
+| ----------- | ------ | ------ | --------- | ---------------------- | ---------- |
+| TRMNL X     | 1040px | 780px  | 4-bit     | Grayscale (16 shades)  | lg:        |
+| TRMNL OG V2 | 800px  | 480px  | 2-bit     | Grayscale (4 shades)   | md:        |
+| TRMNL OG    | 800px  | 480px  | 1-bit     | Monochrome (2 shades)  | md:        |
+| Kindle 2024 | 800px  | 480px  | 8-bit     | Grayscale (256 shades) | sm:        |
+
+**Official TRMNL Devices** (3): TRMNL X (primary lg: device), TRMNL OG V2, TRMNL OG  
+**Kindle Devices** (6): 2024, 7, PW 6th/7th Gen, Oasis 2, Scribe  
+**BYOD Devices** (18+): Kobo, Inkplate, Waveshare, M5Paper, Onyx Boox, and more  
+**Total Supported**: 27+ devices
+
+**Reference**: [Device Models API](https://usetrmnl.com/api/models) • [Photo Fetcher Docs](../src/services/photo-fetcher.ts)
 
 ### Responsive System
 
@@ -131,17 +141,18 @@ The framework uses a **mobile-first** approach with three responsive dimensions:
 
 #### 1. Size-Based Breakpoints (Progressive)
 
-- `sm:` - 600px+ (Kindle 2024)
-- `md:` - 800px+ (TRMNL OG, OG V2)
-- `lg:` - 1024px+ (TRMNL V2)
+- `sm:` - 600px+ (Kindle devices in portrait)
+- `md:` - 800px+ (TRMNL OG, OG V2, most BYOD)
+- `lg:` - 1024px+ (TRMNL X, Kindle Scribe, Kobo, etc.)
 
 **Usage**: `md:value--large lg:value--xlarge` (applies at breakpoint and above)
 
 #### 2. Bit-Depth Variants (Specific)
 
-- `1bit:` - Monochrome (2 shades) - TRMNL OG
-- `2bit:` - Grayscale (4 shades) - TRMNL OG V2
-- `4bit:` - Grayscale (16 shades) - TRMNL V2, Kindle
+- `1bit:` - Monochrome (2 shades) - TRMNL OG, Waveshare, Inky Impression
+- `2bit:` - Grayscale (4 shades) - TRMNL OG V2, Seeed
+- `4bit:` - Grayscale (16 shades) - TRMNL X, M5Paper, Kobo Aura HD
+- `8bit:` - Grayscale (256 shades) - All Kindle devices, Kobo Libra
 
 **Usage**: `1bit:bg--black 2bit:bg--gray-45 4bit:bg--gray-75` (each targets only that bit-depth)
 
