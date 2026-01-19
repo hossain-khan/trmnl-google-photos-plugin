@@ -2,13 +2,26 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { parseAlbumUrl } from '../lib/url-parser';
 import { fetchRandomPhoto } from './services/photo-fetcher';
+import {
+  Logger,
+  trackPerformance,
+  trackError,
+  sendAnalytics,
+  classifyErrorSeverity,
+  getErrorType,
+  type PerformanceMetrics,
+  type ErrorContext,
+} from './services/monitoring-service';
 
 // Type definitions for Cloudflare Workers environment
 type Bindings = {
   ENVIRONMENT?: string;
   PHOTOS_CACHE?: KVNamespace; // Optional KV namespace for caching album data
-  // Add other bindings here when needed (Analytics, etc.)
+  ANALYTICS?: AnalyticsEngineDataset; // Optional Analytics Engine (disabled on free tier)
 };
+
+// Constants
+const CACHE_HIT_THRESHOLD_MS = 500; // Cache hits typically respond in <500ms
 
 // Create Hono app with type safety
 const app = new Hono<{ Bindings: Bindings }>();
@@ -88,29 +101,35 @@ app.get('/health', (c) => {
 app.get('/api/photo', async (c) => {
   const startTime = Date.now();
   const requestId = crypto.randomUUID().substring(0, 8);
+  const logger = new Logger(requestId);
 
-  // Structured logging function
-  const log = (level: string, message: string, data?: any) => {
-    const logEntry = {
-      timestamp: new Date().toISOString(),
-      requestId,
-      level,
-      message,
-      duration: Date.now() - startTime,
-      ...data,
-    };
-    console.log(JSON.stringify(logEntry));
-  };
+  let statusCode = 200;
+  let errorType: string | undefined;
+  let cacheHit = false;
 
   try {
-    log('info', 'GET /api/photo request received');
+    logger.info('GET /api/photo request received');
 
     // Extract album_url from query parameters
     const album_url = c.req.query('album_url');
 
     // Validate album URL parameter
     if (!album_url || album_url.trim() === '') {
-      log('warn', 'Missing album_url parameter');
+      statusCode = 400;
+      errorType = 'missing_parameter';
+      logger.warn('Missing album_url parameter');
+
+      // Track error
+      const errorContext: ErrorContext = {
+        requestId,
+        endpoint: '/api/photo',
+        errorMessage: 'Missing required parameter: album_url',
+        errorType,
+        severity: classifyErrorSeverity(statusCode, 'Missing parameter'),
+        statusCode,
+      };
+      trackError(errorContext);
+
       return c.json(
         {
           error: 'Bad Request',
@@ -121,22 +140,34 @@ app.get('/api/photo', async (c) => {
       );
     }
 
-    log('info', 'Album URL provided', {
-      album_url_preview: album_url.substring(0, 50) + '...',
-    });
+    logger.info('Album URL provided');
 
     // Parse and validate album URL
     const parseStartTime = Date.now();
     const urlValidation = parseAlbumUrl(album_url);
     const parseDuration = Date.now() - parseStartTime;
 
-    log('debug', 'URL parsing completed', {
+    logger.debug('URL parsing completed', {
       parseDuration,
       valid: urlValidation.valid,
     });
 
     if (!urlValidation.valid || !urlValidation.url) {
-      log('warn', 'Invalid album URL format', { error: urlValidation.error });
+      statusCode = 400;
+      errorType = 'invalid_url';
+      logger.warn('Invalid album URL format', { error: urlValidation.error });
+
+      // Track error
+      const errorContext: ErrorContext = {
+        requestId,
+        endpoint: '/api/photo',
+        errorMessage: `Invalid album URL: ${urlValidation.error}`,
+        errorType,
+        severity: classifyErrorSeverity(statusCode, urlValidation.error || ''),
+        statusCode,
+      };
+      trackError(errorContext);
+
       return c.json(
         {
           error: 'Bad Request',
@@ -153,24 +184,39 @@ app.get('/api/photo', async (c) => {
     try {
       photoData = await fetchRandomPhoto(urlValidation.url, c.env.PHOTOS_CACHE);
       const fetchDuration = Date.now() - fetchStartTime;
+      cacheHit = fetchDuration < CACHE_HIT_THRESHOLD_MS; // Likely cached if <500ms
 
-      log('info', 'Photo fetched successfully', {
+      logger.info('Photo fetched successfully', {
         uid: photoData.metadata?.uid,
         count: photoData.photo_count,
         fetchDuration,
-        cached: fetchDuration < 500, // Likely cached if <500ms
+        cached: cacheHit,
       });
     } catch (error) {
       const fetchDuration = Date.now() - fetchStartTime;
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch photos';
+      errorType = getErrorType(errorMessage);
 
-      log('error', 'Photo fetch failed', {
+      logger.error('Photo fetch failed', {
         error: errorMessage,
+        errorType,
         fetchDuration,
       });
 
       // Return appropriate status code based on error
-      const statusCode = errorMessage.includes('not found') ? 404 : 500;
+      statusCode = errorMessage.includes('not found') ? 404 : 500;
+
+      // Track error
+      const errorContext: ErrorContext = {
+        requestId,
+        endpoint: '/api/photo',
+        errorMessage,
+        errorType,
+        severity: classifyErrorSeverity(statusCode, errorMessage),
+        statusCode,
+        stack: error instanceof Error ? error.stack : undefined,
+      };
+      trackError(errorContext);
 
       return c.json(
         {
@@ -178,12 +224,11 @@ app.get('/api/photo', async (c) => {
           message: errorMessage,
           timestamp: new Date().toISOString(),
         },
-        statusCode
+        statusCode as 404 | 500
       );
     }
 
     // Return JSON response (flat structure for TRMNL templates)
-    // TRMNL templates access these directly: {{ photo_url }}, {{ caption }}
     const response = {
       photo_url: photoData.photo_url,
       thumbnail_url: photoData.thumbnail_url,
@@ -194,20 +239,58 @@ app.get('/api/photo', async (c) => {
     };
 
     const totalDuration = Date.now() - startTime;
-    log('info', 'JSON response sent successfully', {
+    logger.info('JSON response sent successfully', {
       totalDuration,
       responseSize: JSON.stringify(response).length,
     });
+
+    // Track performance metrics
+    const metrics: PerformanceMetrics = {
+      requestId,
+      endpoint: '/api/photo',
+      totalDuration,
+      photoFetchDuration: Date.now() - fetchStartTime,
+      cacheHit,
+      statusCode,
+    };
+    trackPerformance(metrics);
+
+    // Send to Analytics Engine (if configured - disabled by default on free tier)
+    sendAnalytics(c.env.ANALYTICS, metrics as unknown as Record<string, unknown>);
 
     return c.json(response);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     const totalDuration = Date.now() - startTime;
+    statusCode = 500;
+    errorType = 'unhandled_error';
 
-    log('error', 'Unhandled error in /api/photo endpoint', {
+    logger.error('Unhandled error in /api/photo endpoint', {
       error: errorMessage,
       stack: error instanceof Error ? error.stack : undefined,
       totalDuration,
+    });
+
+    // Track critical error
+    const errorContext: ErrorContext = {
+      requestId,
+      endpoint: '/api/photo',
+      errorMessage,
+      errorType,
+      severity: 'critical',
+      statusCode,
+      stack: error instanceof Error ? error.stack : undefined,
+    };
+    trackError(errorContext);
+
+    // Send to Analytics Engine (if configured - disabled by default on free tier)
+    sendAnalytics(c.env.ANALYTICS, {
+      requestId,
+      endpoint: '/api/photo',
+      totalDuration,
+      statusCode,
+      errorType,
+      cacheHit,
     });
 
     return c.json(
