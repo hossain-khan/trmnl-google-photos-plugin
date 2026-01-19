@@ -520,28 +520,6 @@
             </div>
         </div>
 
-        <div class="demo-section">
-            <h2>🎨 Layout Previews</h2>
-            <p>Browse the four layout templates with sample data. These templates are uploaded to TRMNL's Markup Editor.</p>
-            
-            <div class="demo-controls">
-                <select id="layoutPreview" onchange="loadPreviewTemplate()">
-                    <option value="">Select a layout to preview...</option>
-                    <option value="full">Full Screen</option>
-                    <option value="half_horizontal">Half Horizontal</option>
-                    <option value="half_vertical">Half Vertical</option>
-                    <option value="quadrant">Quadrant</option>
-                </select>
-            </div>
-            
-            <div id="templatePreview" class="preview-container">
-                <div class="preview-empty">
-                    <div style="font-size: 48px; margin-bottom: 10px;">📐</div>
-                    <p>Select a layout above to preview the template with sample data</p>
-                </div>
-            </div>
-        </div>
-
         <div class="demo-section setup-info">
             <h2>🚀 Setup Instructions</h2>
             <p>Get started with the Google Photos TRMNL plugin in just a few simple steps:</p>
@@ -801,64 +779,6 @@
             } finally {
                 fetchBtn.disabled = false;
                 fetchBtn.textContent = '🔄 Fetch Photo Data';
-            }
-        }
-        
-        async function loadPreviewTemplate() {
-            const layout = document.getElementById('layoutPreview').value;
-            const templatePreview = document.getElementById('templatePreview');
-            
-            console.log('[Template] Loading preview for layout:', layout);
-            
-            if (!layout) {
-                templatePreview.innerHTML = '<div class="preview-empty"><div style="font-size: 48px; margin-bottom: 10px;">📐</div><p>Select a layout above to preview the template with sample data</p></div>';
-                return;
-            }
-            
-            templatePreview.innerHTML = '<div class="preview-empty"><div style="font-size: 48px;">⏳</div><p>Loading template...</p></div>';
-            
-            try {
-                const templateUrl = `templates/preview/${layout}.liquid`;
-                console.log('[Template] Fetching:', templateUrl);
-                const response = await fetch(templateUrl);
-                const html = await response.text();
-                
-                console.log(`[Template] ✓ Template loaded (${html.length} chars)`);
-                
-                // Determine view class based on layout using a mapping for maintainability
-                const viewClassMap = {
-                    full: 'view--full',
-                    half_horizontal: 'view--half view--half-horizontal',
-                    half_vertical: 'view--half view--half-vertical',
-                    quadrant: 'view--quadrant'
-                };
-                const viewClass = viewClassMap[layout] || 'view--full';
-                
-                // Wrap in TRMNL framework with proper structure
-                templatePreview.innerHTML = `
-                    <div class="environment trmnl" style="max-width: 800px; width: 100%; margin: 0 auto;">
-                        <div class="screen">
-                            <div class="view ${viewClass}">
-                                ${html}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // Re-initialize TRMNL JavaScript for the new content
-                if (window.TRMNL && window.TRMNL.init) {
-                    try {
-                        console.log('[Template] Initializing TRMNL framework...');
-                        window.TRMNL.init();
-                        console.log('[Template] ✓ TRMNL framework initialized');
-                    } catch (initError) {
-                        console.error('[Template] ✗ Error initializing TRMNL framework:', initError);
-                        // Keep the rendered template visible even if TRMNL.init fails
-                    }
-                }
-            } catch (error) {
-                console.error('[Template] ✗ Failed to load template:', error);
-                templatePreview.innerHTML = '<div class="preview-empty"><div style="font-size: 48px;">❌</div><p>Failed to load template</p></div>';
             }
         }
         
