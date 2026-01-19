@@ -23,6 +23,12 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Liquid } from 'liquidjs';
 
+
+interface TemplateInfo {
+  name: string;
+  path: string;
+  type: string;
+}
 // Get current directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -60,7 +66,7 @@ const previewTemplates = readdirSync(PREVIEW_DIR)
 const allTemplates = [...mainTemplates, ...previewTemplates];
 
 console.log(`📄 Found ${allTemplates.length} templates to test:`);
-allTemplates.forEach(t => console.log(`   - ${t.type}/${t.name}`));
+allTemplates.forEach((t: TemplateInfo): void => console.log(`   - ${t.type}/${t.name}`));
 console.log('');
 
 // Sample data for testing main templates
@@ -109,9 +115,9 @@ const longCaptionData = {
 };
 
 // Test Suite 1: Template Syntax Validity
-describe('Template Syntax Validity', () => {
-  allTemplates.forEach(template => {
-    it(`should parse ${template.type}/${template.name} without syntax errors`, async () => {
+describe('Template Syntax Validity', (): void => {
+  allTemplates.forEach((template: TemplateInfo): void => {
+    it(`should parse ${template.type}/${template.name} without syntax errors`, async (): Promise<void> => {
       const content = readFileSync(template.path, 'utf-8');
       
       // Attempt to parse the template
@@ -119,16 +125,16 @@ describe('Template Syntax Validity', () => {
         await liquid.parseAndRender(content, validPhotoData);
         assert.ok(true, 'Template parsed successfully');
       } catch (error) {
-        assert.fail(`Template has syntax errors: ${error.message}`);
+        assert.fail(`Template has syntax errors: ${(error as Error).message}`);
       }
     });
   });
 });
 
 // Test Suite 2: Main Template Rendering with Valid Data
-describe('Main Template Rendering - Valid Data', () => {
-  mainTemplates.forEach(template => {
-    it(`should render ${template.name} with valid photo data`, async () => {
+describe('Main Template Rendering - Valid Data', (): void => {
+  mainTemplates.forEach((template: TemplateInfo): void => {
+    it(`should render ${template.name} with valid photo data`, async (): Promise<void> => {
       const content = readFileSync(template.path, 'utf-8');
       
       const rendered = await liquid.parseAndRender(content, validPhotoData);
@@ -143,9 +149,9 @@ describe('Main Template Rendering - Valid Data', () => {
 });
 
 // Test Suite 3: Main Template Rendering with Empty Data
-describe('Main Template Rendering - Empty Data', () => {
-  mainTemplates.forEach(template => {
-    it(`should render ${template.name} with empty photo data (error state)`, async () => {
+describe('Main Template Rendering - Empty Data', (): void => {
+  mainTemplates.forEach((template: TemplateInfo): void => {
+    it(`should render ${template.name} with empty photo data (error state)`, async (): Promise<void> => {
       const content = readFileSync(template.path, 'utf-8');
       
       const rendered = await liquid.parseAndRender(content, emptyPhotoData);
@@ -161,9 +167,9 @@ describe('Main Template Rendering - Empty Data', () => {
 });
 
 // Test Suite 4: Main Template Rendering with Missing Data
-describe('Main Template Rendering - Missing Data', () => {
-  mainTemplates.forEach(template => {
-    it(`should render ${template.name} with missing photo data`, async () => {
+describe('Main Template Rendering - Missing Data', (): void => {
+  mainTemplates.forEach((template: TemplateInfo): void => {
+    it(`should render ${template.name} with missing photo data`, async (): Promise<void> => {
       const content = readFileSync(template.path, 'utf-8');
       
       const rendered = await liquid.parseAndRender(content, missingPhotoData);
@@ -176,9 +182,9 @@ describe('Main Template Rendering - Missing Data', () => {
 });
 
 // Test Suite 5: Main Template Rendering with Long Caption
-describe('Main Template Rendering - Long Caption', () => {
-  mainTemplates.forEach(template => {
-    it(`should render ${template.name} with long caption`, async () => {
+describe('Main Template Rendering - Long Caption', (): void => {
+  mainTemplates.forEach((template: TemplateInfo): void => {
+    it(`should render ${template.name} with long caption`, async (): Promise<void> => {
       const content = readFileSync(template.path, 'utf-8');
       
       const rendered = await liquid.parseAndRender(content, longCaptionData);
@@ -197,9 +203,9 @@ describe('Main Template Rendering - Long Caption', () => {
 });
 
 // Test Suite 6: Preview Template Rendering
-describe('Preview Template Rendering', () => {
-  previewTemplates.forEach(template => {
-    it(`should render preview/${template.name} with hardcoded data`, async () => {
+describe('Preview Template Rendering', (): void => {
+  previewTemplates.forEach((template: TemplateInfo): void => {
+    it(`should render preview/${template.name} with hardcoded data`, async (): Promise<void> => {
       const content = readFileSync(template.path, 'utf-8');
       
       // Preview templates have hardcoded content, should render without external data
@@ -214,9 +220,9 @@ describe('Preview Template Rendering', () => {
 });
 
 // Test Suite 7: Template Structure Validation
-describe('Template Structure Validation', () => {
-  allTemplates.forEach(template => {
-    it(`should have proper structure in ${template.type}/${template.name}`, () => {
+describe('Template Structure Validation', (): void => {
+  allTemplates.forEach((template: TemplateInfo): void => {
+    it(`should have proper structure in ${template.type}/${template.name}`, (): void => {
       const content = readFileSync(template.path, 'utf-8');
       
       // Check for essential structural elements
@@ -235,12 +241,12 @@ describe('Template Structure Validation', () => {
 });
 
 // Test Suite 8: Template Consistency Between Main and Preview
-describe('Template Consistency - Main vs Preview', () => {
+describe('Template Consistency - Main vs Preview', (): void => {
   mainTemplates.forEach(mainTemplate => {
     const previewTemplate = previewTemplates.find(p => p.name === mainTemplate.name);
     
     if (previewTemplate) {
-      it(`should have similar structure between main/${mainTemplate.name} and preview/${mainTemplate.name}`, () => {
+      it(`should have similar structure between main/${mainTemplate.name} and preview/${mainTemplate.name}`, (): void => {
         const mainContent = readFileSync(mainTemplate.path, 'utf-8');
         const previewContent = readFileSync(previewTemplate.path, 'utf-8');
         
@@ -266,9 +272,9 @@ describe('Template Consistency - Main vs Preview', () => {
 });
 
 // Test Suite 9: Template Variables Usage
-describe('Template Variables Usage', () => {
-  mainTemplates.forEach(template => {
-    it(`should use standard template variables in ${template.name}`, () => {
+describe('Template Variables Usage', (): void => {
+  mainTemplates.forEach((template: TemplateInfo): void => {
+    it(`should use standard template variables in ${template.name}`, (): void => {
       const content = readFileSync(template.path, 'utf-8');
       
       // Check for TRMNL standard variables
@@ -283,9 +289,9 @@ describe('Template Variables Usage', () => {
 });
 
 // Test Suite 10: Image Attributes Validation
-describe('Image Attributes Validation', () => {
-  allTemplates.forEach(template => {
-    it(`should have proper image attributes in ${template.type}/${template.name}`, () => {
+describe('Image Attributes Validation', (): void => {
+  allTemplates.forEach((template: TemplateInfo): void => {
+    it(`should have proper image attributes in ${template.type}/${template.name}`, (): void => {
       const content = readFileSync(template.path, 'utf-8');
       
       // Check for image tags

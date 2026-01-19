@@ -10,8 +10,39 @@
 import { writeFile } from 'fs/promises';
 import { resolve } from 'path';
 
+interface MockPhoto {
+  uid: string;
+  url: string;
+  width: number;
+  height: number;
+  imageUpdateDate: number;
+  albumAddDate: number;
+}
+
+interface ValidationResult {
+  valid: boolean;
+  error?: string;
+  url?: string;
+}
+
+interface OutputData {
+  photo_url: string;
+  thumbnail_url: string;
+  caption: string | null;
+  timestamp: string;
+  album_name: string;
+  photo_count: number;
+  metadata: {
+    uid: string;
+    original_width: number;
+    original_height: number;
+    image_update_date: string;
+    album_add_date: string;
+  };
+}
+
 // Mock photo data that simulates what google-photos-album-image-url-fetch would return
-const mockPhotos = [
+const mockPhotos: MockPhoto[] = [
   {
     uid: "AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_",
     url: "https://lh3.googleusercontent.com/Pt3C6874cqkfeuIVL0XZ-UCsC6zLzeQmxq7T9-sDiPhyAgvJiKl_SCrvrMMkpuWuZ1TFkU65ilaZJrCbePRYo1q1qGTYvFV6J8gbYfZhhxQuXm2zXx6QDQkj0K-uBBUzozw7YLYQ5g",
@@ -42,14 +73,14 @@ console.log('🧪 Testing photo fetching logic...\n');
 
 // Test URL validation
 console.log('Test 1: URL Validation');
-const testUrls = [
+const testUrls: string[] = [
   'https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5',
   'https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF',
   'https://invalid-url.com',
   ''
 ];
 
-function validateAlbumUrl(url) {
+function validateAlbumUrl(url: string): ValidationResult {
   if (!url) {
     return { valid: false, error: 'URL is required' };
   }
@@ -67,7 +98,7 @@ function validateAlbumUrl(url) {
   };
 }
 
-testUrls.forEach(url => {
+testUrls.forEach((url: string): void => {
   const result = validateAlbumUrl(url);
   console.log(`  ${result.valid ? '✓' : '✗'} ${url || '(empty)'} - ${result.valid ? 'Valid' : result.error}`);
 });
@@ -77,11 +108,11 @@ console.log('\nTest 2: Image Optimization for E-ink');
 const EINK_WIDTH = 800;
 const EINK_HEIGHT = 480;
 
-function optimizeForEink(baseUrl, originalWidth, originalHeight) {
+function optimizeForEink(baseUrl: string, originalWidth: number, originalHeight: number): string {
   const aspectRatio = originalWidth / originalHeight;
   const einkAspectRatio = EINK_WIDTH / EINK_HEIGHT;
   
-  let targetWidth, targetHeight;
+  let targetWidth: number, targetHeight: number;
   
   if (aspectRatio > einkAspectRatio) {
     targetWidth = EINK_WIDTH;
@@ -94,24 +125,28 @@ function optimizeForEink(baseUrl, originalWidth, originalHeight) {
   return `${baseUrl}=w${targetWidth}-h${targetHeight}`;
 }
 
-mockPhotos.forEach((photo, idx) => {
+mockPhotos.forEach((photo: MockPhoto, idx: number): void => {
   const optimized = optimizeForEink(photo.url, photo.width, photo.height);
   const sizeMatch = optimized.match(/=w(\d+)-h(\d+)/);
-  console.log(`  Photo ${idx + 1}: ${photo.width}x${photo.height} → ${sizeMatch[1]}x${sizeMatch[2]}`);
+  if (sizeMatch) {
+    console.log(`  Photo ${idx + 1}: ${photo.width}x${photo.height} → ${sizeMatch[1]}x${sizeMatch[2]}`);
+  }
 });
 
 // Test random selection
 console.log('\nTest 3: Random Photo Selection');
-function selectRandomPhoto(photos) {
+function selectRandomPhoto(photos: MockPhoto[]): MockPhoto | null {
   if (!photos || photos.length === 0) return null;
   const randomIndex = Math.floor(Math.random() * photos.length);
   return photos[randomIndex];
 }
 
-const selections = [];
+const selections: string[] = [];
 for (let i = 0; i < 10; i++) {
   const selected = selectRandomPhoto(mockPhotos);
-  selections.push(selected.uid);
+  if (selected) {
+    selections.push(selected.uid);
+  }
 }
 const uniqueSelections = new Set(selections);
 console.log(`  ✓ Made 10 random selections, ${uniqueSelections.size} unique photos selected`);
@@ -121,7 +156,7 @@ console.log('\nTest 4: Output Data Structure');
 const selectedPhoto = mockPhotos[0];
 const optimizedUrl = optimizeForEink(selectedPhoto.url, selectedPhoto.width, selectedPhoto.height);
 
-const outputData = {
+const outputData: OutputData = {
   photo_url: optimizedUrl,
   thumbnail_url: `${selectedPhoto.url}=w400-h300`,
   caption: null,

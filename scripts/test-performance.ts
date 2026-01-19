@@ -12,7 +12,7 @@
  * - Wall time: ~30 seconds maximum (for long-running operations)
  * 
  * Usage:
- *   node scripts/test-performance.js
+ *   node scripts/test-performance.ts
  */
 
 import { performance } from 'node:perf_hooks';
@@ -26,8 +26,63 @@ const projectRoot = join(__dirname, '..');
 
 console.log('⚡ Performance Monitoring Test\n');
 
+interface Targets {
+  cpuTime: number;
+  totalTime: number;
+  photoFetch: number;
+  templateRender: number;
+  urlParse: number;
+}
+
+interface MeasurementResult<T = any> {
+  name: string;
+  duration: number;
+  success: boolean;
+  error?: string;
+  result?: T;
+  htmlSize?: number;
+}
+
+interface PerformanceCheck {
+  name: string;
+  value: string;
+  target: number;
+  pass: boolean;
+  unit: string;
+}
+
+interface AllResults {
+  urlParse: MeasurementResult[];
+  dataTransform: MeasurementResult[];
+}
+
+interface MockGooglePhoto {
+  uid: string;
+  url: string;
+  width: number;
+  height: number;
+  imageUpdateDate: number;
+  albumAddDate: number;
+}
+
+interface PhotoData {
+  photo_url: string;
+  thumbnail_url: string;
+  caption: string | null;
+  timestamp: string;
+  album_name: string;
+  photo_count: number;
+  metadata: {
+    uid: string;
+    original_width: number;
+    original_height: number;
+    image_update_date: string;
+    album_add_date: string;
+  };
+}
+
 // Performance targets
-const TARGETS = {
+const TARGETS: Targets = {
   cpuTime: 50, // 50ms CPU time limit
   totalTime: 3000, // 3 seconds total time
   photoFetch: 2000, // 2 seconds for photo fetching
@@ -38,15 +93,15 @@ const TARGETS = {
 /**
  * Measure execution time of a function
  */
-async function measureTime(name, fn) {
+async function measureTime<T>(name: string, fn: () => T | Promise<T>): Promise<MeasurementResult<T>> {
   const startTime = performance.now();
-  let result;
-  let error = null;
+  let result: T | undefined;
+  let error: Error | null = null;
 
   try {
     result = await fn();
   } catch (err) {
-    error = err;
+    error = err as Error;
   }
 
   const endTime = performance.now();
@@ -64,17 +119,17 @@ async function measureTime(name, fn) {
 /**
  * Test URL parsing performance
  */
-async function testUrlParsing() {
+async function testUrlParsing(): Promise<MeasurementResult[]> {
   // Load URL parser
-  const { parseAlbumUrl } = await import(join(projectRoot, 'lib', 'url-parser.ts'));
+  const { parseAlbumUrl } = await import(join(projectRoot, 'lib', 'url-parser'));
 
-  const testUrls = [
+  const testUrls: string[] = [
     'https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8',
     'https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF',
     'https://photos.google.com/share/AF1QipMZNuJ5JH6n3yF?key=value',
   ];
 
-  const results = [];
+  const results: MeasurementResult[] = [];
 
   for (const url of testUrls) {
     const result = await measureTime(`Parse: ${url.substring(0, 40)}...`, () => {
@@ -89,11 +144,11 @@ async function testUrlParsing() {
 /**
  * Test data transformation performance
  */
-async function testDataTransformation() {
-  const results = [];
+async function testDataTransformation(): Promise<MeasurementResult[]> {
+  const results: MeasurementResult[] = [];
 
   // Mock Google Photo data
-  const mockGooglePhoto = {
+  const mockGooglePhoto: MockGooglePhoto = {
     uid: 'AF1QipO4_Y5pseqWDPSlY7AAo0wmg76xW4gX0kOz8-p_',
     url: 'https://lh3.googleusercontent.com/example',
     width: 4000,
@@ -110,7 +165,7 @@ async function testDataTransformation() {
   results.push(optimizeResult);
 
   // Test photo data conversion
-  const convertResult = await measureTime('Convert photo data', () => {
+  const convertResult = await measureTime<PhotoData>('Convert photo data', () => {
     return {
       photo_url: `${mockGooglePhoto.url}=w800-h480`,
       thumbnail_url: `${mockGooglePhoto.url}=w400-h300`,
@@ -147,11 +202,11 @@ async function testDataTransformation() {
 /**
  * Display test results in a table
  */
-function displayResults(category, results) {
+function displayResults(category: string, results: MeasurementResult[]): void {
   console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
   console.log(`${category}\n`);
 
-  results.forEach(result => {
+  results.forEach((result: MeasurementResult): void => {
     const icon = result.success ? '✅' : '❌';
     const duration = `${result.duration}ms`.padEnd(10);
     const name = result.name.padEnd(40);
@@ -171,11 +226,11 @@ function displayResults(category, results) {
 /**
  * Calculate total CPU time estimate
  */
-function calculateTotalCPUTime(allResults) {
+function calculateTotalCPUTime(allResults: MeasurementResult[][]): number {
   let totalTime = 0;
 
-  allResults.forEach(categoryResults => {
-    categoryResults.forEach(result => {
+  allResults.forEach((categoryResults: MeasurementResult[]): void => {
+    categoryResults.forEach((result: MeasurementResult): void => {
       if (result.success) {
         totalTime += result.duration;
       }
@@ -188,7 +243,7 @@ function calculateTotalCPUTime(allResults) {
 /**
  * Evaluate performance against targets
  */
-function evaluatePerformance(allResults) {
+function evaluatePerformance(allResults: AllResults): boolean {
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('📊 Performance Summary\n');
 
@@ -196,7 +251,7 @@ function evaluatePerformance(allResults) {
   const urlParseAvg = allResults.urlParse.reduce((sum, r) => sum + r.duration, 0) / allResults.urlParse.length;
   const dataTransformAvg = allResults.dataTransform.reduce((sum, r) => sum + r.duration, 0) / allResults.dataTransform.length;
 
-  const checks = [
+  const checks: PerformanceCheck[] = [
     {
       name: 'URL parsing',
       value: urlParseAvg.toFixed(2),
@@ -213,7 +268,7 @@ function evaluatePerformance(allResults) {
     },
   ];
 
-  checks.forEach(check => {
+  checks.forEach((check: PerformanceCheck): void => {
     const icon = check.pass ? '✅' : '⚠️';
     console.log(`${icon} ${check.name}: ${check.value}${check.unit} (target: <${check.target}${check.unit})`);
   });
@@ -227,7 +282,7 @@ function evaluatePerformance(allResults) {
   console.log(`   Total (excl. network): ~${(urlParseAvg + dataTransformAvg + 2).toFixed(0)}ms`);
   console.log(`   Total (with network):  ~${(urlParseAvg + dataTransformAvg + 2 + 200).toFixed(0)}-${(urlParseAvg + dataTransformAvg + 2 + 2000).toFixed(0)}ms`);
 
-  const allPassed = checks.every(c => c.pass);
+  const allPassed = checks.every((c: PerformanceCheck) => c.pass);
 
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
@@ -243,7 +298,7 @@ function evaluatePerformance(allResults) {
 /**
  * Main function
  */
-async function main() {
+async function main(): Promise<void> {
   console.log('🏃 Running performance tests...\n');
 
   try {
@@ -259,7 +314,7 @@ async function main() {
     displayResults('🔄 Data Transformation Performance', dataTransformResults);
 
     // Evaluate overall performance
-    const allResults = {
+    const allResults: AllResults = {
       urlParse: urlParseResults,
       dataTransform: dataTransformResults,
     };
@@ -276,8 +331,8 @@ async function main() {
     process.exit(passed ? 0 : 1);
 
   } catch (error) {
-    console.error('❌ Performance test failed:', error.message);
-    console.error(error.stack);
+    console.error('❌ Performance test failed:', (error as Error).message);
+    console.error((error as Error).stack);
     process.exit(1);
   }
 }

@@ -21,6 +21,38 @@
 
 import { performance } from 'node:perf_hooks';
 
+interface RequestResult {
+  requestId: number;
+  success: boolean;
+  status: number;
+  duration: number;
+  htmlLength: number;
+  isError: boolean;
+  error?: string;
+}
+
+interface Stats {
+  total: number;
+  successful: number;
+  failed: number;
+  errorRate: string;
+  avgDuration: number;
+  minDuration: number;
+  maxDuration: number;
+  p50: number;
+  p95: number;
+  p99: number;
+  totalDuration: number;
+  requestsPerSecond: string;
+}
+
+interface SuccessCriteria {
+  name: string;
+  pass: boolean;
+  value: string;
+  target: string;
+}
+
 // Configuration
 const DEFAULT_WORKER_URL = 'http://localhost:8787';
 const DEFAULT_NUM_REQUESTS = 50;
@@ -38,7 +70,7 @@ console.log(`Test album: ${VALID_ALBUM_URL.substring(0, 50)}...\n`);
 /**
  * Create a sample TRMNL request
  */
-function createTRMNLRequest(albumUrl = VALID_ALBUM_URL, layout = 'full') {
+function createTRMNLRequest(albumUrl: string = VALID_ALBUM_URL, layout: string = 'full'): object {
   return {
     trmnl: {
       plugin_settings: {
@@ -58,7 +90,7 @@ function createTRMNLRequest(albumUrl = VALID_ALBUM_URL, layout = 'full') {
 /**
  * Make a single request to the worker
  */
-async function makeRequest(requestId, layout = 'full') {
+async function makeRequest(requestId: number, layout: string = 'full'): Promise<RequestResult> {
   const startTime = performance.now();
   
   try {
@@ -96,7 +128,7 @@ async function makeRequest(requestId, layout = 'full') {
       duration: Math.round(duration),
       htmlLength: 0,
       isError: true,
-      error: error.message,
+      error: (error as Error).message,
     };
   }
 }
@@ -104,11 +136,11 @@ async function makeRequest(requestId, layout = 'full') {
 /**
  * Run load test with concurrent requests
  */
-async function runLoadTest() {
+async function runLoadTest(): Promise<{ results: RequestResult[]; totalDuration: number }> {
   console.log('⏱️  Starting load test...\n');
 
   const layouts = ['full', 'half_horizontal', 'half_vertical', 'quadrant'];
-  const requests = [];
+  const requests: Promise<RequestResult>[] = [];
 
   // Create all request promises
   for (let i = 0; i < numRequests; i++) {
@@ -130,12 +162,12 @@ async function runLoadTest() {
 /**
  * Calculate statistics from results
  */
-function calculateStats(results, totalDuration) {
-  const successfulRequests = results.filter(r => r.success && !r.isError);
-  const failedRequests = results.filter(r => !r.success || r.isError);
+function calculateStats(results: RequestResult[], totalDuration: number): Stats {
+  const successfulRequests = results.filter((r: RequestResult) => r.success && !r.isError);
+  const failedRequests = results.filter((r: RequestResult) => !r.success || r.isError);
   
   const durations = successfulRequests.map(r => r.duration);
-  durations.sort((a, b) => a - b);
+  durations.sort((a: number, b: number) => a - b);
 
   const avgDuration = durations.reduce((a, b) => a + b, 0) / durations.length || 0;
   const minDuration = durations[0] || 0;
@@ -168,7 +200,7 @@ function calculateStats(results, totalDuration) {
 /**
  * Display results in a formatted table
  */
-function displayResults(stats) {
+function displayResults(stats: Stats): void {
   console.log('📊 Load Test Results\n');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log(`Total Requests:       ${stats.total}`);
@@ -192,7 +224,7 @@ function displayResults(stats) {
 /**
  * Evaluate test results against targets
  */
-function evaluateResults(stats) {
+function evaluateResults(stats: Stats): boolean {
   console.log('\n✅ Success Criteria:\n');
   
   const checks = [
@@ -222,13 +254,13 @@ function evaluateResults(stats) {
     },
   ];
 
-  checks.forEach(check => {
+  checks.forEach((check: SuccessCriteria): void => {
     const icon = check.pass ? '✅' : '❌';
     console.log(`${icon} ${check.name}`);
     console.log(`   Value: ${check.value} | Target: ${check.target}`);
   });
 
-  const allPassed = checks.every(c => c.pass);
+  const allPassed = checks.every((c: SuccessCriteria) => c.pass);
   
   if (allPassed) {
     console.log('\n🎉 All success criteria met!');
@@ -255,7 +287,7 @@ async function main() {
       console.log('✅ Worker is healthy\n');
     } catch (error) {
       console.error(`❌ Cannot reach worker at ${workerUrl}`);
-      console.error(`   Error: ${error.message}`);
+      console.error(`   Error: ${(error as Error).message}`);
       console.error('\n💡 Tip: Start the worker with: npm run dev');
       process.exit(1);
     }
@@ -276,8 +308,8 @@ async function main() {
     process.exit(passed ? 0 : 1);
 
   } catch (error) {
-    console.error('❌ Load test failed:', error.message);
-    console.error(error.stack);
+    console.error('❌ Load test failed:', (error as Error).message);
+    console.error((error as Error).stack);
     process.exit(1);
   }
 }
