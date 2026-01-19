@@ -76,10 +76,12 @@ const validPhotoData = {
   caption: 'Test photo caption',
   photo_count: 42,
   album_name: 'Test Album',
-  custom_title: 'Test Instance',
   trmnl: {
     plugin_settings: {
       instance_name: 'Google Photos Shared Album',
+      custom_fields_values: {
+        custom_title: 'Test Instance',
+      },
     },
   },
 };
@@ -89,19 +91,23 @@ const emptyPhotoData = {
   caption: '',
   photo_count: 0,
   album_name: '',
-  custom_title: 'Test Instance',
   trmnl: {
     plugin_settings: {
       instance_name: 'Google Photos Shared Album',
+      custom_fields_values: {
+        custom_title: 'Test Instance',
+      },
     },
   },
 };
 
 const missingPhotoData = {
-  custom_title: '',
   trmnl: {
     plugin_settings: {
       instance_name: 'Google Photos Shared Album',
+      custom_fields_values: {
+        custom_title: '',
+      },
     },
   },
 };
@@ -112,10 +118,12 @@ const longCaptionData = {
     'This is a very long caption that should be truncated by the data-clamp attribute. '.repeat(10),
   photo_count: 142,
   album_name: 'Summer Vacation 2026',
-  custom_title: 'Test Instance',
   trmnl: {
     plugin_settings: {
       instance_name: 'Google Photos Shared Album',
+      custom_fields_values: {
+        custom_title: 'Test Instance',
+      },
     },
   },
 };
@@ -153,7 +161,7 @@ describe('Main Template Rendering - Valid Data', (): void => {
         assert.ok(rendered.includes('img'), 'Should contain image tag');
         assert.ok(rendered.includes(validPhotoData.photo_url), 'Should include photo URL');
         assert.ok(
-          rendered.includes(validPhotoData.custom_title),
+          rendered.includes(validPhotoData.trmnl.plugin_settings.custom_fields_values.custom_title),
           'Should include custom title'
         );
       }
