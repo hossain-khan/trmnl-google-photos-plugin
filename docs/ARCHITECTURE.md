@@ -124,7 +124,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 - ✅ Global distribution
 - ✅ Free tier supports 100k requests/day
 
-### 3. URL Parser (`lib/url-parser.js`)
+### 3. URL Parser (`src/lib/url-parser.ts`)
 
 **Purpose**: Validate and extract album IDs from Google Photos URLs
 
@@ -234,7 +234,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 
 2. Worker: Validate Album URL
    - Extract album URL from query parameter
-   - Parse with lib/url-parser.js
+   - Parse with src/lib/url-parser.ts
    - Validate format with Zod schema
    - If invalid → return error JSON
 
@@ -338,7 +338,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 - **Language**: TypeScript (compiled to JavaScript)
 - **Framework**: Hono 4.11.4
 - **Validation**: Zod 4.3.5
-- **Photo Fetcher**: google-photos-album-image-url-fetch 2.3.1
+- **Photo Fetcher**: google-photos-album-image-url-fetch 3.2.0
 - **Caching**: Cloudflare KV (PHOTOS_CACHE)
 - **HTTP Client**: Undici (built-in)
 
@@ -566,7 +566,7 @@ refresh_frequency: 60 # minutes (1 hour)
 4. **Minimal Bundle Size**
    - Small dependencies (Hono, Zod, photo-fetcher)
    - TypeScript compiled to optimized JS
-   - <50KB total worker size (no template rendering)
+   - ~832KB total worker size (~144KB gzipped)
 
 ---
 
@@ -707,7 +707,7 @@ async function fetchPhotosWithRetry(url, maxRetries = 3) {
 - Cache performance validation
 - Load testing results
 
-**Total**: ✅ 65 tests passing
+**Total**: ✅ 217 tests passing
 
 ### Testing Approach
 
@@ -792,7 +792,7 @@ async function fetchPhotosWithRetry(url, maxRetries = 3) {
 - ✅ Photo fetching integrated with Google Photos
 - ✅ KV caching implemented and deployed (67ms response time)
 - ✅ JSON API fully operational
-- ✅ All 65 tests passing
+- ✅ All 217 tests passing
 - ✅ Production deployment at `trmnl-google-photos.gohk.xyz`
 - ✅ CORS configured for GitHub Pages and TRMNL
 
@@ -818,7 +818,7 @@ The TRMNL Google Photos Plugin architecture is designed for **simplicity, privac
 ✅ **Cost-Efficient**: $0 for MVP, <$10/month at scale  
 ✅ **Maintainable**: Minimal dependencies, clear separation of concerns
 
-The entire system fits in a single Cloudflare Worker (~100KB) and delivers random photos from Google Photos albums to TRMNL devices in <3 seconds. No databases. No servers. No complexity.
+The entire system fits in a single Cloudflare Worker (~832KB, 144KB gzipped) and delivers random photos from Google Photos albums to TRMNL devices in <3 seconds. No databases. No servers. No complexity.
 
 **It just works.** ✨
 
@@ -834,6 +834,6 @@ The entire system fits in a single Cloudflare Worker (~100KB) and delivers rando
 ---
 
 **Document Version**: 1.0  
-**Last Updated**: January 18, 2026  
+**Last Updated**: January 19, 2026  
 **Author**: Hossain Khan  
 **Project**: Community plugin for TRMNL
