@@ -20,6 +20,7 @@ npm run cf:login
 ```
 
 This will:
+
 1. Open a browser window
 2. Ask you to log into Cloudflare
 3. Request permission to use Wrangler
@@ -46,6 +47,7 @@ npm run deploy
 ```
 
 This will:
+
 - Build and bundle your TypeScript code
 - Upload to Cloudflare Workers
 - Deploy to: `https://trmnl-google-photos.gohk.xyz`
@@ -77,6 +79,7 @@ curl https://trmnl-google-photos.gohk.xyz/health
 ```
 
 Expected response:
+
 ```json
 {
   "status": "ok",
@@ -113,6 +116,7 @@ Add your account ID to `wrangler.toml` (see Step 2).
 If `trmnl-google-photos.gohk.xyz` is taken, you can:
 
 1. Choose a different subdomain in `wrangler.toml`:
+
    ```toml
    name = "trmnl-google-photos-plugin"
    ```
@@ -122,6 +126,7 @@ If `trmnl-google-photos.gohk.xyz` is taken, you can:
 ### TypeScript compilation errors
 
 Run type checking locally first:
+
 ```bash
 npx tsc --noEmit
 ```

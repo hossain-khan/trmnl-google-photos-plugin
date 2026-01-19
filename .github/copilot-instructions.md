@@ -18,6 +18,7 @@ This is a TRMNL plugin that displays random photos from Google Photos shared alb
 ### Current Status
 
 **Backend & Integration**: ✅ **Complete** (January 2026)
+
 - ✅ Google Photos API reverse engineering and integration
 - ✅ URL parser implementation (42 test cases)
 - ✅ Cloudflare Worker with Hono framework
@@ -35,7 +36,7 @@ This is a TRMNL plugin that displays random photos from Google Photos shared alb
 For developers working on this project:
 
 1. **Understand the Project**: Read this file completely for comprehensive context
-2. **Review Documentation**: 
+2. **Review Documentation**:
    - `README.md` - Project overview and installation
    - `docs/ARCHITECTURE.md` - System architecture and design
    - `docs/API_DOCUMENTATION.md` - Complete API reference
@@ -83,8 +84,8 @@ trmnl-google-photos-plugin/
 
 ## Key Files
 
-- **templates/*.liquid**: Four layout templates that adapt to different display sizes and orientations (uploaded to TRMNL Markup Editor)
-- **templates/preview/*.liquid**: Preview versions with hardcoded content (for local testing without API)
+- **templates/\*.liquid**: Four layout templates that adapt to different display sizes and orientations (uploaded to TRMNL Markup Editor)
+- **templates/preview/\*.liquid**: Preview versions with hardcoded content (for local testing without API)
 - **lib/url-parser.js**: URL parser and validator for Google Photos shared albums
 - **src/index.ts**: Main Cloudflare Worker entry point with photo fetching logic
 - **scripts/fetch-photos.js**: Photo fetching implementation using `google-photos-album-image-url-fetch`
@@ -96,12 +97,14 @@ trmnl-google-photos-plugin/
 ### Template Structure and Synchronization
 
 **Main Templates** (`templates/*.liquid`) are the **source of truth**:
+
 - Use template variables from JSON API (e.g., `{{ photo_url }}`, `{{ caption }}`)
 - Conditionals for handling missing data
 - Error states for unconfigured plugins
 - These are uploaded to TRMNL Markup Editor and used in production
 
 **Preview Templates** (`templates/preview/*.liquid`) are **synchronized mirrors**:
+
 - Use hardcoded content instead of template variables
 - Same HTML structure and CSS classes as main templates
 - Use `https://picsum.photos/300/200?grayscale` for images
@@ -109,6 +112,7 @@ trmnl-google-photos-plugin/
 - Purpose: Test layouts in TRMNL Markup Editor without API calls
 
 **⚠️ Critical Rule**: Always keep preview templates in sync with main templates. When you modify a main template:
+
 1. Update the corresponding preview template with the same structural changes
 2. Replace template variables with hardcoded equivalents
 3. Test both templates to ensure visual consistency
@@ -117,12 +121,12 @@ trmnl-google-photos-plugin/
 
 ### Device Specifications
 
-| Device | Width | Height | Bit Depth | Display Type |
-|--------|-------|--------|-----------|--------------|
-| TRMNL OG | 800px | 480px | 1-bit | Monochrome (2 shades) |
-| TRMNL OG V2 | 800px | 480px | 2-bit | Grayscale (4 shades) |
-| TRMNL V2 | 1024px | 758px | 4-bit | Grayscale (16 shades) |
-| Kindle 2024 | 600px | 800px | 4-bit | Grayscale (16 shades) |
+| Device      | Width  | Height | Bit Depth | Display Type          |
+| ----------- | ------ | ------ | --------- | --------------------- |
+| TRMNL OG    | 800px  | 480px  | 1-bit     | Monochrome (2 shades) |
+| TRMNL OG V2 | 800px  | 480px  | 2-bit     | Grayscale (4 shades)  |
+| TRMNL V2    | 1024px | 758px  | 4-bit     | Grayscale (16 shades) |
+| Kindle 2024 | 600px  | 800px  | 4-bit     | Grayscale (16 shades) |
 
 ### Responsive System
 
@@ -197,12 +201,14 @@ The plugin provides four layouts for different display configurations:
 **Use Case**: Full-screen display (entire TRMNL screen)
 
 **Key Features**:
+
 - Large photo display area (90% of screen height)
 - Optional caption below photo (truncated to 2 lines)
 - Photo count badge in title bar
 - Error state for unconfigured plugin
 
 **Layout Structure**:
+
 ```liquid
 <div class="flex flex--col gap--small h--full">
   <div class="flex flex--center-x flex--center-y" style="flex: 1;">
@@ -215,6 +221,7 @@ The plugin provides four layouts for different display configurations:
 ```
 
 **Critical Learnings**:
+
 - Use `flex: 1` to make photo area fill available space
 - `image--contain` ensures photo fits without cropping
 - `data-clamp="2"` prevents long captions from taking too much space
@@ -225,12 +232,14 @@ The plugin provides four layouts for different display configurations:
 **Use Case**: Half-size horizontal display (abundant horizontal space, minimal vertical)
 
 **Key Features**:
+
 - Flex row layout with photo on left, caption on right
 - Vertical centering: `flex--center-y`
 - Portrait mode fallback: `portrait:flex--col`
 - Photo count badge in caption area
 
 **Layout Structure**:
+
 ```liquid
 <div class="flex flex--row gap--medium portrait:flex--col flex--center-y">
   <div class="flex flex--center-x flex--center-y" style="flex: 1;">
@@ -243,6 +252,7 @@ The plugin provides four layouts for different display configurations:
 ```
 
 **Critical Learnings**:
+
 - Horizontal layouts benefit from side-by-side photo + caption
 - Limit caption width to prevent it from dominating the layout
 - Use `portrait:flex--col` for graceful degradation on portrait screens
@@ -252,11 +262,13 @@ The plugin provides four layouts for different display configurations:
 **Use Case**: Half-size vertical display
 
 **Key Features**:
+
 - Maximizes photo display area (85% of height)
 - Compact caption below (2 lines max)
 - Minimal padding to maximize space
 
 **Critical Learnings**:
+
 - Vertical layouts should prioritize photo over caption
 - Reduce padding (`p--2`) for more photo space
 - Keep caption concise with `data-clamp="2"`
@@ -266,12 +278,14 @@ The plugin provides four layouts for different display configurations:
 **Use Case**: Quarter-size display (most compact)
 
 **Key Features**:
+
 - Photo only, no caption
 - Minimal padding (`p--1`)
 - Photo fills entire space
 - Simplified title bar
 
 **Critical Learnings**:
+
 - Smallest layout drops caption entirely
 - Focus on clean photo display
 - Every pixel counts in quadrant layouts
@@ -284,14 +298,15 @@ Standard pattern for displaying photos across layouts:
 
 ```liquid
 <div class="flex flex--center-x flex--center-y" style="flex: 1;">
-  <img src="{{ photo.photo_url }}" 
-       alt="{{ photo.caption }}" 
+  <img src="{{ photo.photo_url }}"
+       alt="{{ photo.caption }}"
        class="image image--contain"
        style="max-width: 100%; max-height: 100%; object-fit: contain;">
 </div>
 ```
 
 **Key Points**:
+
 - Always use `flex--center-x flex--center-y` to center photos
 - `image--contain` ensures photo fits without cropping
 - `object-fit: contain` maintains aspect ratio
@@ -311,6 +326,7 @@ For captions that may be very long:
 ```
 
 **Why**:
+
 - `data-clamp="2"` truncates to 2 lines, preventing layout overflow
 - Always wrap in conditional to handle missing captions
 - Use `description` class for appropriate font sizing
@@ -335,6 +351,7 @@ Always provide helpful error states for unconfigured plugins:
 ```
 
 **Why**:
+
 - Users need clear guidance when plugin isn't configured
 - Emoji provides visual feedback (📷)
 - Instructions should be actionable
@@ -343,11 +360,13 @@ Always provide helpful error states for unconfigured plugins:
 ### 4. Responsive Sizing Strategy
 
 **Image sizing**:
+
 - Use percentage-based sizing: `max-width: 100%; max-height: 100%`
 - Let container control size via `flex: 1`
 - Always use `object-fit: contain` to prevent cropping
 
 **Text sizing**:
+
 - Use framework classes: `description`, `title`, `value`
 - Use `data-clamp` to prevent overflow
 - Adjust font size for compact layouts (quadrant uses smaller sizes)
@@ -367,6 +386,7 @@ Use consistent padding unless space constraints require reduction.
 **Problem**: Photo doesn't appear or shows broken image icon
 
 **Solution**:
+
 - Check `photo.photo_url` is valid and accessible
 - Ensure URL is HTTPS (TRMNL requires secure connections)
 - Test image URL in browser first
@@ -377,6 +397,7 @@ Use consistent padding unless space constraints require reduction.
 **Problem**: Long captions push photo out of view
 
 **Solution**:
+
 - Use `data-clamp="2"` or `data-clamp="4"` to limit lines
 - Set `max-width` on caption container (e.g., `style="max-width: 200px"`)
 - Wrap caption in conditional to handle missing captions
@@ -386,6 +407,7 @@ Use consistent padding unless space constraints require reduction.
 **Problem**: Photo appears stretched or cropped incorrectly
 
 **Solution**:
+
 - Always use `object-fit: contain` to maintain aspect ratio
 - Use `image--contain` class from TRMNL framework
 - Center photo with `flex--center-x flex--center-y`
@@ -396,6 +418,7 @@ Use consistent padding unless space constraints require reduction.
 **Problem**: Layout breaks on certain TRMNL screen sizes
 
 **Solution**:
+
 - Test all four device sizes (see Device Specifications above)
 - Use responsive breakpoints: `md:`, `lg:` for size-specific adjustments
 - Use `portrait:` prefix for portrait-specific styles
@@ -406,6 +429,7 @@ Use consistent padding unless space constraints require reduction.
 **Problem**: No feedback when plugin unconfigured
 
 **Solution**:
+
 - Always check `{% if photo.photo_url %}` before displaying photo
 - Provide clear else block with instructions
 - Include visual indicator (emoji) for better UX
@@ -427,6 +451,7 @@ Use consistent padding unless space constraints require reduction.
 ```
 
 **Field Descriptions**:
+
 - `photo_url` (required): Full-resolution photo URL (optimized for e-ink with size params)
 - `thumbnail_url` (optional): Lower resolution version (not currently used)
 - `caption` (optional): Photo caption/description from Google Photos
@@ -493,6 +518,7 @@ Critical scenarios to test:
 ### Device Testing
 
 Test across all TRMNL devices:
+
 - **Kindle 2024**: 600x800px (portrait), 4-bit
 - **TRMNL OG**: 800x480px (landscape), 1-bit
 - **TRMNL OG V2**: 800x480px (landscape), 2-bit
@@ -513,6 +539,7 @@ Test across all TRMNL devices:
 ## Development Notes
 
 **About This Document**: These copilot instructions were specifically created for the Google Photos Shared Album plugin. The structure and patterns are inspired by TRMNL best practices and adapted from the TRMNL Elements plugin template, but all content has been tailored to this project's unique requirements:
+
 - Photo display and image handling patterns
 - Google Photos API integration approach
 - Four layout template system
@@ -520,6 +547,7 @@ Test across all TRMNL devices:
 - Phase-based implementation strategy
 
 **Key Differences from Other TRMNL Plugins**:
+
 - Uses reverse-engineered Google Photos API (no OAuth)
 - Image-centric layouts vs data/text layouts
 - Focuses on responsive photo display
@@ -530,14 +558,16 @@ Test across all TRMNL devices:
 ### Completed Work ✅ (January 2026)
 
 **Project Setup**:
+
 - [x] Created directory structure
-- [x] Added settings.yml configuration  
+- [x] Added settings.yml configuration
 - [x] Built four Liquid templates
 - [x] Created preview page (index.html)
 - [x] Set up GitHub Pages deployment
 - [x] Updated README and copilot-instructions
 
 **Backend Development**:
+
 - [x] Researched Google Photos API
 - [x] Implemented URL parser with regex validation (42 tests)
 - [x] Set up Cloudflare Worker with Hono framework
@@ -548,6 +578,7 @@ Test across all TRMNL devices:
 - [x] All 65 tests passing
 
 **Production Deployment**:
+
 - [x] Deployed to `trmnl-google-photos.gohk.xyz`
 - [x] KV caching configured and operational
 - [x] Production monitoring in place
@@ -555,6 +586,7 @@ Test across all TRMNL devices:
 ### Future Enhancements 📋 (Post v1.0)
 
 **Phase 1: TRMNL Marketplace**
+
 - [ ] Upload templates to TRMNL Markup Editor
 - [ ] Test on TRMNL device/simulator
 - [ ] Create demo screenshots and plugin icon
@@ -562,6 +594,7 @@ Test across all TRMNL devices:
 - [ ] User guides and documentation
 
 **Phase 2: Feature Enhancements**
+
 - [ ] Multiple albums per user
 - [ ] Photo filters (date range, tags)
 - [ ] Video thumbnail support
@@ -569,6 +602,7 @@ Test across all TRMNL devices:
 - [ ] Analytics dashboard
 
 **Phase 3: OAuth Support (v2.0)**
+
 - [ ] Private album support
 - [ ] Secure token storage
 - [ ] Refresh token management
@@ -576,6 +610,7 @@ Test across all TRMNL devices:
 ## Workflow
 
 Stateless workflow with Polling strategy:
+
 1. **User Setup**: User pastes shared album URL in TRMNL plugin settings (custom form field)
 2. **TRMNL Polling**: Platform sends GET to `/api/photo?album_url=...` (hourly refresh)
 3. **Fetch Photos**: Worker fetches album data from Google Photos (checks KV cache first)
@@ -588,6 +623,7 @@ Stateless workflow with Polling strategy:
 ## Technical Stack
 
 ### Backend (Cloudflare Worker)
+
 - **Runtime**: Cloudflare Workers
 - **Framework**: Hono (lightweight web framework)
 - **Language**: TypeScript
@@ -598,12 +634,14 @@ Stateless workflow with Polling strategy:
 - **API Response**: JSON (TRMNL renders templates on their platform)
 
 ### Templates (TRMNL-Side)
+
 - **Location**: Stored in TRMNL's Markup Editor
 - **Format**: Template files (.liquid extension)
 - **Rendering**: Done by TRMNL platform, not by Worker
 - **Data**: Worker provides JSON, TRMNL merges into templates
 
 ### GitHub Pages Demo (Optional)
+
 - **Purpose**: Preview plugin with interactive UI
 - **Data Source**: Same JSON API endpoint
 - **Rendering**: Client-side JavaScript (no server-side rendering)

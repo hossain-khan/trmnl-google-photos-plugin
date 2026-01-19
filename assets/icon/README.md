@@ -18,6 +18,7 @@ Place plugin icons in this directory:
 The `trmnl-google-photos.svg` logo combines TRMNL's signature radial shutter design with Google Photos' brand colors to create a cohesive visual identity that represents both platforms.
 
 **Color Palette**: Uses Google Photos' signature colors with smooth transitions:
+
 - **Blue** (#4285F4), **Red** (#EA4335), **Yellow** (#FBBC04), **Green** (#34A853)
 - Three intermediate colors create a flowing gradient: Purple (#966495), Orange (#F2801C), Yellow-Green (#98B22B)
 

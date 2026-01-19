@@ -1,8 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { parseAlbumUrl } from '../lib/url-parser.js';
+import { parseAlbumUrl } from '../lib/url-parser';
 import { fetchRandomPhoto } from './services/photo-fetcher';
-import type { TRMNLRequest } from './types';
 
 // Type definitions for Cloudflare Workers environment
 type Bindings = {
@@ -15,17 +14,20 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>();
 
 // Enable CORS for GitHub Pages and TRMNL platform
-app.use('/*', cors({
-  origin: [
-    'https://hossain-khan.github.io',
-    'https://usetrmnl.com',
-    'http://localhost:8787',
-    'http://localhost:3000'
-  ],
-  allowMethods: ['GET', 'OPTIONS'],
-  allowHeaders: ['Content-Type'],
-  maxAge: 86400, // 24 hours
-}));
+app.use(
+  '/*',
+  cors({
+    origin: [
+      'https://hossain-khan.github.io',
+      'https://usetrmnl.com',
+      'http://localhost:8787',
+      'http://localhost:3000',
+    ],
+    allowMethods: ['GET', 'OPTIONS'],
+    allowHeaders: ['Content-Type'],
+    maxAge: 86400, // 24 hours
+  })
+);
 
 /**
  * Health check endpoint - returns basic service status
@@ -59,16 +61,16 @@ app.get('/health', (c) => {
 
 /**
  * GET /api/photo - TRMNL Polling Endpoint (JSON API)
- * 
+ *
  * Returns random photo data as JSON for TRMNL's Polling strategy.
  * TRMNL platform will merge this JSON into Liquid templates stored in Markup Editor.
- * 
+ *
  * Query Parameters:
  * - album_url: Google Photos shared album URL (required)
- * 
+ *
  * Example:
  * GET /api/photo?album_url=https://photos.app.goo.gl/...
- * 
+ *
  * Response (200 OK):
  * {
  *   "photo_url": "https://lh3.googleusercontent.com/...",
@@ -77,7 +79,7 @@ app.get('/health', (c) => {
  *   "photo_count": 142,
  *   "timestamp": "2026-01-18T20:00:00.000Z"
  * }
- * 
+ *
  * Error Responses:
  * - 400: Missing or invalid album_url parameter
  * - 404: Album not found or inaccessible
@@ -139,10 +141,7 @@ app.get('/api/photo', async (c) => {
         {
           error: 'Bad Request',
           message: `Invalid album URL: ${urlValidation.error}`,
-          validFormats: [
-            'https://photos.app.goo.gl/...',
-            'https://photos.google.com/share/...',
-          ],
+          validFormats: ['https://photos.app.goo.gl/...', 'https://photos.google.com/share/...'],
         },
         400
       );
@@ -163,8 +162,7 @@ app.get('/api/photo', async (c) => {
       });
     } catch (error) {
       const fetchDuration = Date.now() - fetchStartTime;
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to fetch photos';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch photos';
 
       log('error', 'Photo fetch failed', {
         error: errorMessage,
@@ -203,8 +201,7 @@ app.get('/api/photo', async (c) => {
 
     return c.json(response);
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     const totalDuration = Date.now() - startTime;
 
     log('error', 'Unhandled error in /api/photo endpoint', {
@@ -227,13 +224,13 @@ app.get('/api/photo', async (c) => {
 
 /**
  * POST /markup - DEPRECATED
- * 
+ *
  * This endpoint has been replaced by GET /api/photo (Polling strategy).
  * TRMNL now renders templates on their platform, not in the Worker.
- * 
+ *
  * Please use GET /api/photo?album_url=... instead.
  */
-app.post('/markup', async (c) => {
+app.post('/markup', (c) => {
   return c.json(
     {
       error: 'Endpoint Deprecated',

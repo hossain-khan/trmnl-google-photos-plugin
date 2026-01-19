@@ -2,19 +2,19 @@
 
 /**
  * Bundle Size Checker
- * 
+ *
  * Checks if the Cloudflare Worker bundle stays within the 1MB limit
- * 
+ *
  * Cloudflare Workers Limits:
  * - Free tier: 1MB compressed bundle size
  * - Paid tier: 10MB compressed bundle size
  * - Recommended: Stay well under limit for fast cold starts
- * 
+ *
  * Usage:
- *   node scripts/test-bundle-size.js
+ *   node scripts/test-bundle-size.ts
  */
 
-import { readFileSync, statSync, existsSync } from 'node:fs';
+import { statSync, existsSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,38 +26,64 @@ const projectRoot = join(__dirname, '..');
 console.log('📦 Bundle Size Checker\n');
 
 // Cloudflare Workers limits (in bytes)
-const LIMITS = {
+interface Limits {
+  free: number;
+  paid: number;
+  recommended: number;
+}
+
+const LIMITS: Limits = {
   free: 1 * 1024 * 1024, // 1MB
   paid: 10 * 1024 * 1024, // 10MB
   recommended: 0.5 * 1024 * 1024, // 500KB (for fast cold starts)
 };
 
+interface FileInfo {
+  file: string;
+  size: number;
+  estimated?: boolean;
+}
+
+interface BundleInfo {
+  size: number;
+  path?: string;
+  uncompressed?: number;
+  files?: FileInfo[];
+  method: 'actual' | 'estimated';
+}
+
+interface LimitCheck {
+  name: string;
+  limit: number;
+  pass: boolean;
+}
+
 /**
  * Format bytes to human-readable format
  */
-function formatBytes(bytes) {
+function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 Bytes';
-  
+
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 /**
  * Calculate percentage of limit
  */
-function calculatePercentage(size, limit) {
+function calculatePercentage(size: number, limit: number): string {
   return ((size / limit) * 100).toFixed(1);
 }
 
 /**
  * Check bundle size by building the worker
  */
-function checkBundleSize() {
+function checkBundleSize(): BundleInfo {
   console.log('🔨 Building worker bundle...\n');
-  
+
   try {
     // Run wrangler deploy --dry-run to get bundle info
     // Note: This requires wrangler CLI to be installed
@@ -70,14 +96,10 @@ function checkBundleSize() {
     console.log(result);
 
     // Look for bundle file in .wrangler-output directory
-    const bundlePaths = [
-      '.wrangler-output/index.js',
-      '.wrangler/deploy/index.js',
-      'dist/index.js',
-    ];
+    const bundlePaths = ['.wrangler-output/index.js', '.wrangler/deploy/index.js', 'dist/index.js'];
 
     let bundleSize = 0;
-    let bundlePath = null;
+    let bundlePath: string | null = null;
 
     for (const path of bundlePaths) {
       const fullPath = join(projectRoot, path);
@@ -99,10 +121,9 @@ function checkBundleSize() {
       path: bundlePath,
       method: 'actual',
     };
-
   } catch (error) {
     console.log('⚠️  Could not build bundle with wrangler. Estimating from source...');
-    console.log(`   Error: ${error.message}`);
+    console.log(`   Error: ${(error as Error).message}`);
     return estimateBundleSize();
   }
 }
@@ -110,11 +131,11 @@ function checkBundleSize() {
 /**
  * Estimate bundle size from source files and node_modules
  */
-function estimateBundleSize() {
+function estimateBundleSize(): BundleInfo {
   console.log('📊 Estimating bundle size from source files...\n');
-  
+
   let totalSize = 0;
-  const files = [];
+  const files: FileInfo[] = [];
 
   // Source files
   const sourceFiles = [
@@ -124,10 +145,10 @@ function estimateBundleSize() {
     'src/services/photo-fetcher.ts',
     'src/services/template-renderer.ts',
     'src/services/cache-service.ts',
-    'lib/url-parser.js',
+    'lib/url-parser.ts',
   ];
 
-  sourceFiles.forEach(file => {
+  sourceFiles.forEach((file: string): void => {
     const fullPath = join(projectRoot, file);
     if (existsSync(fullPath)) {
       const stats = statSync(fullPath);
@@ -138,14 +159,14 @@ function estimateBundleSize() {
 
   // Estimate dependency sizes (rough approximation)
   // These are bundled and tree-shaken, so actual size is smaller
-  const dependencies = {
+  const dependencies: Record<string, number> = {
     hono: 50 * 1024, // ~50KB
     zod: 50 * 1024, // ~50KB (tree-shaken)
     'google-photos-album-image-url-fetch': 30 * 1024, // ~30KB
   };
 
   let dependencySize = 0;
-  Object.entries(dependencies).forEach(([name, size]) => {
+  Object.entries(dependencies).forEach(([name, size]: [string, number]): void => {
     dependencySize += size;
     files.push({ file: `node_modules/${name}`, size, estimated: true });
   });
@@ -164,23 +185,23 @@ function estimateBundleSize() {
 /**
  * Display bundle size analysis
  */
-function displayAnalysis(bundleInfo) {
+function displayAnalysis(bundleInfo: BundleInfo): void {
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('📦 Bundle Size Analysis\n');
-  
+
   if (bundleInfo.method === 'actual') {
     console.log(`Bundle path:          ${bundleInfo.path}`);
     console.log(`Bundle size:          ${formatBytes(bundleInfo.size)}`);
   } else {
     console.log(`Method:               Estimated (compressed)`);
-    console.log(`Uncompressed:         ${formatBytes(bundleInfo.uncompressed)}`);
+    console.log(`Uncompressed:         ${formatBytes(bundleInfo.uncompressed!)}`);
     console.log(`Estimated compressed: ${formatBytes(bundleInfo.size)}`);
   }
 
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('\n📏 Limits:\n');
 
-  const checks = [
+  const checks: LimitCheck[] = [
     {
       name: 'Free tier (1MB)',
       limit: LIMITS.free,
@@ -198,13 +219,15 @@ function displayAnalysis(bundleInfo) {
     },
   ];
 
-  checks.forEach(check => {
+  checks.forEach((check: LimitCheck): void => {
     const icon = check.pass ? '✅' : '❌';
     const percentage = calculatePercentage(bundleInfo.size, check.limit);
-    const bar = '█'.repeat(Math.min(20, Math.round(percentage / 5)));
-    
+    const bar = '█'.repeat(Math.min(20, Math.round(parseFloat(percentage) / 5)));
+
     console.log(`${icon} ${check.name}`);
-    console.log(`   ${formatBytes(bundleInfo.size)} / ${formatBytes(check.limit)} (${percentage}%)`);
+    console.log(
+      `   ${formatBytes(bundleInfo.size)} / ${formatBytes(check.limit)} (${percentage}%)`
+    );
     console.log(`   ${bar}`);
     console.log('');
   });
@@ -213,11 +236,11 @@ function displayAnalysis(bundleInfo) {
   if (bundleInfo.files && bundleInfo.files.length > 0) {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('📄 File Breakdown:\n');
-    
+
     // Sort by size (largest first)
     const sortedFiles = [...bundleInfo.files].sort((a, b) => b.size - a.size);
-    
-    sortedFiles.forEach(({ file, size, estimated }) => {
+
+    sortedFiles.forEach(({ file, size, estimated }: FileInfo): void => {
       const sizeStr = formatBytes(size).padEnd(10);
       const estMarker = estimated ? '(est)' : '';
       console.log(`  ${sizeStr} ${file} ${estMarker}`);
@@ -230,7 +253,7 @@ function displayAnalysis(bundleInfo) {
 /**
  * Provide optimization recommendations
  */
-function provideRecommendations(bundleInfo) {
+function provideRecommendations(bundleInfo: BundleInfo): void {
   console.log('\n💡 Optimization Recommendations:\n');
 
   if (bundleInfo.size > LIMITS.free) {
@@ -251,14 +274,18 @@ function provideRecommendations(bundleInfo) {
   }
 
   console.log('\n📚 Resources:');
-  console.log('   - Cloudflare Workers Limits: https://developers.cloudflare.com/workers/platform/limits/');
-  console.log('   - Bundle size optimization: https://developers.cloudflare.com/workers/platform/limits/#worker-size');
+  console.log(
+    '   - Cloudflare Workers Limits: https://developers.cloudflare.com/workers/platform/limits/'
+  );
+  console.log(
+    '   - Bundle size optimization: https://developers.cloudflare.com/workers/platform/limits/#worker-size'
+  );
 }
 
 /**
  * Main function
  */
-function main() {
+function main(): void {
   try {
     const bundleInfo = checkBundleSize();
     displayAnalysis(bundleInfo);
@@ -272,10 +299,9 @@ function main() {
 
     console.log('\n✅ Bundle size check PASSED');
     process.exit(0);
-
   } catch (error) {
-    console.error('❌ Bundle size check failed:', error.message);
-    console.error(error.stack);
+    console.error('❌ Bundle size check failed:', (error as Error).message);
+    console.error((error as Error).stack);
     process.exit(1);
   }
 }

@@ -40,11 +40,13 @@ curl http://localhost:8787/
 ### First Time Setup
 
 1. Login to Cloudflare:
+
    ```bash
    npm run cf:login
    ```
 
 2. Deploy:
+
    ```bash
    npm run deploy
    ```
@@ -56,14 +58,14 @@ curl http://localhost:8787/
 
 ## 📚 Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start local development server |
-| `npm run deploy` | Deploy to production |
+| Command              | Description                       |
+| -------------------- | --------------------------------- |
+| `npm run dev`        | Start local development server    |
+| `npm run deploy`     | Deploy to production              |
 | `npm run deploy:dev` | Deploy to development environment |
-| `npm run types` | Generate TypeScript types |
-| `npm run cf:login` | Login to Cloudflare |
-| `npm test` | Run all tests |
+| `npm run types`      | Generate TypeScript types         |
+| `npm run cf:login`   | Login to Cloudflare               |
+| `npm test`           | Run all tests                     |
 
 ## 🔍 Endpoints
 
@@ -80,14 +82,17 @@ curl http://localhost:8787/
 ## 🐛 Troubleshooting
 
 **Worker won't start?**
+
 - Make sure all dependencies are installed: `npm install`
 - Check Node.js version: `node --version` (should be 18+)
 
 **Can't deploy?**
+
 - Make sure you're logged in: `npm run cf:login`
 - Check your Cloudflare account has Workers enabled
 
 **TypeScript errors?**
+
 - Run `npm run types` to generate type definitions
 - Check `tsconfig.json` is present
 
