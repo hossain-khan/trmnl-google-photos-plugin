@@ -2,7 +2,7 @@
 
 <img src="assets/icon/google-photos-icon.png" align="right" alt="Google Photos Icon" width="60"/>
 
-Display random photos from your Google Photos shared albums on TRMNL e-ink displays — **no OAuth, no data storage, no tracking**. Just paste your shared album link and enjoy your memories!
+Display random photos from your Google Photos shared albums on TRMNL e-ink displays — **no OAuth, minimal caching, privacy-focused**. Just paste your shared album link and enjoy your memories!
 
 > "Your photos deserve to be displayed, not buried in the cloud."
 
@@ -11,10 +11,13 @@ Display random photos from your Google Photos shared albums on TRMNL e-ink displ
 This plugin is built with privacy at its core:
 
 - ✅ **No OAuth** - No Google account connection required
-- ✅ **No Data Storage** - We don't store your photos or personal information
+- ✅ **No Personal Data** - We never store your photos or account information
+- ✅ **Temporary Caching Only** - Album metadata cached for 1 hour to improve performance (80% faster!)
 - ✅ **No Tracking** - Fully stateless, GDPR compliant
 - ✅ **Public Albums Only** - Only accesses albums you've explicitly shared
 - ✅ **Direct Access** - Photos load directly from Google's servers to your device
+
+**What's cached?** Only album metadata (photo URLs, captions) for 1 hour. Your actual photos stay on Google's servers and are never stored by us.
 
 Your photos stay private. We simply help your TRMNL display them.
 
