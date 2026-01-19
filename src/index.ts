@@ -253,7 +253,7 @@ app.get('/api/photo', async (c) => {
     trackPerformance(metrics);
 
     // Send to Analytics Engine (if configured)
-    await sendAnalytics(c.env.ANALYTICS, metrics);
+    sendAnalytics(c.env.ANALYTICS, metrics);
 
     return c.json(response);
   } catch (error) {
@@ -281,7 +281,7 @@ app.get('/api/photo', async (c) => {
     trackError(errorContext);
 
     // Send to Analytics Engine (if configured)
-    await sendAnalytics(c.env.ANALYTICS, {
+    sendAnalytics(c.env.ANALYTICS, {
       requestId,
       endpoint: '/api/photo',
       totalDuration,

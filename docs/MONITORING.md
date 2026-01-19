@@ -79,12 +79,12 @@ All logs are output as structured JSON for easy parsing and analysis.
 
 ### Log Levels
 
-| Level   | Purpose                               | Examples                                 |
-| ------- | ------------------------------------- | ---------------------------------------- |
-| `debug` | Detailed debugging information        | URL parsing steps, validation details    |
-| `info`  | Normal operations                     | Request received, photo fetched          |
-| `warn`  | Warning conditions                    | Missing parameters, invalid URLs         |
-| `error` | Error conditions requiring attention  | Photo fetch failed, cache errors         |
+| Level   | Purpose                              | Examples                              |
+| ------- | ------------------------------------ | ------------------------------------- |
+| `debug` | Detailed debugging information       | URL parsing steps, validation details |
+| `info`  | Normal operations                    | Request received, photo fetched       |
+| `warn`  | Warning conditions                   | Missing parameters, invalid URLs      |
+| `error` | Error conditions requiring attention | Photo fetch failed, cache errors      |
 
 ### Privacy Safeguards
 
@@ -99,10 +99,14 @@ The logging system **automatically sanitizes** sensitive data:
 
 ```typescript
 // Input
-{ album_url: "https://photos.app.goo.gl/ABC123XYZ..." }
+{
+  album_url: 'https://photos.app.goo.gl/ABC123XYZ...';
+}
 
 // Logged Output
-{ album_url_preview: "https://photos.app.goo.gl/ABC123XYZ..." }
+{
+  album_url_preview: 'https://photos.app.goo.gl/ABC123XYZ...';
+}
 ```
 
 ---
@@ -113,14 +117,14 @@ The logging system **automatically sanitizes** sensitive data:
 
 The monitoring system tracks the following performance metrics:
 
-| Metric                 | Description                          | Target      | Tracked How              |
-| ---------------------- | ------------------------------------ | ----------- | ------------------------ |
-| **Total Duration**     | End-to-end request time              | <3s         | Per request              |
-| **URL Parse Duration** | Time to validate album URL           | <10ms       | Per request              |
-| **Photo Fetch Time**   | Time to fetch photos from API        | <2s         | Per request              |
-| **Cache Hit Rate**     | % of requests served from cache      | >80%        | Aggregated               |
-| **Response Size**      | JSON response size                   | <5KB        | Per request              |
-| **Status Codes**       | HTTP status code distribution        | 95% = 200   | Aggregated               |
+| Metric                 | Description                     | Target    | Tracked How |
+| ---------------------- | ------------------------------- | --------- | ----------- |
+| **Total Duration**     | End-to-end request time         | <3s       | Per request |
+| **URL Parse Duration** | Time to validate album URL      | <10ms     | Per request |
+| **Photo Fetch Time**   | Time to fetch photos from API   | <2s       | Per request |
+| **Cache Hit Rate**     | % of requests served from cache | >80%      | Aggregated  |
+| **Response Size**      | JSON response size              | <5KB      | Per request |
+| **Status Codes**       | HTTP status code distribution   | 95% = 200 | Aggregated  |
 
 ### Performance Log Example
 
@@ -145,6 +149,7 @@ Cache hits are automatically detected based on fetch duration:
 - **Cache MISS**: `fetchDuration >= 500ms`
 
 This heuristic works because:
+
 - Cached responses: ~67ms (KV read)
 - Uncached responses: ~1350ms (Google Photos API)
 
@@ -158,27 +163,27 @@ Errors are automatically classified by **severity** and **type**:
 
 #### Severity Levels
 
-| Severity   | Status Codes | Description                        | Alert Priority |
-| ---------- | ------------ | ---------------------------------- | -------------- |
-| `low`      | 4xx (other)  | Minor client errors                | Low            |
-| `medium`   | 400          | Invalid input, configuration       | Medium         |
-| `high`     | 403, 404     | Access denied, not found           | High           |
-| `critical` | 500+         | Server errors, system failures     | Critical       |
+| Severity   | Status Codes | Description                    | Alert Priority |
+| ---------- | ------------ | ------------------------------ | -------------- |
+| `low`      | 4xx (other)  | Minor client errors            | Low            |
+| `medium`   | 400          | Invalid input, configuration   | Medium         |
+| `high`     | 403, 404     | Access denied, not found       | High           |
+| `critical` | 500+         | Server errors, system failures | Critical       |
 
 #### Error Types
 
 Automatically detected error types:
 
-| Error Type              | Trigger Keywords                  | Common Causes                      |
-| ----------------------- | --------------------------------- | ---------------------------------- |
-| `missing_parameter`     | Missing parameter                 | No album_url provided              |
-| `invalid_url`           | Invalid URL                       | Malformed album URL                |
-| `album_not_found`       | "not found", "404"                | Album deleted or private           |
-| `album_access_denied`   | "access denied", "403"            | Album sharing disabled             |
-| `empty_album`           | "No photos"                       | Album has 0 photos                 |
-| `cache_error`           | "cache", "Cache"                  | KV read/write failure              |
-| `timeout`               | "timeout", "Timeout"              | Slow Google Photos API             |
-| `unhandled_error`       | All other errors                  | Unexpected failures                |
+| Error Type            | Trigger Keywords       | Common Causes            |
+| --------------------- | ---------------------- | ------------------------ |
+| `missing_parameter`   | Missing parameter      | No album_url provided    |
+| `invalid_url`         | Invalid URL            | Malformed album URL      |
+| `album_not_found`     | "not found", "404"     | Album deleted or private |
+| `album_access_denied` | "access denied", "403" | Album sharing disabled   |
+| `empty_album`         | "No photos"            | Album has 0 photos       |
+| `cache_error`         | "cache", "Cache"       | KV read/write failure    |
+| `timeout`             | "timeout", "Timeout"   | Slow Google Photos API   |
+| `unhandled_error`     | All other errors       | Unexpected failures      |
 
 ### Error Log Example
 
@@ -229,16 +234,19 @@ Use the Cloudflare API or Dashboard to query analytics data.
 Each request sends the following data to Analytics Engine:
 
 **Blobs** (string dimensions):
+
 - Request ID
 - Endpoint path
 - Error type (or "none")
 
 **Doubles** (numeric metrics):
+
 - Total duration (ms)
 - Status code
 - Cache hit (1) or miss (0)
 
 **Indexes** (queryable dimensions):
+
 - Endpoint path
 
 ### Example Analytics Queries
@@ -246,7 +254,7 @@ Each request sends the following data to Analytics Engine:
 **Cache Hit Rate** (Last 24 hours):
 
 ```sql
-SELECT 
+SELECT
   AVG(double1) as avg_duration_ms,
   SUM(double3) / COUNT(*) * 100 as cache_hit_rate_percent,
   COUNT(*) as total_requests
@@ -258,7 +266,7 @@ WHERE timestamp > NOW() - INTERVAL '24' HOUR
 **Error Rate by Type**:
 
 ```sql
-SELECT 
+SELECT
   blob3 as error_type,
   COUNT(*) as error_count,
   AVG(double1) as avg_duration_ms
@@ -272,7 +280,7 @@ ORDER BY error_count DESC
 **Performance Percentiles**:
 
 ```sql
-SELECT 
+SELECT
   APPROX_QUANTILE(double1, 0.50) as p50_ms,
   APPROX_QUANTILE(double1, 0.95) as p95_ms,
   APPROX_QUANTILE(double1, 0.99) as p99_ms
@@ -313,6 +321,7 @@ wrangler tail | grep '"/api/photo"'
 4. Click **Logs** → **Real-time Logs**
 
 **Features**:
+
 - Live log streaming
 - Log level filtering
 - Search by request ID
@@ -377,21 +386,25 @@ For advanced error tracking:
 ### Key Metrics to Monitor
 
 #### 1. Availability
+
 - **Target**: 99.9% uptime
 - **Alert**: <99% over 1 hour
 - **Monitor**: Health check endpoint
 
 #### 2. Response Time
+
 - **Target**: p95 <3s, p99 <5s
 - **Alert**: p95 >5s over 10 minutes
 - **Monitor**: Performance logs
 
 #### 3. Error Rate
+
 - **Target**: <1% of requests
 - **Alert**: >5% over 5 minutes
 - **Monitor**: Error logs by severity
 
 #### 4. Cache Hit Rate
+
 - **Target**: >80%
 - **Alert**: <50% over 1 hour
 - **Monitor**: Cache hit/miss logs
@@ -430,6 +443,7 @@ wrangler tail | grep '"cached"' | \
 **Symptoms**: No logs in dashboard or wrangler tail
 
 **Solutions**:
+
 1. Verify worker is deployed: `wrangler whoami`
 2. Check worker is running: `curl https://trmnl-google-photos.gohk.xyz/health`
 3. Restart wrangler tail: `wrangler tail --tail 100`
@@ -439,6 +453,7 @@ wrangler tail | grep '"cached"' | \
 **Symptoms**: Analytics data not available in dashboard
 
 **Solutions**:
+
 1. Verify you're on Paid plan ($5/month required)
 2. Check binding in wrangler.toml: `binding = "ANALYTICS"`
 3. Redeploy worker: `npm run deploy`
@@ -449,6 +464,7 @@ wrangler tail | grep '"cached"' | \
 **Symptoms**: Many error logs, high error rate
 
 **Investigation Steps**:
+
 1. Filter error logs: `wrangler tail | grep '"level":"error"'`
 2. Check error types: Look for `errorType` in logs
 3. Common causes:
@@ -457,6 +473,7 @@ wrangler tail | grep '"cached"' | \
    - `timeout`: Google Photos API slow/down
 
 **Solutions**:
+
 - For `album_not_found`: Notify users to check album sharing
 - For `cache_error`: Check KV namespace binding
 - For `timeout`: Increase timeout or add retry logic
@@ -466,11 +483,13 @@ wrangler tail | grep '"cached"' | \
 **Symptoms**: High p95/p99 latencies, >3s responses
 
 **Investigation**:
+
 1. Check cache hit rate: Should be >80%
 2. Look for uncached requests: `"cached":false`
 3. Monitor Google Photos API response times
 
 **Solutions**:
+
 - Low cache hit rate: Increase TTL in cache-service.ts
 - Slow API: Add retry logic or fallback
 - Cold starts: Deploy to multiple regions (Paid plan)
@@ -481,13 +500,13 @@ wrangler tail | grep '"cached"' | \
 
 ### Expected Metrics (Production)
 
-| Metric               | Cache HIT | Cache MISS | Target   |
-| -------------------- | --------- | ---------- | -------- |
-| Total Duration       | ~67ms     | ~1350ms    | <3s      |
-| URL Parse Time       | ~5ms      | ~5ms       | <10ms    |
-| Photo Fetch Time     | ~60ms     | ~1300ms    | <2s      |
-| Response Size        | ~500B     | ~500B      | <5KB     |
-| Error Rate           | <0.1%     | <1%        | <1%      |
+| Metric           | Cache HIT | Cache MISS | Target |
+| ---------------- | --------- | ---------- | ------ |
+| Total Duration   | ~67ms     | ~1350ms    | <3s    |
+| URL Parse Time   | ~5ms      | ~5ms       | <10ms  |
+| Photo Fetch Time | ~60ms     | ~1300ms    | <2s    |
+| Response Size    | ~500B     | ~500B      | <5KB   |
+| Error Rate       | <0.1%     | <1%        | <1%    |
 
 ### Performance Degradation Indicators
 
@@ -533,6 +552,7 @@ Monitor for these warning signs:
 ### For Development
 
 1. **Use wrangler tail for debugging**
+
    ```bash
    wrangler tail --format pretty
    ```
@@ -577,18 +597,21 @@ Monitor for these warning signs:
 Use this checklist to verify monitoring is working:
 
 ### Initial Setup
+
 - [ ] Analytics Engine binding enabled in wrangler.toml
 - [ ] Worker deployed with monitoring service
 - [ ] Structured logging verified (check console output)
 - [ ] No PII in logs (verify sanitization)
 
 ### Regular Monitoring
+
 - [ ] Health endpoint returns 200 OK
 - [ ] Error logs reviewed (weekly)
 - [ ] Performance metrics within targets
 - [ ] Cache hit rate >80%
 
 ### Incident Response
+
 - [ ] Alert system configured
 - [ ] On-call rotation defined
 - [ ] Runbook for common issues

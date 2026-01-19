@@ -111,6 +111,25 @@ We follow strict TypeScript and code quality standards:
 
 See [QUICKSTART.md](docs/QUICKSTART.md) for detailed development instructions.
 
+### Monitoring & Observability
+
+The plugin includes comprehensive monitoring and analytics:
+
+- **Structured JSON Logging** - All requests logged in machine-readable format
+- **Performance Tracking** - Response times, cache hit rates (>80% target)
+- **Error Classification** - Automatic severity levels (low/medium/high/critical)
+- **Privacy-First** - No PII in logs (album URLs truncated, photo URLs excluded)
+- **Analytics Engine** - Optional Cloudflare Analytics for advanced metrics
+
+See [MONITORING.md](docs/MONITORING.md) for complete monitoring documentation.
+
+**Key Metrics**:
+
+- Cache hit rate: >80%
+- p95 latency: <3s
+- Error rate: <1%
+- Availability: 99.9%
+
 ## ⚠️ Important Notes
 
 ### Legal & Privacy Considerations

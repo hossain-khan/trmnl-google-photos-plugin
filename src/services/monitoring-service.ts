@@ -29,7 +29,7 @@ export interface LogEntry {
   level: LogLevel;
   message: string;
   duration?: number;
-  [key: string]: any; // Additional context data
+  [key: string]: unknown; // Additional context data
 }
 
 /**
@@ -74,7 +74,7 @@ export class Logger {
   /**
    * Log a message with specified level
    */
-  private log(level: LogLevel, message: string, data?: Record<string, any>): void {
+  private log(level: LogLevel, message: string, data?: Record<string, unknown>): void {
     const logEntry: LogEntry = {
       timestamp: new Date().toISOString(),
       requestId: this.requestId,
@@ -93,10 +93,10 @@ export class Logger {
    * - Removes photo URLs
    * - Masks any potential user identifiers
    */
-  private sanitizeData(data?: Record<string, any>): Record<string, any> {
+  private sanitizeData(data?: Record<string, unknown>): Record<string, unknown> {
     if (!data) return {};
 
-    const sanitized: Record<string, any> = {};
+    const sanitized: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(data)) {
       // Truncate album URLs for privacy (always truncate to 40 chars + "...")
@@ -121,19 +121,19 @@ export class Logger {
     return sanitized;
   }
 
-  debug(message: string, data?: Record<string, any>): void {
+  debug(message: string, data?: Record<string, unknown>): void {
     this.log('debug', message, data);
   }
 
-  info(message: string, data?: Record<string, any>): void {
+  info(message: string, data?: Record<string, unknown>): void {
     this.log('info', message, data);
   }
 
-  warn(message: string, data?: Record<string, any>): void {
+  warn(message: string, data?: Record<string, unknown>): void {
     this.log('warn', message, data);
   }
 
-  error(message: string, data?: Record<string, any>): void {
+  error(message: string, data?: Record<string, unknown>): void {
     this.log('error', message, data);
   }
 
@@ -148,7 +148,7 @@ export class Logger {
 /**
  * Classify error severity based on error type and status code
  */
-export function classifyErrorSeverity(statusCode: number, errorMessage: string): ErrorSeverity {
+export function classifyErrorSeverity(statusCode: number, _errorMessage: string): ErrorSeverity {
   // Critical: 500 errors or system failures
   if (statusCode >= 500) {
     return 'critical';
@@ -173,7 +173,7 @@ export function classifyErrorSeverity(statusCode: number, errorMessage: string):
  */
 export function getErrorType(errorMessage: string): string {
   const lowerMessage = errorMessage.toLowerCase();
-  
+
   if (lowerMessage.includes('not found') || lowerMessage.includes('404')) {
     return 'album_not_found';
   }
@@ -224,27 +224,26 @@ export function trackError(context: ErrorContext): void {
 /**
  * Send metrics to Cloudflare Analytics Engine (if configured)
  */
-export async function sendAnalytics(
+export function sendAnalytics(
   analytics: AnalyticsEngineDataset | undefined,
-  dataPoint: Record<string, any>
-): Promise<void> {
+  dataPoint: Record<string, unknown>
+): void {
   if (!analytics) {
     return; // Analytics not configured
   }
 
   try {
+    const requestId = typeof dataPoint.requestId === 'string' ? dataPoint.requestId : 'unknown';
+    const endpoint = typeof dataPoint.endpoint === 'string' ? dataPoint.endpoint : 'unknown';
+    const errorType = typeof dataPoint.errorType === 'string' ? dataPoint.errorType : 'none';
+    const totalDuration = typeof dataPoint.totalDuration === 'number' ? dataPoint.totalDuration : 0;
+    const statusCode = typeof dataPoint.statusCode === 'number' ? dataPoint.statusCode : 0;
+    const cacheHit = dataPoint.cacheHit === true ? 1 : 0;
+
     analytics.writeDataPoint({
-      blobs: [
-        dataPoint.requestId || 'unknown',
-        dataPoint.endpoint || 'unknown',
-        dataPoint.errorType || 'none',
-      ],
-      doubles: [
-        dataPoint.totalDuration || 0,
-        dataPoint.statusCode || 0,
-        dataPoint.cacheHit ? 1 : 0,
-      ],
-      indexes: [dataPoint.endpoint || 'unknown'],
+      blobs: [requestId, endpoint, errorType],
+      doubles: [totalDuration, statusCode, cacheHit],
+      indexes: [endpoint],
     });
   } catch (error) {
     // Don't throw - analytics failures shouldn't break the app
