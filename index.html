@@ -210,7 +210,7 @@
         </h1>
         <p class="description">
             Display random photos from your Google Photos shared albums on TRMNL devices.<br>
-            <strong>Architecture:</strong> JSON API (Polling) + Liquid Templates on TRMNL Platform
+            <strong>Architecture:</strong> JSON API (Polling) - Worker returns data, TRMNL renders templates
         </p>
 
         <div class="demo-section">
@@ -277,8 +277,8 @@
                 <li>Paste your shared album URL in the plugin settings</li>
                 <li>Add to your TRMNL playlist</li>
             </ol>
-            <p><strong>Status:</strong> JSON API is live! Worker returns photo data as JSON. TRMNL platform merges JSON into Liquid templates stored in Markup Editor.</p>
-            <p><strong>Architecture:</strong> Polling strategy (GET /api/photo) - Worker returns JSON, not HTML. TRMNL does the template rendering.</p>
+            <p><strong>Status:</strong> JSON API is live! Worker returns photo data as JSON. TRMNL platform renders templates stored in Markup Editor.</p>
+            <p><strong>Architecture:</strong> Polling strategy (GET /api/photo) - Worker returns JSON, not HTML. TRMNL handles all template rendering.</p>
         </div>
 
         <div class="layouts">

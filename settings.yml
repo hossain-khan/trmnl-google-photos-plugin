@@ -16,6 +16,8 @@ polling_headers: ""  # No custom headers needed
 # Note: Custom form fields moved to custom-fields.yml for better organization
 # See: custom-fields.yml
 
+# Plugin layouts - template files uploaded to TRMNL Markup Editor
+# Templates use variables from the JSON API response
 layouts:
   - name: full
     label: Full Screen
