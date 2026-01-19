@@ -23,8 +23,8 @@ Your photos stay private. We simply help your TRMNL display them.
 
 ## 📦 Installation
 
-1. Visit [TRMNL Plugins](https://usetrmnl.com/plugins)
-2. Search for "**Google Photos Shared Album**"
+1. Visit [TRMNL Recipes](https://usetrmnl.com/recipes)
+2. Search for "**Google Photos**"
 3. Click **Install**
 4. Create a shared album in Google Photos (if you haven't already)
 5. Copy the shared album link from Google Photos
@@ -33,83 +33,11 @@ Your photos stay private. We simply help your TRMNL display them.
 
 That's it! Your photos will automatically refresh every hour with a new random photo from your album.
 
-## 💡 How to Create a Shared Album
+> ℹ️ **Tip:** You can update your shared album anytime, and TRMNL will automatically show new photos!
 
-1. Open [Google Photos](https://photos.google.com)
-2. Select photos you want to display
-3. Click **Share** → **Create shared album**
-4. Copy the share link (looks like `photos.app.goo.gl/...`)
-5. Paste this link in the TRMNL plugin settings
+## 📝 Contributing
 
-**Tip:** You can update your shared album anytime, and TRMNL will automatically show new photos!
-
-## 🛠️ Developer Guide
-
-This project is built with **TypeScript** for enhanced reliability and maintainability.
-
-### Prerequisites
-
-- Node.js 18+ (LTS recommended)
-- npm or yarn package manager
-
-### Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/hossain-khan/trmnl-google-photos-plugin.git
-cd trmnl-google-photos-plugin
-
-# Install dependencies
-npm install
-
-# Run tests
-npm test
-
-# Check code formatting
-npm run format:check
-
-# Run linter
-npm run lint
-
-# Format code
-npm run format
-
-# Build and deploy
-npm run deploy
-```
-
-### Tech Stack
-
-- **TypeScript** - 100% TypeScript codebase with strict type checking
-- **Cloudflare Workers** - Serverless backend (Hono framework)
-- **Prettier** - Code formatting
-- **ESLint** - Linting with TypeScript support
-- **tsx** - TypeScript execution for scripts and tests
-- **Zod** - Runtime validation
-
-### Project Structure
-
-```
-trmnl-google-photos-plugin/
-├── src/              # Cloudflare Worker source (TypeScript)
-├── lib/              # Core libraries (TypeScript)
-├── scripts/          # Utility scripts & tests (TypeScript)
-├── templates/        # TRMNL Liquid templates
-└── docs/             # Documentation
-```
-
-### Contributing
-
-We follow strict TypeScript and code quality standards:
-
-1. **TypeScript First** - All code must be in TypeScript
-2. **Type Safety** - Strict type checking enabled (`strict: true`)
-3. **No `any` Types** - Use proper types or generics
-4. **Formatting** - Code must pass Prettier checks (`npm run format`)
-5. **Linting** - Code must pass ESLint checks (`npm run lint`)
-6. **Tests** - All tests must pass (`npm test`)
-
-See [QUICKSTART.md](docs/QUICKSTART.md) for detailed development instructions.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution and development instructions.
 
 ## ⚠️ Important Notes
 
