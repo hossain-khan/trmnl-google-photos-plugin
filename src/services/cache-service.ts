@@ -10,7 +10,6 @@
  */
 
 import type { GooglePhoto } from '../types';
-import { extractAlbumId } from '../lib/url-parser';
 
 /**
  * Cached album data structure
