@@ -4,16 +4,6 @@
 
 Display random photos from your Google Photos shared albums on TRMNL e-ink displays — **no OAuth, minimal caching, privacy-focused**. Just paste your shared album link and enjoy your memories!
 
-<p align="center">
-  <a href="https://usetrmnl.com/plugins">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="assets/trmnl-brand/trmnl-badge-show-it-on-dark.svg">
-      <source media="(prefers-color-scheme: light)" srcset="assets/trmnl-brand/trmnl-badge-show-it-on-light.svg">
-      <img alt="Show it on TRMNL" src="assets/trmnl-brand/trmnl-badge-show-it-on-dark.svg" height="40">
-    </picture>
-  </a>
-</p>
-
 > "Your photos deserve to be displayed, not buried in the cloud."
 
 ## 🖼️ Gallery
@@ -46,6 +36,16 @@ See how your photos look across different TRMNL layouts:
     </td>
   </tr>
 </table>
+
+<p align="right">
+  <a href="#-installation">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="assets/trmnl-brand/trmnl-badge-works-with-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="assets/trmnl-brand/trmnl-badge-works-with-light.svg">
+      <img alt="Show it on TRMNL" src="assets/trmnl-brand/trmnl-badge-show-it-on-dark.svg" height="40">
+    </picture>
+  </a>
+</p>
 
 ## 🔐 Privacy First
 
