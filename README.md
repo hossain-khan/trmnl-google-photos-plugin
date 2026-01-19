@@ -78,6 +78,7 @@ MIT License - see [LICENSE](LICENSE) for details
 
 ## 🙏 Acknowledgments
 
+- [`google-photos-album-image-url-fetch`](https://www.npmjs.com/package/google-photos-album-image-url-fetch) The core library that makes fetching Google Photos URLs possible (reverse-engineered API)
 - Inspired by the TRMNL Apple Photos plugin by [@zegl](https://github.com/zegl/trmnl-apple-photos)
 - Built for the amazing [TRMNL](https://usetrmnl.com) community
 

@@ -8,14 +8,25 @@
     <meta property="og:image" content="assets/icon/trmnl-google-photos.png">
     <meta property="og:title" content="Google Photos TRMNL Plugin">
     <meta property="og:description" content="Display random photos from your Google Photos shared albums on TRMNL e-ink displays">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://usetrmnl.com/css/latest/plugins.css">
     <script src="https://usetrmnl.com/js/latest/plugins.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%);
+            color: #1a202c;
+            line-height: 1.6;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         .container {
             max-width: 1200px;
@@ -23,54 +34,48 @@
         }
         h1 {
             text-align: center;
-            color: #333;
+            color: #1a202c;
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        h2 {
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: -0.01em;
+        }
+        p {
+            color: #4a5568;
+            line-height: 1.7;
         }
         .description {
             text-align: center;
-            color: #666;
-            margin-bottom: 40px;
+            color: #4a5568;
+            margin-bottom: 3rem;
+            font-size: 1.125rem;
+            line-height: 1.8;
         }
-        .layouts {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 30px;
+        .description strong {
+            color: #2d3748;
+            font-weight: 600;
         }
-        .layout-preview {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .demo-section {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.03);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
-        .layout-preview h2 {
+        .demo-section h2 {
             margin-top: 0;
-            color: #333;
-            font-size: 1.2em;
         }
-        .layout-preview .specs {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 15px;
-        }
-        .preview-frame {
-            border: 2px solid #ddd;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            min-height: 200px;
-        }
-        .placeholder {
-            color: #999;
-            text-align: center;
-        }
-        .setup-info {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+        .demo-section > p {
+            color: #718096;
+            margin-bottom: 1.5rem;
         }
         .setup-info h2 {
             margin-top: 0;
@@ -106,33 +111,57 @@
         .demo-controls input {
             flex: 1;
             min-width: 300px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+            color: #2d3748;
+        }
+        .demo-controls input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
         }
         .demo-controls select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #2d3748;
+        }
+        .demo-controls select:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
         }
         .demo-controls button {
-            padding: 10px 20px;
-            background: #0366d6;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
         }
         .demo-controls button:hover {
-            background: #0256c7;
+            background: linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
         }
         .demo-controls button:disabled {
-            background: #ccc;
+            background: #cbd5e0;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         .preview-container {
             border: 2px solid #ddd;
@@ -154,39 +183,64 @@
             padding: 40px;
         }
         .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 4px;
-            margin-top: 10px;
+            background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+            color: #742a2a;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border-left: 4px solid #fc8181;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .error-message strong {
+            font-weight: 600;
         }
         .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 4px;
-            margin-top: 10px;
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            color: #22543d;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border-left: 4px solid #48bb78;
+            font-size: 15px;
+            line-height: 1.6;
         }
-        #jsonContent {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
-            line-height: 1.5;
-            background: #f8f9fa;
-            border-radius: 4px;
-            margin: 0;
+        .success-message strong {
+            font-weight: 600;
         }
-        .example-urls {
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #666;
-        }
-        .example-urls a {
-            color: #0366d6;
-            cursor: pointer;
+        .success-message a {
+            color: #22543d;
+            font-weight: 600;
             text-decoration: underline;
         }
+        #jsonContent {
+            font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin: 0;
+            color: #2d3748;
+        }
+        .example-urls {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        .example-urls strong {
+            color: #4a5568;
+            font-weight: 600;
+        }
+        .example-urls a {
+            color: #3182ce;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.2s ease;
+        }
         .example-urls a:hover {
-            color: #0256c7;
+            border-bottom-color: #3182ce;
         }
         .github-link {
             text-align: center;
@@ -198,6 +252,60 @@
         }
         .github-link a:hover {
             text-decoration: underline;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0366d6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .metadata-container {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        .metadata-container h4 {
+            margin: 0 0 1rem 0;
+            color: #2d3748;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+        .metadata-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .metadata-item:last-child {
+            border-bottom: none;
+        }
+        .metadata-label {
+            font-weight: 500;
+            color: #718096;
+        }
+        .metadata-value {
+            color: #2d3748;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-weight: 500;
+        }
+        .cache-hit {
+            color: #28a745;
+            font-weight: 600;
+        }
+        .cache-miss {
+            color: #ffc107;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -281,52 +389,6 @@
             <p><strong>Architecture:</strong> Polling strategy (GET /api/photo) - Worker returns JSON, not HTML. TRMNL handles all template rendering.</p>
         </div>
 
-        <div class="layouts">
-            <div class="layout-preview">
-                <h2>Full Screen</h2>
-                <p class="specs">800x480px or 1024x758px</p>
-                <div class="preview-frame">
-                    <div class="placeholder">
-                        <div style="font-size: 48px;">📷</div>
-                        <p>Full screen layout<br>Largest photo display</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="layout-preview">
-                <h2>Half Horizontal</h2>
-                <p class="specs">~400x480px or ~512x758px</p>
-                <div class="preview-frame">
-                    <div class="placeholder">
-                        <div style="font-size: 36px;">📷</div>
-                        <p>Wide horizontal layout<br>Photo with caption</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="layout-preview">
-                <h2>Half Vertical</h2>
-                <p class="specs">800x~240px or 1024x~379px</p>
-                <div class="preview-frame">
-                    <div class="placeholder">
-                        <div style="font-size: 36px;">📷</div>
-                        <p>Tall vertical layout<br>Photo focused</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="layout-preview">
-                <h2>Quadrant</h2>
-                <p class="specs">~400x~240px or ~512x~379px</p>
-                <div class="preview-frame">
-                    <div class="placeholder">
-                        <div style="font-size: 24px;">📷</div>
-                        <p>Compact quarter size<br>Photo only</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="github-link">
             <p>
                 <strong>For Developers:</strong> 
@@ -357,40 +419,119 @@
             
             // Validate input
             if (!albumUrl) {
-                errorContainer.innerHTML = '<div class="error-message">Please enter a Google Photos album URL</div>';
+                errorContainer.innerHTML = '<div class="error-message"><strong>⚠️ Validation Error:</strong> Please enter a Google Photos album URL</div>';
                 return;
             }
             
-            // Show loading state
+            // Validate URL format
+            if (!albumUrl.includes('photos.app.goo.gl') && !albumUrl.includes('photos.google.com')) {
+                errorContainer.innerHTML = '<div class="error-message"><strong>⚠️ Invalid URL:</strong> Please enter a valid Google Photos shared album URL (photos.app.goo.gl/... or photos.google.com/share/...)</div>';
+                return;
+            }
+            
+            // Show loading state with spinner
             fetchBtn.disabled = true;
             fetchBtn.textContent = '⏳ Fetching...';
             previewContainer.style.display = 'none';
             jsonOutput.style.display = 'flex';
-            jsonContent.textContent = 'Loading...';
+            jsonContent.innerHTML = '<div class="spinner"></div><p style="text-align: center; color: #666; margin-top: 10px;">Fetching photo data from API...</p>';
+            
+            const startTime = performance.now();
             
             try {
                 const url = `${API_URL}?album_url=${encodeURIComponent(albumUrl)}`;
                 const response = await fetch(url);
+                const endTime = performance.now();
+                const clientLatency = Math.round(endTime - startTime);
+                
+                // Extract metadata from response headers
+                const cacheStatus = response.headers.get('x-cache-status') || 'unknown';
+                const serverTime = response.headers.get('x-response-time') || 'N/A';
+                const totalTime = serverTime !== 'N/A' ? `${serverTime} (server) + ${clientLatency}ms (network)` : `${clientLatency}ms (total)`;
                 
                 if (!response.ok) {
-                    throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                    // More specific error messages based on status code
+                    let errorMsg = '';
+                    switch (response.status) {
+                        case 400:
+                            errorMsg = 'Invalid album URL format. Please check the URL and try again.';
+                            break;
+                        case 403:
+                            errorMsg = 'Album access denied. The album may be private or link sharing may be disabled. Please ensure the album has link sharing enabled.';
+                            break;
+                        case 404:
+                            errorMsg = 'Album not found. The album may have been deleted or the link is incorrect.';
+                            break;
+                        case 429:
+                            errorMsg = 'Rate limit exceeded. Please wait a moment and try again.';
+                            break;
+                        case 500:
+                        case 502:
+                        case 503:
+                            errorMsg = 'Server error. The service may be temporarily unavailable. Please try again later.';
+                            break;
+                        default:
+                            errorMsg = `Server returned ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMsg);
                 }
                 
                 const data = await response.json();
                 
+                // Check if data contains error information
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
                 // Display the JSON response
                 jsonContent.textContent = JSON.stringify(data, null, 2);
+                
+                // Build metadata display
+                const metadataHtml = `
+                    <div class="metadata-container">
+                        <h4>📊 Response Metadata</h4>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Cache Status:</span>
+                            <span class="metadata-value ${cacheStatus.toLowerCase() === 'hit' ? 'cache-hit' : 'cache-miss'}">
+                                ${cacheStatus.toUpperCase()} ${cacheStatus.toLowerCase() === 'hit' ? '⚡' : '🔄'}
+                            </span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Response Time:</span>
+                            <span class="metadata-value">${totalTime}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Photos in Album:</span>
+                            <span class="metadata-value">${data.photo_count || 'N/A'}</span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Album Name:</span>
+                            <span class="metadata-value">${data.album_name || 'Unknown'}</span>
+                        </div>
+                    </div>
+                `;
+                
                 errorContainer.innerHTML = `<div class="success-message">
-                    <strong>✓ Success!</strong> Photo data fetched successfully. 
-                    <br>Photo URL: <a href="${data.photo_url}" target="_blank">View photo</a>
-                    <br>Album: ${data.album_name} (${data.photo_count} photos)
-                </div>`;
+                    <strong>✓ Success!</strong> Photo data fetched successfully in ${clientLatency}ms
+                    <br>Photo URL: <a href="${data.photo_url}" target="_blank">View photo →</a>
+                </div>` + metadataHtml;
                 
             } catch (error) {
                 console.error('Error fetching photo data:', error);
                 jsonOutput.style.display = 'none';
                 previewContainer.style.display = 'flex';
-                errorContainer.innerHTML = `<div class="error-message"><strong>Error:</strong> ${error.message}</div>`;
+                
+                // Enhanced error message with troubleshooting tips
+                let troubleshootingTips = '';
+                if (error.message.includes('Album access denied') || error.message.includes('403')) {
+                    troubleshootingTips = '<br><br><strong>💡 Troubleshooting:</strong><br>1. Open the album in Google Photos<br>2. Click the share button (⋯)<br>3. Enable "Share album" or "Create link"<br>4. Copy the new link and try again';
+                } else if (error.message.includes('Album not found') || error.message.includes('404')) {
+                    troubleshootingTips = '<br><br><strong>💡 Troubleshooting:</strong><br>• Verify the URL is correct<br>• Check if the album still exists<br>• Try accessing the album in your browser first';
+                } else if (error.message.includes('Invalid album URL')) {
+                    troubleshootingTips = '<br><br><strong>💡 Expected format:</strong><br>• photos.app.goo.gl/XXXXXXXXX<br>• photos.google.com/share/XXXXXXXXX';
+                }
+                
+                errorContainer.innerHTML = `<div class="error-message"><strong>❌ Error:</strong> ${error.message}${troubleshootingTips}</div>`;
             } finally {
                 fetchBtn.disabled = false;
                 fetchBtn.textContent = '🔄 Fetch Photo Data';
