@@ -16,6 +16,13 @@ export interface TRMNLRequest {
       width: number;
       height: number;
       bit_depth?: number;
+      /**
+       * Device model identifier (e.g., 'v2', 'og_png', 'amazon_kindle_2024')
+       * @experimental This property is likely not supported yet by TRMNL platform.
+       * @see https://discord.com/channels/1281055965508141100/1284987869546549268/1462580151970959534
+       * @see https://usetrmnl.com/api/models - Device model reference
+       */
+      device_model_id?: string;
     };
     layout?: string;
   };
