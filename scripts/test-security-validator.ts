@@ -60,6 +60,12 @@ describe('Photo URL Validation', (): void => {
   it('should reject empty strings', (): void => {
     assert.strictEqual(isValidPhotoUrl(''), false);
   });
+
+  it('should reject subdomain attack attempts', (): void => {
+    // CodeQL protection: reject URLs like https://lh3.googleusercontent.com.malicious.com
+    const maliciousUrl = 'https://lh3.googleusercontent.com.malicious.com/photo.jpg';
+    assert.strictEqual(isValidPhotoUrl(maliciousUrl), false);
+  });
 });
 
 // Test Suite 2: Caption Sanitization

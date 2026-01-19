@@ -184,15 +184,21 @@ describe('Photo URL Validation', (): void => {
   const jsUriPhotoUrl = 'javascript:alert("xss")';
 
   it('should accept valid Google Photos URL (lh3.googleusercontent.com)', (): void => {
-    assert.ok(validGooglePhotoUrl.startsWith('https://lh3.googleusercontent.com'));
+    // Note: This is a test assertion, not production validation.
+    // Production code uses isValidPhotoUrl() from security-validator.ts
+    // which uses URL parsing and hostname validation to prevent subdomain attacks.
+    const url = new URL(validGooglePhotoUrl);
+    assert.ok(url.hostname === 'lh3.googleusercontent.com');
   });
 
   it('should reject non-Google Photos URLs', (): void => {
-    assert.ok(!invalidPhotoUrl.startsWith('https://lh3.googleusercontent.com'));
+    const url = new URL(invalidPhotoUrl);
+    assert.ok(url.hostname !== 'lh3.googleusercontent.com');
   });
 
   it('should reject data: URIs', (): void => {
-    assert.ok(!dataUriPhotoUrl.startsWith('https://lh3.googleusercontent.com'));
+    // data: URIs don't have a valid URL structure
+    assert.ok(!dataUriPhotoUrl.startsWith('https://'));
   });
 
   it('should reject javascript: URIs', (): void => {

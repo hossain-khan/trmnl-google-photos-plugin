@@ -31,15 +31,24 @@ export function isValidPhotoUrl(url: string | null | undefined): boolean {
     return false;
   }
 
+  // Parse URL to validate hostname properly (prevents subdomain attacks)
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    return false;
+  }
+
   // Must be from Google's CDN (lh3.googleusercontent.com or lh4, lh5, etc.)
-  // Google Photos uses numbered hostnames (lh3, lh4, lh5, etc.)
-  const isGoogleCDN = /^https:\/\/lh[0-9]+\.googleusercontent\.com\//.test(url);
+  // Use exact hostname matching to prevent attacks like lh3.googleusercontent.com.malicious.com
+  const hostname = parsedUrl.hostname.toLowerCase();
+  const isGoogleCDN = /^lh[0-9]+\.googleusercontent\.com$/.test(hostname);
 
   if (!isGoogleCDN) {
     return false;
   }
 
-  // Reject data: URIs, javascript: URIs, etc.
+  // Reject data: URIs, javascript: URIs, etc. in the full URL
   const lowerUrl = url.toLowerCase();
   if (lowerUrl.includes('data:') || lowerUrl.includes('javascript:')) {
     return false;
