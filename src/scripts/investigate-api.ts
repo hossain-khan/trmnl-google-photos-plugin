@@ -10,10 +10,10 @@
  * 4. Documenting API endpoints and data structures
  *
  * Usage:
- *   tsx scripts/investigate-api.ts <album-url>
+ *   tsx src/scripts/investigate-api.ts <album-url>
  *
  * Example:
- *   tsx scripts/investigate-api.ts https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5
+ *   tsx src/scripts/investigate-api.ts https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5
  */
 
 import axios, { AxiosResponse } from 'axios';

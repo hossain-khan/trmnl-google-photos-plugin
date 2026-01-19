@@ -323,13 +323,13 @@ This runs all test suites:
 
 ```bash
 # URL parser tests only
-tsx --test scripts/test-url-parser.ts
+tsx --test src/tests/test-url-parser.ts
 
 # Cache service tests only
-tsx --test scripts/test-cache-service.ts
+tsx --test src/tests/test-cache-service.ts
 
 # Performance tests only
-tsx --test scripts/test-performance.ts
+tsx --test src/tests/test-performance.ts
 ```
 
 ## Next Steps
@@ -343,7 +343,7 @@ Future testing enhancements:
 
 ## References
 
-- Test script: `scripts/test-fetch.js`
-- Implementation: `scripts/fetch-photos.js`
+- Test script: `src/tests/test-fetch.ts`
+- Implementation: `src/scripts/fetch-photos.ts`
 - Library: https://github.com/yumetodo/google-photos-album-image-url-fetch
 - Architecture: See [ARCHITECTURE.md](ARCHITECTURE.md)

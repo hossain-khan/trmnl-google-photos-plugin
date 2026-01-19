@@ -1,7 +1,7 @@
 /**
  * Tests for Cache Service
  *
- * Run with: node --test scripts/test-cache-service.ts
+ * Run with: tsx --test src/tests/test-cache-service.ts
  *
  * Note: This test file tests the logic without actually importing TypeScript files.
  * The cache service will be tested in integration tests when the worker is deployed.

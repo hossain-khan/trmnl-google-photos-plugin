@@ -15,7 +15,7 @@
  *   npm test
  *
  * Or directly:
- *   node scripts/test-url-parser.ts
+ *   tsx src/tests/test-url-parser.ts
  */
 
 import { describe, it } from 'node:test';
@@ -26,7 +26,7 @@ import {
   isValidAlbumUrl,
   normalizeAlbumUrl,
   getErrorMessage,
-} from '../src/lib/url-parser';
+} from '../lib/url-parser';
 
 console.log('🧪 Testing Google Photos Album URL Parser\n');
 

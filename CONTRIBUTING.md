@@ -61,7 +61,7 @@ All checks must pass before your PR can be merged.
 - Write tests for new functionality
 - Ensure existing tests pass
 - Use `tsx --test` for running TypeScript tests
-- Tests are located in `scripts/test-*.ts`
+- Tests are located in `src/tests/test-*.ts`
 
 ## 📝 Commit Messages
 
