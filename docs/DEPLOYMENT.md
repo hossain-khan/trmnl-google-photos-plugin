@@ -58,7 +58,10 @@ This will:
 ⛅️ wrangler 4.x.x
 -------------------
 Your worker has access to the following bindings:
-- ENVIRONMENT: "production"
+- KV Namespaces:
+  - PHOTOS_CACHE: 737dfeaef9a142689b8896ed818fb615
+- Vars:
+  - ENVIRONMENT: "production"
 Total Upload: XX.XX KiB / gzip: XX.XX KiB
 Uploaded trmnl-google-photos (X.XX sec)
 Published trmnl-google-photos (X.XX sec)
@@ -99,7 +102,7 @@ For testing changes before production:
 npm run deploy:dev
 ```
 
-This deploys to: `https://trmnl-google-photos-dev.hk-c91.workers.dev`
+This deploys to a development worker subdomain with a separate KV namespace for testing.
 
 ## Troubleshooting
 
@@ -113,12 +116,12 @@ Add your account ID to `wrangler.toml` (see Step 2).
 
 ### Subdomain already taken
 
-If `trmnl-google-photos.gohk.xyz` is taken, you can:
+If subdomain is taken, you can:
 
-1. Choose a different subdomain in `wrangler.toml`:
+1. Choose a different worker name in `wrangler.toml`:
 
    ```toml
-   name = "trmnl-google-photos-plugin"
+   name = "your-unique-worker-name"
    ```
 
 2. Or use a custom domain (requires Cloudflare zone)
@@ -165,9 +168,10 @@ After successful deployment:
 
 1. ✅ Verify endpoints are accessible via HTTPS
 2. ✅ Test health check returns 200 OK
-3. ✅ Confirm environment variable is set correctly
-4. ✅ Implement `/api/photo` endpoint for TRMNL integration
-5. ✅ Add photo fetching and JSON response logic
+3. ✅ Confirm environment variables are set correctly
+4. ✅ Test `/api/photo` endpoint with demo album
+5. ✅ Verify KV caching is working (check logs for cache hits)
+6. ✅ Monitor performance metrics in Cloudflare dashboard
 
 ## Resources
 

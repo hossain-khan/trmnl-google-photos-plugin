@@ -535,6 +535,7 @@ Test across all TRMNL devices:
 7. **Add conditional rendering**: Check for data existence before displaying
 8. **Use framework utilities**: Prefer TRMNL classes over custom CSS
 9. **Test with real photos**: Use actual Google Photos URLs, not placeholders
+10. **Format before commit**: Always run `npm run format` before committing to ensure consistent code formatting
 
 ## Development Notes
 
