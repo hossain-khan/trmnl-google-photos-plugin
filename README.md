@@ -6,7 +6,7 @@ Display random photos from your Google Photos shared albums on TRMNL e-ink displ
 
 > "Your photos deserve to be displayed, not buried in the cloud."
 
-## � Gallery
+## 🖼️ Gallery
 
 See how your photos look across different TRMNL layouts:
 
@@ -37,7 +37,7 @@ See how your photos look across different TRMNL layouts:
   </tr>
 </table>
 
-## �🔐 Privacy First
+## 🔐 Privacy First
 
 This plugin is built with privacy at its core:
 
