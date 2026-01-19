@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const projectRoot = join(__dirname, '..');
+const projectRoot = join(__dirname, '..', '..');
 
 console.log('⚡ Performance Monitoring Test\n');
 

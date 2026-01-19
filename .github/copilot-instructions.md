@@ -70,9 +70,22 @@ trmnl-google-photos-plugin/
 ├── lib/                          # Core library code
 │   └── url-parser.js            # URL parser and validator
 ├── src/                          # Cloudflare Worker source
-│   └── index.ts                 # Main worker entry point
-├── scripts/                      # Build and automation scripts
-│   └── fetch-photos.js          # Photo fetching implementation
+│   ├── index.ts                 # Main worker entry point
+│   ├── lib/                     # Core library code
+│   │   └── url-parser.ts        # URL parser and validator
+│   ├── services/                # Service modules
+│   │   ├── cache-service.ts     # KV caching service
+│   │   ├── monitoring-service.ts # Monitoring and metrics
+│   │   ├── photo-fetcher.ts     # Photo fetching implementation
+│   │   └── security-validator.ts # Security validation
+│   ├── scripts/                 # Build and automation scripts
+│   │   ├── fetch-photos.ts      # Photo fetching script
+│   │   └── investigate-api.ts   # API investigation script
+│   └── tests/                   # Test files
+│       ├── test-url-parser.ts   # URL parser tests
+│       ├── test-fetch.ts        # Photo fetching tests
+│       ├── test-cache-service.ts # Cache service tests
+│       └── test-*.ts            # Other test files
 ├── index.html                    # Preview/testing page
 ├── settings.yml                  # Plugin settings configuration
 ├── wrangler.toml                 # Cloudflare Worker configuration
@@ -84,9 +97,10 @@ trmnl-google-photos-plugin/
 
 - **templates/\*.liquid**: Four layout templates that adapt to different display sizes and orientations (uploaded to TRMNL Markup Editor)
 - **templates/preview/\*.liquid**: Preview versions with hardcoded content (for local testing without API)
-- **lib/url-parser.js**: URL parser and validator for Google Photos shared albums
+- **src/lib/url-parser.ts**: URL parser and validator for Google Photos shared albums
 - **src/index.ts**: Main Cloudflare Worker entry point with photo fetching logic
-- **scripts/fetch-photos.js**: Photo fetching implementation using `google-photos-album-image-url-fetch`
+- **src/scripts/fetch-photos.ts**: Photo fetching implementation using `google-photos-album-image-url-fetch`
+- **src/tests/test-\*.ts**: Test files for all components
 - **settings.yml**: TRMNL plugin configuration (polling strategy, refresh frequency)
 - **wrangler.toml**: Cloudflare Worker configuration (production deployment)
 - **index.html**: Preview/testing page

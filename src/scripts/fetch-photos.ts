@@ -15,13 +15,13 @@
  * - Update api/photo.json
  *
  * Usage:
- *   tsx scripts/fetch-photos.ts <album-url>
+ *   tsx src/scripts/fetch-photos.ts <album-url>
  *
  * Environment Variables:
  *   - SHARED_ALBUM_URL: Google Photos shared album URL (optional if passed as arg)
  *
  * Example:
- *   tsx scripts/fetch-photos.ts https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5
+ *   tsx src/scripts/fetch-photos.ts https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5
  */
 
 import * as GooglePhotosAlbum from 'google-photos-album-image-url-fetch';

@@ -17,6 +17,6 @@
     "noEmit": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["src/**/*", "worker/**/*", "lib/**/*", "scripts/**/*"],
+  "include": ["src/**/*", "worker/**/*", "lib/**/*"],
   "exclude": ["node_modules", "dist", ".wrangler"]
 }

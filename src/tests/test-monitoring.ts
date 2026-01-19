@@ -15,7 +15,7 @@ import {
   trackError,
   type PerformanceMetrics,
   type ErrorContext,
-} from '../src/services/monitoring-service';
+} from '../services/monitoring-service';
 
 console.log('🧪 Testing Monitoring Service\n');
 

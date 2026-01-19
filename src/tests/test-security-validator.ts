@@ -16,7 +16,7 @@ import {
   validateTimestamp,
   validatePhotoData,
   SECURITY_LIMITS,
-} from '../src/services/security-validator';
+} from '../services/security-validator';
 
 console.log('🔒 Security Validator Service Tests\n');
 
