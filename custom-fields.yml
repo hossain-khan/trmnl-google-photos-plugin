@@ -37,13 +37,6 @@
     🎨 Photography portfolios<br>
     💝 Gift displays for loved ones
     <br><br>
-    <strong>Technical Details:</strong><br>
-    • 99%+ uptime reliability<br>
-    • <3 second photo refresh<br>
-    • Stateless architecture with optional performance caching<br>
-    • Leverages Google Photos' public shared album API<br>
-    • Hosted on Cloudflare Workers (global CDN)
-    <br><br>
     <strong>Data Privacy:</strong> This plugin prioritizes your privacy. Only album metadata (photo URLs and captions) is temporarily cached for 1 hour to improve performance—your actual photos are never stored and remain on Google's servers. Your album URL is only used to fetch photos in real-time. No cookies, no tracking, no personal data retention. Fully GDPR and privacy compliant.
   github_url: https://github.com/hossain-khan/trmnl-google-photos-plugin
   learn_more_url: https://hossain-khan.github.io/trmnl-google-photos-plugin/
@@ -54,11 +47,11 @@
   description: "Paste your Google Photos shared album link (e.g., https://photos.app.goo.gl/ABC123)"
   placeholder: "https://photos.app.goo.gl/..."
   help_text: To create a shared album, open Google Photos → Create → Shared Album → Get Link. Ensure link sharing is enabled.
-- keyname: instance_name
+- keyname: custom_title
   field_type: string
   name: Display Name
   description: "Custom name to show in the title bar (optional)"
   placeholder: "My Google Photos"
-  default: "My Google Photos"
+  default: ""
   optional: true
-  help_text: This name appears in the plugin's title bar. Leave blank to use "My Google Photos".
+  help_text: This name appears in the plugin's title bar. Leave blank to use the plugin name (Google Photos Shared Album).

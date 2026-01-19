@@ -76,9 +76,10 @@ const validPhotoData = {
   caption: 'Test photo caption',
   photo_count: 42,
   album_name: 'Test Album',
+  custom_title: 'Test Instance',
   trmnl: {
     plugin_settings: {
-      instance_name: 'Test Instance',
+      instance_name: 'Google Photos Shared Album',
     },
   },
 };
@@ -88,17 +89,19 @@ const emptyPhotoData = {
   caption: '',
   photo_count: 0,
   album_name: '',
+  custom_title: 'Test Instance',
   trmnl: {
     plugin_settings: {
-      instance_name: 'Test Instance',
+      instance_name: 'Google Photos Shared Album',
     },
   },
 };
 
 const missingPhotoData = {
+  custom_title: '',
   trmnl: {
     plugin_settings: {
-      instance_name: 'Test Instance',
+      instance_name: 'Google Photos Shared Album',
     },
   },
 };
@@ -109,9 +112,10 @@ const longCaptionData = {
     'This is a very long caption that should be truncated by the data-clamp attribute. '.repeat(10),
   photo_count: 142,
   album_name: 'Summer Vacation 2026',
+  custom_title: 'Test Instance',
   trmnl: {
     plugin_settings: {
-      instance_name: 'Test Instance',
+      instance_name: 'Google Photos Shared Album',
     },
   },
 };
@@ -149,8 +153,8 @@ describe('Main Template Rendering - Valid Data', (): void => {
         assert.ok(rendered.includes('img'), 'Should contain image tag');
         assert.ok(rendered.includes(validPhotoData.photo_url), 'Should include photo URL');
         assert.ok(
-          rendered.includes(validPhotoData.trmnl.plugin_settings.instance_name),
-          'Should include instance name'
+          rendered.includes(validPhotoData.custom_title),
+          'Should include custom title'
         );
       }
     });
@@ -188,7 +192,10 @@ describe('Main Template Rendering - Missing Data', (): void => {
 
       // Skip layout-specific checks for shared.liquid (it's just variables)
       if (template.name !== 'shared.liquid') {
-        assert.ok(rendered.includes('Test Instance'), 'Should still include instance name');
+        assert.ok(
+          rendered.includes('Google Photos Shared Album'),
+          'Should fall back to plugin name when instance_name is empty'
+        );
       }
     });
   });
@@ -319,10 +326,10 @@ describe('Template Variables Usage', (): void => {
         );
         return;
       }
-      // Check for TRMNL standard variables
+      // Check for instance name variable (direct access, not via trmnl.plugin_settings)
       assert.ok(
-        content.includes('{{ trmnl.plugin_settings.instance_name }}'),
-        'Should use trmnl.plugin_settings.instance_name'
+        content.includes('instance_name'),
+        'Should use instance_name variable'
       );
 
       // Check for photo-related variables
