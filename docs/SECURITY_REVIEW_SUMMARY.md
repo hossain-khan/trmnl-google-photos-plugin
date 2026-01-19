@@ -363,13 +363,13 @@ The TRMNL Google Photos Plugin JSON API has successfully passed comprehensive se
 
 ### B. Documentation
 
-- See `SECURITY.md` for security policy
+- See `docs/SECURITY.md` for security policy
 - See `docs/API_DOCUMENTATION.md` for API details
 - See `docs/ARCHITECTURE.md` for system design
 
 ### C. Contact
 
-For security concerns, see SECURITY.md vulnerability reporting process.
+For security concerns, see docs/SECURITY.md vulnerability reporting process.
 
 ---
 
