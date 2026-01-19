@@ -30,9 +30,12 @@ curl http://localhost:8787/
 #   "service": "trmnl-google-photos-plugin",
 #   "version": "0.1.0",
 #   "environment": "production",
-#   "timestamp": "2026-01-18T19:00:00.000Z",
+#   "timestamp": "2026-01-19T09:00:00.000Z",
 #   "message": "TRMNL Google Photos Plugin is running"
 # }
+
+# Test the photo endpoint
+curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/FB8ErkX2wJAQkJzV8"
 ```
 
 ## 🌐 Deploy to Cloudflare
@@ -71,13 +74,14 @@ curl http://localhost:8787/
 
 - `GET /` - Service info and health check
 - `GET /health` - Alternative health check
+- `GET /api/photo` - JSON API endpoint for TRMNL (returns photo data)
 
 ## 📖 Next Steps
 
 - Read [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions
-- Read [src/README.md](src/README.md) for worker architecture
-- See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for system architecture
-- See [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) for API reference
+- See [ARCHITECTURE.md](ARCHITECTURE.md) for system architecture
+- See [API_DOCUMENTATION.md](API_DOCUMENTATION.md) for API reference
+- See [TESTING.md](TESTING.md) for testing information
 
 ## 🐛 Troubleshooting
 
