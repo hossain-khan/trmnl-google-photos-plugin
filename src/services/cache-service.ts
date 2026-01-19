@@ -138,34 +138,3 @@ export function generateCacheMetrics(hit: boolean, albumId: string, error?: stri
     error,
   };
 }
-
-/**
- * Extract album ID from validated Google Photos URL
- * Handles both short URLs (photos.app.goo.gl) and full URLs
- *
- * @param url - Validated Google Photos album URL
- * @returns Album ID for use as cache key
- */
-export function extractAlbumId(url: string): string {
-  // For short URLs like https://photos.app.goo.gl/ABC123
-  const shortUrlMatch = url.match(/photos\.app\.goo\.gl\/([A-Za-z0-9_-]+)/);
-  if (shortUrlMatch) {
-    return shortUrlMatch[1];
-  }
-
-  // For full URLs like https://photos.google.com/share/AF1...
-  const fullUrlMatch = url.match(/\/share\/([A-Za-z0-9_-]+)/);
-  if (fullUrlMatch) {
-    return fullUrlMatch[1];
-  }
-
-  // For album URLs like https://photos.google.com/u/0/album/AF1...
-  const albumMatch = url.match(/\/album\/([A-Za-z0-9_-]+)/);
-  if (albumMatch) {
-    return albumMatch[1];
-  }
-
-  // Fallback: use full URL as cache key (not ideal but safe)
-  console.warn('Could not extract album ID, using full URL as cache key');
-  return url;
-}

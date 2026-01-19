@@ -12,6 +12,7 @@ export default tseslint.config(
       '.wrangler-output/**',
       '*.min.js',
       'coverage/**',
+      'worker-configuration.d.ts',
     ],
   },
   eslint.configs.recommended,
