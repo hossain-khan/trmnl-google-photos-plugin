@@ -573,9 +573,6 @@
         const API_URL = 'https://trmnl-google-photos.gohk.xyz/api/photo';
         const HEALTH_URL = 'https://trmnl-google-photos.gohk.xyz/health';
         
-        // Session cache for fetched photo data
-        let cachedPhotoData = null;
-        
         console.log('[TRMNL] Page loaded, initializing...');
         
         /**
@@ -721,10 +718,6 @@
                 
                 const data = await response.json();
                 
-                // Cache photo data for layout previews
-                cachedPhotoData = data;
-                console.log('[API] Photo data cached for layout previews');
-                
                 console.log('[API] ✓ Photo data received:', {
                     photo_url: data.photo_url ? data.photo_url.substring(0, 50) + '...' : 'N/A',
                     photo_count: data.photo_count,
@@ -831,14 +824,6 @@
                 const html = await response.text();
                 
                 console.log(`[Template] ✓ Template loaded (${html.length} chars)`);
-                
-                // Replace placeholder with cached photo if available
-                if (cachedPhotoData && cachedPhotoData.photo_url) {
-                    console.log('[Template] Injecting cached photo data into template');
-                    html = html.replace(/https:\/\/picsum\.photos\/[^\s"']*/g, cachedPhotoData.photo_url);
-                    html = html.replace(/Google Photos Album/g, cachedPhotoData.album_name || 'Google Photos Album');
-                    html = html.replace(/142 photos/g, `${cachedPhotoData.photo_count || 142} photos`);
-                }
                 
                 // Determine view class based on layout using a mapping for maintainability
                 const viewClassMap = {
