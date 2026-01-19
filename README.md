@@ -35,9 +35,9 @@ That's it! Your photos will automatically refresh every hour with a new random p
 
 > ℹ️ **Tip:** You can update your shared album anytime, and TRMNL will automatically show new photos!
 
-## Contributing
+## 📝 Contributing
 
-See [QUICKSTART.md](docs/QUICKSTART.md) for detailed contribution and development instructions.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution and development instructions.
 
 ## ⚠️ Important Notes
 
