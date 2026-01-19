@@ -461,6 +461,111 @@
             border: 2px dashed #cbd5e0;
             box-shadow: 0 0 0 4px rgba(203, 213, 224, 0.1);
         }
+        .demo-gallery {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding: 0 1rem;
+        }
+        @media (max-width: 968px) {
+            .demo-gallery {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .demo-gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+        .demo-gallery-item {
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            background: white;
+        }
+        .demo-gallery-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        .demo-gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .demo-gallery-item-label {
+            padding: 0.75rem;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #2d3748;
+            background: #f7fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        .lightbox.active {
+            display: flex;
+        }
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90vh;
+            animation: zoomIn 0.3s ease;
+        }
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            line-height: 1;
+            transition: transform 0.2s ease;
+        }
+        .lightbox-close:hover {
+            transform: scale(1.2);
+        }
+        .lightbox-label {
+            position: absolute;
+            bottom: -35px;
+            left: 0;
+            right: 0;
+            color: white;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -516,6 +621,24 @@
                 <div class="preview-empty">
                     <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
                     <p>Enter a Google Photos album URL and click "Fetch Photo Data" to see the JSON response!</p>
+                    <div class="demo-gallery">
+                        <div class="demo-gallery-item" onclick="openLightbox('assets/demo/demo-full.png', 'Full Layout')">
+                            <img src="assets/demo/demo-full.png" alt="Full Layout Demo">
+                            <div class="demo-gallery-item-label">Full Layout</div>
+                        </div>
+                        <div class="demo-gallery-item" onclick="openLightbox('assets/demo/demo-half-horizontal.png', 'Half Horizontal')">
+                            <img src="assets/demo/demo-half-horizontal.png" alt="Half Horizontal Demo">
+                            <div class="demo-gallery-item-label">Half Horizontal</div>
+                        </div>
+                        <div class="demo-gallery-item" onclick="openLightbox('assets/demo/demo-half-vertical.png', 'Half Vertical')">
+                            <img src="assets/demo/demo-half-vertical.png" alt="Half Vertical Demo">
+                            <div class="demo-gallery-item-label">Half Vertical</div>
+                        </div>
+                        <div class="demo-gallery-item" onclick="openLightbox('assets/demo/demo-quadrant.png', 'Quadrant Layout')">
+                            <img src="assets/demo/demo-quadrant.png" alt="Quadrant Layout Demo">
+                            <div class="demo-gallery-item-label">Quadrant</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -547,11 +670,57 @@
         </div>
     </div>
 
+    <!-- Lightbox for demo images -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+            <img id="lightboxImage" src="" alt="">
+            <div id="lightboxLabel" class="lightbox-label"></div>
+        </div>
+    </div>
+
     <script>
         const API_URL = 'https://trmnl-google-photos.gohk.xyz/api/photo';
         const HEALTH_URL = 'https://trmnl-google-photos.gohk.xyz/health';
         
         console.log('[TRMNL] Page loaded, initializing...');
+        
+        /**
+         * Open lightbox with demo image
+         */
+        function openLightbox(imageSrc, label) {
+            console.log('[Lightbox] Opening:', label);
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImage = document.getElementById('lightboxImage');
+            const lightboxLabel = document.getElementById('lightboxLabel');
+            
+            lightboxImage.src = imageSrc;
+            lightboxImage.alt = label;
+            lightboxLabel.textContent = label;
+            lightbox.classList.add('active');
+            
+            // Prevent body scroll when lightbox is open
+            document.body.style.overflow = 'hidden';
+        }
+        
+        /**
+         * Close lightbox
+         */
+        function closeLightbox() {
+            console.log('[Lightbox] Closing');
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('active');
+            
+            // Restore body scroll
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close lightbox on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
         
         /**
          * Check service status via /health endpoint
