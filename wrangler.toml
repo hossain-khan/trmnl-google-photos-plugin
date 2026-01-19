@@ -11,11 +11,21 @@ workers_dev = true
 [vars]
 ENVIRONMENT = "production"
 
-# Observability - Structured Logging for debugging
-# Note: Using fallback structured logging via console.log (free tier compatible)
-# Analytics Engine is disabled - not available on free plan
-# [[analytics_engine_datasets]]
-# binding = "ANALYTICS"
+# Observability - Logs and Traces for debugging
+[observability]
+enabled = false
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+persist = true
+invocation_logs = true
+
+[observability.traces]
+enabled = false
+persist = true
+head_sampling_rate = 1
 
 # KV namespace bindings (optional - for caching)
 # Production namespace for caching album photo data (1-hour TTL)
