@@ -7,7 +7,7 @@
     "jsx": "react",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "allowJs": true,
+    "allowJs": false,
     "checkJs": false,
     "strict": true,
     "esModuleInterop": true,

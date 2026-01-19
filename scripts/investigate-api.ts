@@ -10,27 +10,66 @@
  * 4. Documenting API endpoints and data structures
  * 
  * Usage:
- *   node scripts/investigate-api.js <album-url>
+ *   tsx scripts/investigate-api.ts <album-url>
  * 
  * Example:
- *   node scripts/investigate-api.js https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5
+ *   tsx scripts/investigate-api.ts https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5
  */
 
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import * as cheerio from 'cheerio';
 import { writeFile } from 'fs/promises';
 
 // Configuration
 const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
+interface ApiEndpoint {
+  type?: string;
+  pattern?: string;
+  found?: boolean;
+  description: string;
+}
+
+interface MetaTags {
+  [key: string]: string;
+}
+
+interface Metadata {
+  title?: string;
+  metaTags?: MetaTags;
+  jsonLd?: unknown;
+}
+
+interface HTMLStructure {
+  [key: string]: unknown;
+}
+
+interface Findings {
+  timestamp: string;
+  inputUrl: string;
+  redirectedUrl: string | null;
+  albumId: string | null;
+  htmlStructure: HTMLStructure;
+  photoUrls: string[];
+  metadata: Metadata;
+  apiEndpoints: ApiEndpoint[];
+  rawResponse: string | null;
+}
+
+interface PhotoUrlAnalysis {
+  url: string;
+  parameters: RegExpMatchArray | null;
+  notes: string;
+}
+
 /**
  * Main investigation function
  */
-async function investigateAlbum(albumUrl) {
+async function investigateAlbum(albumUrl: string): Promise<Findings> {
   console.log('📷 Google Photos API Investigation Tool\n');
   console.log(`Investigating album: ${albumUrl}\n`);
   
-  const findings = {
+  const findings: Findings = {
     timestamp: new Date().toISOString(),
     inputUrl: albumUrl,
     redirectedUrl: null,
@@ -45,7 +84,7 @@ async function investigateAlbum(albumUrl) {
   try {
     // Step 1: Follow redirects and get the final URL
     console.log('🔍 Step 1: Following redirects...');
-    const response = await axios.get(albumUrl, {
+    const response: AxiosResponse<string> = await axios.get(albumUrl, {
       headers: {
         'User-Agent': USER_AGENT,
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -58,7 +97,7 @@ async function investigateAlbum(albumUrl) {
       validateStatus: (status) => status < 400
     });
 
-    findings.redirectedUrl = response.request.res.responseUrl || albumUrl;
+    findings.redirectedUrl = (response.request.res as { responseUrl?: string }).responseUrl || albumUrl;
     console.log(`✓ Final URL: ${findings.redirectedUrl}`);
     
     // Step 2: Extract album ID from URL
@@ -105,7 +144,7 @@ async function investigateAlbum(albumUrl) {
       if ($(script).attr('type') === 'application/ld+json') {
         console.log('✓ Found JSON-LD structured data');
         try {
-          const jsonData = JSON.parse($(script).html());
+          const jsonData = JSON.parse($(script).html() || '{}');
           findings.metadata.jsonLd = jsonData;
         } catch (e) {
           console.log('⚠️  Failed to parse JSON-LD data');
@@ -198,11 +237,20 @@ async function investigateAlbum(albumUrl) {
 
   } catch (error) {
     console.error('\n❌ Error during investigation:');
-    console.error(error.message);
-    if (error.response) {
-      console.error(`Status: ${error.response.status}`);
-      console.error(`Headers:`, error.response.headers);
+    
+    if (error instanceof Error) {
+      console.error(error.message);
+      
+      // Type guard for axios error
+      if ('response' in error && error.response) {
+        const axiosError = error as { response: { status: number; headers: unknown } };
+        console.error(`Status: ${axiosError.response.status}`);
+        console.error(`Headers:`, axiosError.response.headers);
+      }
+    } else {
+      console.error('An unknown error occurred');
     }
+    
     throw error;
   }
 }
@@ -210,7 +258,7 @@ async function investigateAlbum(albumUrl) {
 /**
  * Extract photo metadata from Google Photos URLs
  */
-function analyzePhotoUrl(url) {
+function analyzePhotoUrl(url: string): PhotoUrlAnalysis {
   console.log(`\n🔬 Analyzing photo URL structure:`);
   console.log(`URL: ${url}`);
   
@@ -233,8 +281,8 @@ const albumUrl = process.argv[2];
 
 if (!albumUrl) {
   console.error('❌ Error: Please provide a Google Photos shared album URL');
-  console.error('Usage: node scripts/investigate-api.js <album-url>');
-  console.error('Example: node scripts/investigate-api.js https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5');
+  console.error('Usage: tsx scripts/investigate-api.ts <album-url>');
+  console.error('Example: tsx scripts/investigate-api.ts https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5');
   process.exit(1);
 }
 

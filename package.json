@@ -5,8 +5,8 @@
   "main": "scripts/fetch-photos.js",
   "type": "module",
   "scripts": {
-    "fetch": "node scripts/fetch-photos.js",
-    "investigate": "node scripts/investigate-api.js",
+    "fetch": "tsx scripts/fetch-photos.ts",
+    "investigate": "tsx scripts/investigate-api.ts",
     "test": "tsx --test scripts/test-bundle-size.ts scripts/test-cache-service.ts scripts/test-fetch.ts scripts/test-url-parser.ts scripts/test-performance.ts scripts/test-liquid-templates.ts",
     "test:load": "tsx scripts/test-load.ts",
     "test:all": "tsx --test scripts/test-*.ts",

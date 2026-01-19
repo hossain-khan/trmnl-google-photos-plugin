@@ -15,17 +15,17 @@
  * - Update api/photo.json
  * 
  * Usage:
- *   node scripts/fetch-photos.js <album-url>
+ *   tsx scripts/fetch-photos.ts <album-url>
  * 
  * Environment Variables:
  *   - SHARED_ALBUM_URL: Google Photos shared album URL (optional if passed as arg)
  * 
  * Example:
- *   node scripts/fetch-photos.js https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5
+ *   tsx scripts/fetch-photos.ts https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5
  */
 
 import * as GooglePhotosAlbum from 'google-photos-album-image-url-fetch';
-import { writeFile, readFile } from 'fs/promises';
+import { writeFile } from 'fs/promises';
 import { resolve } from 'path';
 
 // Configuration
@@ -33,10 +33,43 @@ const EINK_WIDTH = 800;   // Default TRMNL width
 const EINK_HEIGHT = 480;  // Default TRMNL height
 const API_OUTPUT_FILE = resolve(process.cwd(), 'api/photo.json');
 
+interface ValidationResult {
+  valid: boolean;
+  url?: string;
+  error?: string;
+}
+
+interface Photo {
+  uid: string;
+  url: string;
+  width: number;
+  height: number;
+  imageUpdateDate: number;
+  albumAddDate: number;
+}
+
+interface PhotoMetadata {
+  uid: string;
+  original_width: number;
+  original_height: number;
+  image_update_date: string;
+  album_add_date: string;
+}
+
+interface OutputData {
+  photo_url: string;
+  thumbnail_url: string;
+  caption: null;
+  timestamp: string;
+  album_name: string;
+  photo_count: number;
+  metadata: PhotoMetadata;
+}
+
 /**
  * Parse and validate Google Photos album URL
  */
-function validateAlbumUrl(url) {
+function validateAlbumUrl(url: string | undefined): ValidationResult {
   if (!url) {
     return { valid: false, error: 'URL is required' };
   }
@@ -58,12 +91,13 @@ function validateAlbumUrl(url) {
 /**
  * Optimize image URL for e-ink display
  */
-function optimizeForEink(baseUrl, originalWidth, originalHeight) {
+function optimizeForEink(baseUrl: string, originalWidth: number, originalHeight: number): string {
   // Calculate aspect ratio
   const aspectRatio = originalWidth / originalHeight;
   const einkAspectRatio = EINK_WIDTH / EINK_HEIGHT;
   
-  let targetWidth, targetHeight;
+  let targetWidth: number;
+  let targetHeight: number;
   
   // Fit image within e-ink display bounds while maintaining aspect ratio
   if (aspectRatio > einkAspectRatio) {
@@ -82,7 +116,7 @@ function optimizeForEink(baseUrl, originalWidth, originalHeight) {
 /**
  * Select random photo from album
  */
-function selectRandomPhoto(photos) {
+function selectRandomPhoto(photos: Photo[]): Photo | null {
   if (!photos || photos.length === 0) {
     return null;
   }
@@ -94,7 +128,7 @@ function selectRandomPhoto(photos) {
 /**
  * Extract album name from URL (if possible)
  */
-function extractAlbumName(url) {
+function extractAlbumName(url: string): string {
   // For now, just use a generic name
   // In future, could parse album title from HTML
   return 'Google Photos Shared Album';
@@ -103,7 +137,7 @@ function extractAlbumName(url) {
 /**
  * Main function
  */
-async function main() {
+async function main(): Promise<void> {
   console.log('📷 Google Photos Album Fetcher\n');
   
   // Get album URL from args or environment
@@ -111,9 +145,9 @@ async function main() {
   
   if (!albumUrl) {
     console.error('❌ Error: No album URL provided');
-    console.error('\nUsage: node scripts/fetch-photos.js <album-url>');
-    console.error('   Or: SHARED_ALBUM_URL=<url> node scripts/fetch-photos.js');
-    console.error('\nExample: node scripts/fetch-photos.js https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5');
+    console.error('\nUsage: tsx scripts/fetch-photos.ts <album-url>');
+    console.error('   Or: SHARED_ALBUM_URL=<url> tsx scripts/fetch-photos.ts');
+    console.error('\nExample: tsx scripts/fetch-photos.ts https://photos.app.goo.gl/QKGRYqfdS15bj8Kr5');
     process.exit(1);
   }
   
@@ -129,7 +163,7 @@ async function main() {
   try {
     // Fetch photos from album
     console.log('📡 Fetching photos from album...');
-    const photos = await GooglePhotosAlbum.fetchImageUrls(albumUrl);
+    const photos = await GooglePhotosAlbum.fetchImageUrls(albumUrl) as Photo[];
     
     if (!photos || photos.length === 0) {
       console.error('❌ No photos found in album');
@@ -143,6 +177,12 @@ async function main() {
     // Select random photo
     console.log('🎲 Selecting random photo...');
     const selectedPhoto = selectRandomPhoto(photos);
+    
+    if (!selectedPhoto) {
+      console.error('❌ Failed to select a photo');
+      process.exit(1);
+    }
+    
     console.log(`✓ Selected photo: ${selectedPhoto.uid}`);
     console.log(`  Original size: ${selectedPhoto.width}x${selectedPhoto.height}px\n`);
     
@@ -156,7 +196,7 @@ async function main() {
     console.log(`✓ Optimized for ${EINK_WIDTH}x${EINK_HEIGHT}px display\n`);
     
     // Prepare output data
-    const outputData = {
+    const outputData: OutputData = {
       photo_url: optimizedUrl,
       thumbnail_url: `${selectedPhoto.url}=w400-h300`, // Smaller preview
       caption: null, // Google Photos doesn't expose captions via shared albums
@@ -209,13 +249,20 @@ async function main() {
     
   } catch (error) {
     console.error('\n❌ Error fetching photos:');
-    console.error(error.message);
     
-    if (error.response) {
-      console.error(`   Status: ${error.response.status}`);
-      if (error.response.status === 404) {
-        console.error('   The album may have been deleted or made private');
+    if (error instanceof Error) {
+      console.error(error.message);
+      
+      // Type guard for axios error
+      if ('response' in error && error.response) {
+        const axiosError = error as { response: { status: number } };
+        console.error(`   Status: ${axiosError.response.status}`);
+        if (axiosError.response.status === 404) {
+          console.error('   The album may have been deleted or made private');
+        }
       }
+    } else {
+      console.error('An unknown error occurred');
     }
     
     console.error('\nTroubleshooting:');
