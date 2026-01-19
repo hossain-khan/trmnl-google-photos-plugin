@@ -174,9 +174,7 @@ All three Google Photos URL formats are supported:
 
 ## Success Criteria
 
-### Phase 2 - Issue 1 Requirements
-
-From `docs/FOLLOW_UP_TASKS.md`:
+### API Integration Requirements
 
 - [x] ✅ Collect 10+ Google Photos shared album URLs with different formats
 - [x] ✅ Use Chrome DevTools to analyze network requests (via library source analysis)
@@ -187,12 +185,12 @@ From `docs/FOLLOW_UP_TASKS.md`:
 - [x] ✅ Test with various album sizes (library supports 1-1000+ photos)
 - [x] ✅ Test with different privacy settings (public only supported)
 - [x] ✅ Identify rate limits and restrictions (none observed)
-- [x] ✅ Legal review of ToS compliance risk (documented in GOOGLE_PHOTOS_API.md)
+- [x] ✅ Legal review of ToS compliance risk (documented in README)
 
 **Success Criteria Met**:
 - ✅ Successfully fetch photo URLs from 90%+ of test albums
 - ✅ Understand API structure well enough to implement production code
-- ✅ Document findings in `docs/GOOGLE_PHOTOS_API.md`
+- ✅ Production implementation deployed and operational
 
 ## Next Steps
 
@@ -200,11 +198,10 @@ From `docs/FOLLOW_UP_TASKS.md`:
 2. **Edge Cases**: Test with albums containing videos, live photos
 3. **Performance**: Benchmark with large albums (1000+ photos)
 4. **Monitoring**: Add error tracking for production
-5. **Caching**: Implement S3 caching layer (Issue 5)
 
 ## References
 
 - Test script: `scripts/test-fetch.js`
 - Implementation: `scripts/fetch-photos.js`
 - Library: https://github.com/yumetodo/google-photos-album-image-url-fetch
-- Documentation: `docs/GOOGLE_PHOTOS_API.md`
+- Architecture: See [ARCHITECTURE.md](ARCHITECTURE.md)
