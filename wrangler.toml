@@ -11,8 +11,9 @@ workers_dev = true
 [vars]
 ENVIRONMENT = "production"
 
-# Observability - bindings for Analytics Engine, etc.
-# Uncomment when ready to add observability
+# Observability - Structured Logging for debugging
+# Note: Using fallback structured logging via console.log (free tier compatible)
+# Analytics Engine is disabled - not available on free plan
 # [[analytics_engine_datasets]]
 # binding = "ANALYTICS"
 
