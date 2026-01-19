@@ -146,7 +146,7 @@ preview_id = "your-preview-namespace-id"
 wrangler deploy
 ```
 
-See [KV_CACHING_SETUP.md](../../docs/KV_CACHING_SETUP.md) for detailed setup instructions.
+See [Cloudflare KV Documentation](https://developers.cloudflare.com/kv/) for detailed setup instructions.
 
 ## Cache Behavior
 
@@ -358,5 +358,5 @@ Potential improvements for future versions:
 
 - [cache-service.ts](./cache-service.ts) - Implementation
 - [photo-fetcher.ts](./photo-fetcher.ts) - Integration
-- [KV_CACHING_SETUP.md](../../docs/KV_CACHING_SETUP.md) - Setup guide
 - [test-cache-service.js](../../scripts/test-cache-service.js) - Tests
+- [Cloudflare KV Documentation](https://developers.cloudflare.com/kv/) - Setup guide

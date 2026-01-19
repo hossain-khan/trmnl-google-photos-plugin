@@ -183,7 +183,7 @@ async function investigateAlbum(albumUrl) {
     console.log(`1. Review ${htmlFile} for data structures`);
     console.log(`2. Use Chrome DevTools to inspect network requests`);
     console.log(`3. Look for AF_initDataCallback or similar data injection`);
-    console.log(`4. Document findings in docs/GOOGLE_PHOTOS_API.md`);
+    console.log(`4. Refer to ARCHITECTURE.md for implementation details`);
     console.log('='.repeat(70));
 
     // Display sample photo URLs

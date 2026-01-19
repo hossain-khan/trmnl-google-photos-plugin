@@ -74,7 +74,8 @@ curl http://localhost:8787/
 
 - Read [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions
 - Read [src/README.md](src/README.md) for worker architecture
-- See [docs/PRD_Full_Technical.md](docs/PRD_Full_Technical.md) for full specifications
+- See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for system architecture
+- See [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) for API reference
 
 ## 🐛 Troubleshooting
 
