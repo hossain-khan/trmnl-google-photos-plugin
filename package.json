@@ -7,7 +7,8 @@
   "scripts": {
     "fetch": "tsx scripts/fetch-photos.ts",
     "investigate": "tsx scripts/investigate-api.ts",
-    "test": "tsx --test scripts/test-bundle-size.ts scripts/test-cache-service.ts scripts/test-fetch.ts scripts/test-url-parser.ts scripts/test-performance.ts scripts/test-liquid-templates.ts",
+    "test": "tsx --test scripts/test-bundle-size.ts scripts/test-cache-service.ts scripts/test-fetch.ts scripts/test-url-parser.ts scripts/test-performance.ts scripts/test-liquid-templates.ts scripts/test-security.ts scripts/test-security-validator.ts",
+    "test:security": "tsx --test scripts/test-security.ts scripts/test-security-validator.ts",
     "test:load": "tsx scripts/test-load.ts",
     "test:all": "tsx --test scripts/test-*.ts",
     "format": "prettier --write \"**/*.{ts,js,json,md}\"",

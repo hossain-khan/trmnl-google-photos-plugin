@@ -29,6 +29,18 @@ app.use(
   })
 );
 
+// Add security headers middleware
+app.use('/*', async (c, next) => {
+  await next();
+  
+  // Security headers
+  c.header('X-Content-Type-Options', 'nosniff');
+  c.header('X-Frame-Options', 'DENY');
+  c.header('X-XSS-Protection', '1; mode=block');
+  c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+  c.header('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
+});
+
 /**
  * Health check endpoint - returns basic service status
  * Used to verify the worker is running and accessible
