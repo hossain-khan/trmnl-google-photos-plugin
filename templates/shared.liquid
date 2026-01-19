@@ -1,0 +1,39 @@
+{% comment %}
+  Shared template for Google Photos plugin
+  This file contains reusable assets and variables for all layout templates:
+  - Google Photos icon (base64-encoded) for title bars
+  - Photo selection logic (currently handled by backend API)
+{% endcomment %}
+
+{% comment %}
+  Google Photos icon for title bars (59x59px, base64-encoded PNG)
+  Usage in templates:
+    <img src="{{ icon_google_photos }}" class="icon" alt="Google Photos">
+  
+  This icon is a stylized version of the Google Photos logo optimized for e-ink displays:
+  - 59x59px resolution (optimal for TRMNL title bars)
+  - PNG format with transparency
+  - Base64-encoded for direct embedding
+{% endcomment %}
+{%- capture icon_google_photos -%}
+data:image/png;base64,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
+{%- endcapture -%}
+
+{% comment %}
+  Photo data is provided by the backend API endpoint (/api/photo)
+  The following variables are available from the JSON response:
+  
+  - photo_url: Optimized full-resolution photo URL (1040×780 for TRMNL X)
+  - thumbnail_url: Lower resolution version (400×300, optional)
+  - caption: Photo caption/description (may be empty)
+  - timestamp: When photo was taken/updated (ISO 8601 format)
+  - album_name: Name of the source album
+  - photo_count: Total number of photos in album
+  
+  Metadata (optional):
+  - metadata.uid: Unique photo identifier
+  - metadata.original_width: Original photo width in pixels
+  - metadata.original_height: Original photo height in pixels
+  - metadata.image_update_date: When photo was last updated
+  - metadata.album_add_date: When photo was added to album
+{% endcomment %}

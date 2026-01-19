@@ -143,12 +143,16 @@ describe('Main Template Rendering - Valid Data', (): void => {
 
       // Basic assertions
       assert.ok(rendered.length > 0, 'Rendered output should not be empty');
-      assert.ok(rendered.includes('img'), 'Should contain image tag');
-      assert.ok(rendered.includes(validPhotoData.photo_url), 'Should include photo URL');
-      assert.ok(
-        rendered.includes(validPhotoData.trmnl.plugin_settings.instance_name),
-        'Should include instance name'
-      );
+
+      // Skip layout-specific checks for shared.liquid (it's just variables)
+      if (template.name !== 'shared.liquid') {
+        assert.ok(rendered.includes('img'), 'Should contain image tag');
+        assert.ok(rendered.includes(validPhotoData.photo_url), 'Should include photo URL');
+        assert.ok(
+          rendered.includes(validPhotoData.trmnl.plugin_settings.instance_name),
+          'Should include instance name'
+        );
+      }
     });
   });
 });
@@ -181,7 +185,11 @@ describe('Main Template Rendering - Missing Data', (): void => {
 
       // Should handle missing data gracefully
       assert.ok(rendered.length > 0, 'Rendered output should not be empty');
-      assert.ok(rendered.includes('Test Instance'), 'Should still include instance name');
+
+      // Skip layout-specific checks for shared.liquid (it's just variables)
+      if (template.name !== 'shared.liquid') {
+        assert.ok(rendered.includes('Test Instance'), 'Should still include instance name');
+      }
     });
   });
 });
@@ -232,6 +240,16 @@ describe('Template Structure Validation', (): void => {
   allTemplates.forEach((template: TemplateInfo): void => {
     it(`should have proper structure in ${template.type}/${template.name}`, (): void => {
       const content = readFileSync(template.path, 'utf-8');
+
+      // Skip layout-specific checks for shared.liquid (it's just variables)
+      if (template.name === 'shared.liquid') {
+        // shared.liquid should just contain variable definitions
+        assert.ok(
+          content.includes('icon_google_photos'),
+          'Should define icon_google_photos variable'
+        );
+        return;
+      }
 
       // Check for essential structural elements
       assert.ok(content.includes('<div class="layout">'), 'Should have layout div');
@@ -293,7 +311,14 @@ describe('Template Variables Usage', (): void => {
   mainTemplates.forEach((template: TemplateInfo): void => {
     it(`should use standard template variables in ${template.name}`, (): void => {
       const content = readFileSync(template.path, 'utf-8');
-
+      // Skip for shared.liquid - it defines variables, not uses them
+      if (template.name === 'shared.liquid') {
+        assert.ok(
+          content.includes('icon_google_photos'),
+          'shared.liquid should define icon_google_photos'
+        );
+        return;
+      }
       // Check for TRMNL standard variables
       assert.ok(
         content.includes('{{ trmnl.plugin_settings.instance_name }}'),
@@ -314,6 +339,16 @@ describe('Image Attributes Validation', (): void => {
   allTemplates.forEach((template: TemplateInfo): void => {
     it(`should have proper image attributes in ${template.type}/${template.name}`, (): void => {
       const content = readFileSync(template.path, 'utf-8');
+
+      // Skip for shared.liquid - it doesn't have layout images
+      if (template.name === 'shared.liquid') {
+        // shared.liquid has the icon, check for that
+        assert.ok(
+          content.includes('data:image/png;base64'),
+          'shared.liquid should define base64 icon'
+        );
+        return;
+      }
 
       // Check for image tags
       const hasImage = content.includes('<img');
