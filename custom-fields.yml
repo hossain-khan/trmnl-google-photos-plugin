@@ -46,7 +46,9 @@
   name: Google Photos Shared Album URL
   description: "Paste your Google Photos shared album link (e.g., https://photos.app.goo.gl/ABC123)"
   placeholder: "https://photos.app.goo.gl/..."
-  help_text: To create a shared album, open Google Photos → Create → Shared Album → Get Link. Ensure link sharing is enabled.
+  default: ""
+  optional: true
+  help_text: To create a shared album, open Google Photos → Create → Shared Album → Get Link. Ensure link sharing is enabled. Leave blank to see a demo photo.
 - keyname: custom_title
   field_type: string
   name: Display Name
