@@ -24,4 +24,9 @@
 <div class="title_bar">
   <img src="{{ icon_google_photos }}" class="icon h--5" alt="Google Photos">
   <span class="title title--small">{% if trmnl.plugin_settings.custom_fields_values.custom_title and trmnl.plugin_settings.custom_fields_values.custom_title != '' %}{{ trmnl.plugin_settings.custom_fields_values.custom_title }}{% else %}{{ trmnl.plugin_settings.instance_name }}{% endif %}</span>
+  {% if trmnl.plugin_settings.custom_fields_values.show_metadata != false %}
+  <span class="instance">
+    {% if relative_date %}{{ relative_date }}{% endif %}
+  </span>
+  {% endif %}
 </div>

@@ -63,3 +63,10 @@
   name: Show Photo Year
   description: "Display the photo year in the bottom right corner"
   help_text: When enabled, the year from the photo's date appears in the bottom right corner with a white stroke for visibility. Disable if you prefer a cleaner photo display.
+- keyname: show_metadata
+  field_type: boolean
+  default: true
+  optional: true
+  name: Show Photo Metadata
+  description: "Display photo date and aspect ratio in the title bar"
+  help_text: When enabled, shows when the photo was taken (e.g., '2 years ago') and the aspect ratio (Portrait/Landscape/Square) in the title bar. Disable for a minimal title bar with just the plugin name and photo count.

@@ -34,4 +34,13 @@
 <div class="title_bar">
   <img src="{{ icon_google_photos }}" class="icon h--5" alt="Google Photos">
   <span class="title md:title--large">{% if trmnl.plugin_settings.custom_fields_values.custom_title and trmnl.plugin_settings.custom_fields_values.custom_title != '' %}{{ trmnl.plugin_settings.custom_fields_values.custom_title }}{% else %}{{ trmnl.plugin_settings.instance_name }}{% endif %}</span>
+  {% if trmnl.plugin_settings.custom_fields_values.show_metadata != false %}
+  <span class="instance">
+    {% if relative_date %}{{ relative_date }}{% endif %}
+    {% if aspect_ratio %} • {{ aspect_ratio }}{% endif %}
+  </span>
+  {% endif %}
+  {% if photo_count and photo_count > 0 %}
+  <span class="label">{{ photo_count }} {% if photo_count == 1 %}photo{% else %}photos{% endif %}</span>
+  {% endif %}
 </div>

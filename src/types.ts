@@ -39,6 +39,8 @@ export interface PhotoData {
   image_update_date?: string;
   album_name?: string;
   photo_count: number;
+  relative_date?: string;
+  aspect_ratio?: string;
   metadata?: {
     uid: string;
     original_width: number;
