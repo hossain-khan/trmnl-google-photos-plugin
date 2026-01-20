@@ -53,12 +53,12 @@ This plugin is built with privacy at its core:
 
 - ✅ **No OAuth** - No Google account connection required
 - ✅ **No Personal Data** - We never store your photos or account information
-- ✅ **Temporary Caching Only** - Album metadata cached for 1 hour to improve performance (80% faster!)
+- ✅ **User-Controlled Caching** - You decide: enable 1-hour cache for 80% faster performance, or disable for fresh API calls every time
 - ✅ **No Tracking** - Fully stateless, GDPR compliant
 - ✅ **Public Albums Only** - Only accesses albums you've explicitly shared
 - ✅ **Direct Access** - Photos load directly from Google's servers to your device
 
-**What's cached?** Only album metadata (photo URLs) for 1 hour. Your actual photos stay on Google's servers and are never stored by us.
+**What's cached (when enabled)?** Only album metadata (photo URLs) for 1 hour. Your actual photos stay on Google's servers and are never stored by us. You can disable caching entirely in the plugin settings if you prefer—though this will result in slower loading times (3-5 seconds vs 67ms).
 
 Your photos stay private. We simply help your TRMNL display them.
 

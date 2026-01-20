@@ -125,6 +125,7 @@ app.get('/api/photo', async (c) => {
 
     // Extract album_url from query parameters
     const album_url = c.req.query('album_url');
+    const enable_caching = c.req.query('enable_caching');
 
     // Demo Data: If album_url is empty, 'demo', or '0', return demo photo data
     // This allows the plugin to display a preview in the TRMNL marketplace without requiring
@@ -196,11 +197,22 @@ app.get('/api/photo', async (c) => {
       );
     }
 
-    // Fetch random photo from album (with optional caching)
+    // Determine if caching should be used based on user preference
+    // enable_caching can be: 'true', 'false', '1', '0', or undefined (defaults to true)
+    const useCaching = enable_caching !== 'false' && enable_caching !== '0';
+    const kvNamespace = useCaching ? c.env.PHOTOS_CACHE : undefined;
+
+    logger.info('Cache preference', {
+      enable_caching,
+      useCaching,
+      kvConfigured: !!c.env.PHOTOS_CACHE,
+    });
+
+    // Fetch random photo from album (with optional caching based on user preference)
     let photoData;
     const fetchStartTime = Date.now();
     try {
-      photoData = await fetchRandomPhoto(urlValidation.url, c.env.PHOTOS_CACHE);
+      photoData = await fetchRandomPhoto(urlValidation.url, kvNamespace);
       const fetchDuration = Date.now() - fetchStartTime;
       cacheHit = fetchDuration < CACHE_HIT_THRESHOLD_MS; // Likely cached if <500ms
 
