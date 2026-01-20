@@ -30,3 +30,31 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAQAAACQ9RH5AAAAAXNSR0IArs
   - album_name: Name of the source album
   - photo_count: Total number of photos in album
 {% endcomment %}
+
+{% comment %}
+  ====================================================================================
+  REUSABLE LIQUID TEMPLATES
+  ====================================================================================
+  These templates follow TRMNL best practices for DRY (Don't Repeat Yourself) code.
+  Reference: https://docs.usetrmnl.com/go/reusing-markup
+{% endcomment %}
+
+{% comment %}
+  Photo Display Template
+  ----------------------
+  Renders a photo with optimal settings for e-ink displays.
+  
+  Parameters:
+  - photo_url: URL of the photo to display (required)
+  - caption: Alt text for accessibility (optional)
+  
+  Usage:
+    {% render "photo_display", photo_url: photo_url, caption: caption %}
+{% endcomment %}
+{% template photo_display %}
+<!-- Custom max-width/max-height ensures images fit without cut-off (handles portrait/landscape/any aspect ratio) -->
+<img src="{{ photo_url }}" 
+     alt="{{ caption }}" 
+     class="image image--contain image-dither"
+     style="max-width: 100%; max-height: 100%; object-fit: contain;">
+{% endtemplate %}

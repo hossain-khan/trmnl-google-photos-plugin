@@ -3,11 +3,7 @@
   <div class="flex flex--col gap--small md:gap--medium h--full">
     <!-- Photo Display Area -->
     <div class="flex flex--center-x flex--center-y h--full">
-      <!-- Custom max-width/max-height ensures images fit without cut-off (handles portrait/landscape/any aspect ratio) -->
-      <img src="{{ photo_url }}" 
-           alt="{{ caption }}" 
-           class="image image--contain image-dither"
-           style="max-width: 100%; max-height: 100%; object-fit: contain;">
+      {% render "photo_display", photo_url: photo_url, caption: caption %}
     </div>
     
     <!-- Caption (if available) -->
