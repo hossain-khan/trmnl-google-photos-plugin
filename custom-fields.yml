@@ -76,4 +76,4 @@
   optional: true
   name: Enable Performance Caching
   description: "Cache album metadata for faster loading (recommended for most users)"
-  help_text: When enabled, album metadata (photo URLs) is cached for 1 hour to improve performance by 80%. Your photos are never stored—only the list of photo URLs is temporarily cached. Disable this to ensure zero data is stored anywhere along the process—every request will fetch fresh data directly from Google Photos (slower loading 3-5 seconds vs 67ms, but maximum privacy guaranteed).
+  help_text: When enabled, album metadata (photo URLs) is cached for 1 hour to improve performance by 80%. Your photos are never stored—only the list of photo URLs is temporarily cached. Disable this to ensure zero data is stored anywhere along the process—every request will fetch fresh data directly from Google Photos (slower loading 2-3 seconds vs 100ms, but maximum privacy guaranteed).
