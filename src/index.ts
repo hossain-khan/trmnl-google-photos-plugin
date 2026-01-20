@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { parseAlbumUrl } from './lib/url-parser';
 import { fetchRandomPhoto } from './services/photo-fetcher';
+import { version } from '../package.json';
 import {
   Logger,
   trackPerformance,
@@ -63,7 +64,7 @@ app.get('/', (c) => {
   return c.json({
     status: 'ok',
     service: 'trmnl-google-photos-plugin',
-    version: '0.1.0',
+    version,
     environment: c.env.ENVIRONMENT || 'production',
     timestamp: new Date().toISOString(),
     message: 'TRMNL Google Photos Plugin is running',
@@ -78,7 +79,7 @@ app.get('/health', (c) => {
   return c.json({
     status: 'healthy',
     service: 'trmnl-google-photos-plugin',
-    version: '0.1.0',
+    version,
     environment: c.env.ENVIRONMENT || 'production',
     timestamp: new Date().toISOString(),
     uptime: 'N/A', // Workers are stateless, no persistent uptime
