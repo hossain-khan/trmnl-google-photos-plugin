@@ -24,9 +24,16 @@
 <div class="title_bar">
   <img src="{{ icon_google_photos }}" class="icon h--5" alt="Google Photos">
   <span class="title title--small">{% if trmnl.plugin_settings.custom_fields_values.custom_title and trmnl.plugin_settings.custom_fields_values.custom_title != '' %}{{ trmnl.plugin_settings.custom_fields_values.custom_title }}{% else %}{{ trmnl.plugin_settings.instance_name }}{% endif %}</span>
+  <!-- When show_metadata is enabled: photo count is merged into instance metadata (e.g., "5 days ago • 23 photos")
+       When show_metadata is disabled: photo count displays as separate label badge -->
   {% unless trmnl.plugin_settings.custom_fields_values.show_metadata == "false" %}
   <span class="instance">
     {% if relative_date %}{{ relative_date }}{% endif %}
+    {% if photo_count and photo_count > 0 %} • {{ photo_count }} {% if photo_count == 1 %}photo{% else %}photos{% endif %}{% endif %}
   </span>
+  {% else %}
+  {% if photo_count and photo_count > 0 %}
+  <span class="label label--small">{{ photo_count }} {% if photo_count == 1 %}photo{% else %}photos{% endif %}</span>
+  {% endif %}
   {% endunless %}
 </div>
