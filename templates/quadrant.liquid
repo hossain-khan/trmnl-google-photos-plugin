@@ -12,7 +12,7 @@
   {% endif %}
   
   <!-- Year Display (Bottom Right) -->
-  {% if image_update_date %}
+  {% if image_update_date and trmnl.plugin_settings.custom_fields_values.show_year != false %}
   <!-- Note: TRMNL Framework doesn't provide positioning utilities (absolute/relative),
        so inline styles are used for overlay positioning -->
   <div style="position: absolute; bottom: 0px; right: 8px;">
