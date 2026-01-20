@@ -275,6 +275,25 @@ export function calculateAspectRatio(width: number, height: number): string {
 }
 
 /**
+ * Calculate megapixels from image dimensions
+ * Rounds to nearest 0.5 MP for cleaner display
+ *
+ * @param width - Image width in pixels
+ * @param height - Image height in pixels
+ * @returns Megapixels rounded to nearest 0.5 (e.g., 12, 12.5, 13)
+ *
+ * @example
+ * calculateMegapixels(3024, 4032) // = 12.2 → 12 MP
+ * calculateMegapixels(1920, 1080) // = 2.1 → 2 MP
+ * calculateMegapixels(4000, 3000) // = 12 → 12 MP
+ */
+export function calculateMegapixels(width: number, height: number): number {
+  const megapixels = (width * height) / 1_000_000;
+  // Round to nearest 0.5
+  return Math.round(megapixels * 2) / 2;
+}
+
+/**
  * Convert ISO timestamp to relative date format
  * Examples: "2 years ago", "3 months ago", "5 days ago", "Just now"
  *
@@ -336,6 +355,7 @@ export function convertToPhotoData(
   const imageUpdateDate = validateTimestamp(new Date(photo.imageUpdateDate).toISOString());
   const relativeDate = formatRelativeDate(imageUpdateDate);
   const aspectRatio = calculateAspectRatio(photo.width, photo.height);
+  const megapixels = calculateMegapixels(photo.width, photo.height);
 
   const photoData: PhotoData = {
     photo_url: photoUrl,
@@ -347,6 +367,7 @@ export function convertToPhotoData(
     photo_count: photoCount,
     relative_date: relativeDate,
     aspect_ratio: aspectRatio,
+    megapixels: megapixels,
     metadata: {
       uid: photo.uid,
       original_width: photo.width,

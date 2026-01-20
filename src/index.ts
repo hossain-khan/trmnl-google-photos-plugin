@@ -257,6 +257,7 @@ app.get('/api/photo', async (c) => {
       photo_count: photoData.photo_count,
       relative_date: photoData.relative_date,
       aspect_ratio: photoData.aspect_ratio,
+      megapixels: photoData.megapixels,
     };
 
     const totalDuration = Date.now() - startTime;
