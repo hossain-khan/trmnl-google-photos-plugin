@@ -143,7 +143,10 @@ describe('Template Syntax Validity', (): void => {
       // which liquidjs doesn't support. TRMNL platform handles these properly.
       const content = readFileSync(template.path, 'utf-8');
       if (template.type === 'main' && content.includes('{% render')) {
-        assert.ok(true, `Skipping ${template.name} (uses {% render %} which requires TRMNL platform)`);
+        assert.ok(
+          true,
+          `Skipping ${template.name} (uses {% render %} which requires TRMNL platform)`
+        );
         return;
       }
 
@@ -437,9 +440,6 @@ describe('Image Attributes Validation', (): void => {
         // Main templates use {% render %}, which handles image attributes in shared.liquid
         assert.ok(true, 'Uses shared photo_display template (attributes defined in shared.liquid)');
       }
-    });
-  });
-});
     });
   });
 });
