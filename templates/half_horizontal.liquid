@@ -18,13 +18,7 @@
   </div>
   {% else %}
   <!-- No Photo Available -->
-  <div class="flex flex--col flex--center-x flex--center-y gap--small md:gap--medium h--full">
-    <div class="value value--medium md:value--large lg:value--xlarge">📷</div>
-    <div class="title title--small md:title--medium lg:title--large text--center">No Photos</div>
-    <div class="description md:title md:title--small text--center">
-      Configure your shared album URL in settings
-    </div>
-  </div>
+  {% render "error_state", size: "half" %}
   {% endif %}
 </div>
 

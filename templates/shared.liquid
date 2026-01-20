@@ -58,3 +58,42 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAQAAACQ9RH5AAAAAXNSR0IArs
      class="image image--contain image-dither"
      style="max-width: 100%; max-height: 100%; object-fit: contain;">
 {% endtemplate %}
+
+{% comment %}
+  Error State Template
+  ----------------------
+  Displays a helpful error message when no photo is available (plugin not configured).
+  Provides clear instructions to guide users to configure their shared album URL.
+  
+  Parameters:
+  - size: Layout size variant ('full', 'half', 'quadrant') - controls spacing and text sizing
+  
+  Usage:
+    {% render "error_state", size: "full" %}
+    {% render "error_state", size: "half" %}
+    {% render "error_state", size: "quadrant" %}
+{% endcomment %}
+{% template error_state %}
+{% if size == 'full' %}
+<div class="flex flex--col flex--center-x flex--center-y gap--medium md:gap--large h--full">
+  <div class="value value--large md:value--xlarge lg:value--xxlarge text--center">📷</div>
+  <div class="title title--medium md:title--large lg:title--xlarge text--center">No Photos Available</div>
+  <div class="description md:title md:title--small lg:title lg:title--medium text--center">
+    Please configure your Google Photos shared album URL in the plugin settings.
+  </div>
+</div>
+{% elsif size == 'half' %}
+<div class="flex flex--col flex--center-x flex--center-y gap--small md:gap--medium h--full">
+  <div class="value value--medium md:value--large lg:value--xlarge">📷</div>
+  <div class="title title--small md:title--medium lg:title--large text--center">No Photos</div>
+  <div class="description md:title md:title--small text--center">
+    Configure your shared album URL in settings
+  </div>
+</div>
+{% elsif size == 'quadrant' %}
+<div class="flex flex--col flex--center-x flex--center-y gap--xsmall h--full">
+  <div class="value value--small md:value--medium">📷</div>
+  <div class="description md:title md:title--small text--center">No Photos</div>
+</div>
+{% endif %}
+{% endtemplate %}
