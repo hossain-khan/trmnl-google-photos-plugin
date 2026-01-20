@@ -104,7 +104,7 @@ export function sanitizeCaption(caption: string | null | undefined): string | nu
  * @returns Sanitized album name or default value
  */
 export function sanitizeAlbumName(albumName: string | null | undefined): string {
-  const defaultName = 'Google Photos Shared Album';
+  const defaultName = 'Google Photos Album';
 
   if (!albumName || typeof albumName !== 'string') {
     return defaultName;

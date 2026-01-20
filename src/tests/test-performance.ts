@@ -174,7 +174,7 @@ async function testDataTransformation(): Promise<MeasurementResult[]> {
       thumbnail_url: `${mockGooglePhoto.url}=w400-h300`,
       caption: null,
       timestamp: new Date().toISOString(),
-      album_name: 'Google Photos Shared Album',
+      album_name: 'Google Photos Album',
       photo_count: 10,
       metadata: {
         uid: mockGooglePhoto.uid,
