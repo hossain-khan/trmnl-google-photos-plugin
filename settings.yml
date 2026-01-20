@@ -1,5 +1,5 @@
 uuid: 45ce2102-0b73-47ac-8a32-a1a6ccbcc1c1  # TRMNL will generate this upon plugin submission (Use this to make Webhook API requests.)
-name: Google Photos Shared Album
+name: Google Photos
 author: Hossain Khan
 author_email: trmnl@hossain.dev
 homepage: https://hossain-khan.github.io/trmnl-google-photos-plugin/
