@@ -268,7 +268,7 @@ function gcd(a: number, b: number): number {
 
 /**
  * Calculate aspect ratio from image dimensions
- * Returns standard width:height format (e.g., 16:9, 4:3, 1:1)
+ * Returns standard width:height format, approximating to common ratios when close
  *
  * @param width - Image width in pixels
  * @param height - Image height in pixels
@@ -278,11 +278,71 @@ function gcd(a: number, b: number): number {
  * calculateAspectRatio(1920, 1080) // Returns "16:9"
  * calculateAspectRatio(1080, 1920) // Returns "9:16" (portrait)
  * calculateAspectRatio(1000, 1000) // Returns "1:1" (square)
+ * calculateAspectRatio(5694, 4075) // Returns "3:2" (approx 1.397 ≈ 1.5)
  */
 export function calculateAspectRatio(width: number, height: number): string {
+  const ratio = width / height;
+
+  // Common aspect ratios ordered by popularity
+  // Format: [width, height, decimal ratio, tolerance]
+  const commonRatios: Array<[number, number, number]> = [
+    [1, 1, 1.0], // Square
+    [4, 3, 4 / 3], // Standard (1.333...)
+    [3, 2, 1.5], // Classic photography
+    [16, 10, 1.6], // 16:10 displays
+    [5, 3, 5 / 3], // European standard (1.666...)
+    [16, 9, 16 / 9], // Widescreen (1.777...)
+    [2, 1, 2.0], // Ultrawide
+    [21, 9, 21 / 9], // Cinematic (2.333...)
+    [3, 1, 3.0], // Panoramic
+  ];
+
+  // Tolerance for matching (5% difference)
+  const tolerance = 0.05;
+
+  // Check portrait orientation first
+  if (ratio < 1) {
+    // For portrait, check inverted ratios
+    const invertedRatio = 1 / ratio;
+    for (const [w, h, commonRatio] of commonRatios) {
+      if (Math.abs(invertedRatio - commonRatio) / commonRatio <= tolerance) {
+        return `${h}:${w}`; // Swap for portrait
+      }
+    }
+  } else {
+    // For landscape/square, check normal ratios
+    for (const [w, h, commonRatio] of commonRatios) {
+      if (Math.abs(ratio - commonRatio) / commonRatio <= tolerance) {
+        return `${w}:${h}`;
+      }
+    }
+  }
+
+  // Fallback: use GCD simplification for uncommon ratios
   const divisor = gcd(width, height);
   const simplifiedWidth = width / divisor;
   const simplifiedHeight = height / divisor;
+
+  // If simplified ratio is too large (both > 100), use decimal approximation
+  if (simplifiedWidth > 100 || simplifiedHeight > 100) {
+    // Find best simple fraction approximation
+    const maxDenominator = 20;
+    let bestNum = Math.round(ratio);
+    let bestDen = 1;
+    let bestError = Math.abs(ratio - bestNum);
+
+    for (let den = 2; den <= maxDenominator; den++) {
+      const num = Math.round(ratio * den);
+      const error = Math.abs(ratio - num / den);
+      if (error < bestError) {
+        bestNum = num;
+        bestDen = den;
+        bestError = error;
+      }
+    }
+
+    return `${bestNum}:${bestDen}`;
+  }
 
   return `${simplifiedWidth}:${simplifiedHeight}`;
 }

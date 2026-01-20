@@ -215,8 +215,9 @@ describe('Photo Fetcher Helper Functions', () => {
     });
 
     it('should simplify aspect ratio to lowest terms', () => {
-      const result = calculateAspectRatio(1000, 1040); // GCD = 40
-      assert.equal(result, '25:26');
+      // 1000:1040 ≈ 0.96, which is close to 1:1 (1.0) - approximates for better UX
+      const result = calculateAspectRatio(1000, 1040);
+      assert.equal(result, '1:1');
     });
 
     it('should handle different aspect ratios', () => {
@@ -228,6 +229,12 @@ describe('Photo Fetcher Helper Functions', () => {
       assert.equal(calculateAspectRatio(3024, 4032), '3:4'); // iPhone photo (3:4 ratio)
       assert.equal(calculateAspectRatio(4000, 3000), '4:3'); // DSLR landscape (4:3 ratio)
       assert.equal(calculateAspectRatio(2048, 2048), '1:1'); // Instagram square
+    });
+
+    it('should approximate to common ratios within tolerance', () => {
+      // 5694:4075 ≈ 1.397, which is close to 4:3 (1.333) - approximates for better UX
+      const result = calculateAspectRatio(5694, 4075);
+      assert.equal(result, '4:3');
     });
   });
 
