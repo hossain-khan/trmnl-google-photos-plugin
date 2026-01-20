@@ -252,6 +252,7 @@ app.get('/api/photo', async (c) => {
       thumbnail_url: photoData.thumbnail_url,
       caption: photoData.caption,
       timestamp: photoData.timestamp,
+      image_update_date: photoData.image_update_date,
       album_name: photoData.album_name,
       photo_count: photoData.photo_count,
     };

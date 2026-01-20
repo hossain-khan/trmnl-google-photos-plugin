@@ -109,6 +109,7 @@ Content-Type: application/json
   "thumbnail_url": "https://lh3.googleusercontent.com/...=w400-h300",
   "caption": null,
   "timestamp": "2026-01-19T09:00:00.000Z",
+  "image_update_date": "2023-01-07T18:13:24.232Z",
   "album_name": "Google Photos Shared Album",
   "photo_count": 142
 }
@@ -116,14 +117,15 @@ Content-Type: application/json
 
 **Response Fields:**
 
-| Field           | Type           | Description                                                                  |
-| --------------- | -------------- | ---------------------------------------------------------------------------- |
-| `photo_url`     | string         | Full-resolution photo URL (optimized)                                        |
-| `thumbnail_url` | string         | Lower resolution version                                                     |
-| `caption`       | string \| null | Photo caption (always `null` - not available from shared albums)             |
-| `timestamp`     | string         | ISO 8601 timestamp                                                           |
-| `album_name`    | string         | Album name (always "Google Photos Shared Album" - actual name not available) |
-| `photo_count`   | number         | Total photos in album                                                        |
+| Field               | Type           | Description                                                                  |
+| ------------------- | -------------- | ---------------------------------------------------------------------------- |
+| `photo_url`         | string         | Full-resolution photo URL (optimized)                                        |
+| `thumbnail_url`     | string         | Lower resolution version                                                     |
+| `caption`           | string \| null | Photo caption (always `null` - not available from shared albums)             |
+| `timestamp`         | string         | ISO 8601 timestamp                                                           |
+| `image_update_date` | string         | ISO 8601 timestamp when photo was last updated/taken                         |
+| `album_name`        | string         | Album name (always "Google Photos Shared Album" - actual name not available) |
+| `photo_count`       | number         | Total photos in album                                                        |
 
 **Error: Missing URL (400 Bad Request):**
 

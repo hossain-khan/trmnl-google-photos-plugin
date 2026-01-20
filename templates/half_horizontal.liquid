@@ -1,4 +1,4 @@
-<div class="layout">
+<div class="layout" style="position: relative;">
   {% if photo_url and photo_url != '' %}
   <div class="flex flex--row gap--medium md:gap--large portrait:flex--col portrait:gap--small flex--center-y h--full">
     <!-- Photo Display -->
@@ -19,6 +19,15 @@
   {% else %}
   <!-- No Photo Available -->
   {% render "error_state", size: "half" %}
+  {% endif %}
+  
+  <!-- Year Display (Bottom Right) -->
+  {% if image_update_date %}
+  <!-- Note: TRMNL Framework doesn't provide positioning utilities (absolute/relative),
+       so inline styles are used for overlay positioning -->
+  <div style="position: absolute; bottom: 0px; right: 12px;">
+    <span class="value value--large text-stroke text-stroke--large">{{ image_update_date | date: "%Y" }}</span>
+  </div>
   {% endif %}
 </div>
 
