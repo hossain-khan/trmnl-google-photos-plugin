@@ -111,7 +111,10 @@ Content-Type: application/json
   "timestamp": "2026-01-19T09:00:00.000Z",
   "image_update_date": "2023-01-07T18:13:24.232Z",
   "album_name": "Google Photos Shared Album",
-  "photo_count": 142
+  "photo_count": 142,
+  "relative_date": "4 months ago",
+  "aspect_ratio": "4:3",
+  "megapixels": 12.5
 }
 ```
 
@@ -126,6 +129,9 @@ Content-Type: application/json
 | `image_update_date` | string         | ISO 8601 timestamp when photo was last updated/taken                         |
 | `album_name`        | string         | Album name (always "Google Photos Shared Album" - actual name not available) |
 | `photo_count`       | number         | Total photos in album                                                        |
+| `relative_date`     | string         | Human-readable relative date (e.g., "4 months ago")                          |
+| `aspect_ratio`      | string         | Photo aspect ratio (e.g., "4:3", "16:9")                                     |
+| `megapixels`        | number         | Photo megapixels (calculated from width × height)                            |
 
 **Error: Missing URL (400 Bad Request):**
 
@@ -270,8 +276,12 @@ curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.ap
   "thumbnail_url": "https://lh3.googleusercontent.com/...=w400-h300",
   "caption": null,
   "timestamp": "2026-01-19T09:00:00.000Z",
+  "image_update_date": "2023-01-07T18:13:24.232Z",
   "album_name": "Google Photos Shared Album",
-  "photo_count": 142
+  "photo_count": 142,
+  "relative_date": "4 months ago",
+  "aspect_ratio": "4:3",
+  "megapixels": 12.5
 }
 ```
 
@@ -344,7 +354,7 @@ Templates are stored in TRMNL Markup Editor and render JSON data from the API. T
 - Photo count badge in title area
 - Maximizes photo visibility
 
-**Recommended Screens**: All devices, especially TRMNL V2 (1024x758)
+**Recommended Screens**: All devices, especially TRMNL X (1040x780)
 
 ### 2. Half Horizontal Layout (`half_horizontal`)
 
@@ -391,12 +401,12 @@ Templates are stored in TRMNL Markup Editor and render JSON data from the API. T
 
 Supported TRMNL devices:
 
-| Device      | Width  | Height | Bit Depth | Display Type          |
-| ----------- | ------ | ------ | --------- | --------------------- |
-| TRMNL OG    | 800px  | 480px  | 1-bit     | Monochrome (2 shades) |
-| TRMNL OG V2 | 800px  | 480px  | 2-bit     | Grayscale (4 shades)  |
-| TRMNL V2    | 1024px | 758px  | 4-bit     | Grayscale (16 shades) |
-| Kindle 2024 | 600px  | 800px  | 4-bit     | Grayscale (16 shades) |
+| Device      | Width  | Height | Bit Depth | Display Type           |
+| ----------- | ------ | ------ | --------- | ---------------------- |
+| TRMNL OG    | 800px  | 480px  | 1-bit     | Monochrome (2 shades)  |
+| TRMNL OG V2 | 800px  | 480px  | 2-bit     | Grayscale (4 shades)   |
+| TRMNL X     | 1040px | 780px  | 4-bit     | Grayscale (16 shades)  |
+| Kindle 2024 | 800px  | 480px  | 8-bit     | Grayscale (256 shades) |
 
 **Photo Optimization**:
 

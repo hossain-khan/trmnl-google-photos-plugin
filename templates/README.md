@@ -31,17 +31,14 @@ Templates receive JSON data from the backend API (`/api/photo`):
 {
   "photo_url": "https://lh3.googleusercontent.com/...=w1040-h780",
   "thumbnail_url": "https://lh3.googleusercontent.com/...=w400-h300",
-  "caption": "Photo caption/description",
+  "caption": null,
   "timestamp": "2026-01-19T14:00:00Z",
-  "album_name": "My Google Photos Album",
+  "image_update_date": "2023-01-07T18:13:24.232Z",
+  "album_name": "Google Photos Shared Album",
   "photo_count": 142,
-  "metadata": {
-    "uid": "unique-photo-id",
-    "original_width": 4032,
-    "original_height": 3024,
-    "image_update_date": "2026-01-15T10:30:00Z",
-    "album_add_date": "2026-01-10T08:00:00Z"
-  }
+  "relative_date": "4 months ago",
+  "aspect_ratio": "4:3",
+  "megapixels": 12.5
 }
 ```
 
@@ -73,6 +70,6 @@ Templates use TRMNL Framework v2 responsive utilities:
 
 - **Backend**: Cloudflare Worker returns JSON (stateless polling strategy)
 - **Rendering**: TRMNL platform merges JSON into templates
-- **Display**: Optimized for e-ink devices (800×480 TRMNL OG, 1040×780 TRMNL X)
+- **Display**: Optimized for e-ink devices (800×480 TRMNL OG, 1040×780 TRMNL X logical)
 
 For more details, see [API Documentation](../docs/API_DOCUMENTATION.md) and [Architecture](../docs/ARCHITECTURE.md).

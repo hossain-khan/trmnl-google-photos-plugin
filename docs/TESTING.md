@@ -104,7 +104,7 @@ Validates template rendering with sample data.
 
 ### 2. Image Optimization Tests
 
-Tests that images are correctly optimized for e-ink displays (800x480px).
+Tests that images are correctly optimized for e-ink displays (e.g., 800x480px for TRMNL OG, 1040x780px logical for TRMNL X).
 
 | Original Size | Aspect Ratio | Optimized Size | Expected                   | Result  |
 | ------------- | ------------ | -------------- | -------------------------- | ------- |
