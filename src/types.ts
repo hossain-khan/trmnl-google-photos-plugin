@@ -36,6 +36,7 @@ export interface PhotoData {
   thumbnail_url?: string;
   caption?: string | null;
   timestamp: string;
+  image_update_date?: string;
   album_name?: string;
   photo_count: number;
   metadata?: {

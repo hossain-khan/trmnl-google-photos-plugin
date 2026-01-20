@@ -274,19 +274,21 @@ export function convertToPhotoData(
   const albumName = sanitizeAlbumName('Google Photos Shared Album');
   const photoCount = validatePhotoCount(totalPhotos);
   const timestamp = validateTimestamp(new Date().toISOString());
+  const imageUpdateDate = validateTimestamp(new Date(photo.imageUpdateDate).toISOString());
 
   const photoData: PhotoData = {
     photo_url: photoUrl,
     thumbnail_url: thumbnailUrl,
     caption: caption,
     timestamp: timestamp,
+    image_update_date: imageUpdateDate,
     album_name: albumName,
     photo_count: photoCount,
     metadata: {
       uid: photo.uid,
       original_width: photo.width,
       original_height: photo.height,
-      image_update_date: validateTimestamp(new Date(photo.imageUpdateDate).toISOString()),
+      image_update_date: imageUpdateDate,
       album_add_date: validateTimestamp(new Date(photo.albumAddDate).toISOString()),
     },
   };

@@ -1,4 +1,4 @@
-<div class="layout">
+<div class="layout" style="position: relative;">
   <div class="flex flex--col gap--small md:gap--medium h--full">
     <!-- Photo Display Area -->
     <div class="flex flex--center-x flex--center-y h--full">
@@ -13,6 +13,13 @@
     <div class="text--center mb--small md:mb--medium">
       <span class="description md:value md:value--small lg:value lg:value--medium" data-clamp="2">Beautiful sunset at the beach with palm trees swaying in the gentle ocean breeze</span>
     </div>
+  </div>
+  
+  <!-- Year Display (Bottom Right) -->
+  <!-- Note: TRMNL Framework doesn't provide positioning utilities (absolute/relative),
+       so inline styles are used for overlay positioning -->
+  <div style="position: absolute; bottom: 0px; right: 16px;">
+    <span class="value value--xlarge text-stroke text-stroke--large">2023</span>
   </div>
 </div>
 
