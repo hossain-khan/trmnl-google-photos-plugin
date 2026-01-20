@@ -11,31 +11,31 @@ console.log('🧪 Testing /api/photo Endpoint\n');
 describe('/api/photo Endpoint', () => {
   describe('Query Parameter Parsing', () => {
     it('should handle enable_caching=true parameter', () => {
-      const enable_caching = 'true';
+      const enable_caching: string | undefined = 'true';
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
       assert.strictEqual(useCaching, true, 'Should enable caching when enable_caching=true');
     });
 
     it('should handle enable_caching=false parameter', () => {
-      const enable_caching = 'false';
+      const enable_caching: string | undefined = 'false';
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
       assert.strictEqual(useCaching, false, 'Should disable caching when enable_caching=false');
     });
 
     it('should handle enable_caching=0 parameter', () => {
-      const enable_caching = '0';
+      const enable_caching: string | undefined = '0';
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
       assert.strictEqual(useCaching, false, 'Should disable caching when enable_caching=0');
     });
 
     it('should handle enable_caching=1 parameter', () => {
-      const enable_caching = '1';
+      const enable_caching: string | undefined = '1';
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
       assert.strictEqual(useCaching, true, 'Should enable caching when enable_caching=1');
     });
 
     it('should default to enabled when parameter is undefined', () => {
-      const enable_caching = undefined;
+      const enable_caching: string | undefined = undefined;
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
       assert.strictEqual(
         useCaching,
@@ -45,7 +45,7 @@ describe('/api/photo Endpoint', () => {
     });
 
     it('should default to enabled when parameter is empty string', () => {
-      const enable_caching = '';
+      const enable_caching: string | undefined = '';
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
       assert.strictEqual(
         useCaching,
@@ -65,7 +65,7 @@ describe('/api/photo Endpoint', () => {
 
   describe('KV Namespace Selection', () => {
     it('should pass undefined KV when caching disabled', () => {
-      const enable_caching = 'false';
+      const enable_caching: string | undefined = 'false';
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
       const mockKV = { name: 'PHOTOS_CACHE' }; // Mock KV namespace
       const kvNamespace = useCaching ? mockKV : undefined;
@@ -78,7 +78,7 @@ describe('/api/photo Endpoint', () => {
     });
 
     it('should pass KV namespace when caching enabled', () => {
-      const enable_caching = 'true';
+      const enable_caching: string | undefined = 'true';
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
       const mockKV = { name: 'PHOTOS_CACHE' };
       const kvNamespace = useCaching ? mockKV : undefined;
@@ -87,7 +87,7 @@ describe('/api/photo Endpoint', () => {
     });
 
     it('should handle KV not configured gracefully', () => {
-      const enable_caching = 'true';
+      const enable_caching: string | undefined = 'true';
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
       const mockKV = undefined; // KV not configured in environment
       const kvNamespace = useCaching ? mockKV : undefined;
@@ -103,7 +103,7 @@ describe('/api/photo Endpoint', () => {
   describe('Cache Behavior Logic', () => {
     it('should respect user preference over KV availability', () => {
       // User disables caching - should not use KV even if available
-      const enable_caching = 'false';
+      const enable_caching: string | undefined = 'false';
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
       const mockKV = { name: 'PHOTOS_CACHE' };
       const kvNamespace = useCaching ? mockKV : undefined;
@@ -112,7 +112,7 @@ describe('/api/photo Endpoint', () => {
     });
 
     it('should enable caching when both user and system support it', () => {
-      const enable_caching = 'true';
+      const enable_caching: string | undefined = 'true';
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
       const mockKV = { name: 'PHOTOS_CACHE' };
       const kvNamespace = useCaching ? mockKV : undefined;
@@ -157,7 +157,7 @@ describe('/api/photo Endpoint', () => {
   describe('Backward Compatibility', () => {
     it('should maintain default behavior for existing installations', () => {
       // Existing installations won't have enable_caching parameter
-      const enable_caching = undefined;
+      const enable_caching: string | undefined = undefined;
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
 
       assert.strictEqual(
@@ -169,7 +169,7 @@ describe('/api/photo Endpoint', () => {
 
     it('should not break when TRMNL sends empty string', () => {
       // TRMNL might send empty string for boolean fields
-      const enable_caching = '';
+      const enable_caching: string | undefined = '';
       const useCaching = enable_caching !== 'false' && enable_caching !== '0';
 
       assert.strictEqual(
