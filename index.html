@@ -272,9 +272,15 @@
             width: 100%;
             align-items: start;
         }
-        @media (max-width: 968px) {
+        @media (max-width: 1024px) {
             .split-view {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .split-view {
+                gap: 0.75rem;
             }
         }
         .json-panel {
@@ -282,6 +288,11 @@
             border: 2px solid #e2e8f0;
             border-radius: 8px;
             overflow: hidden;
+        }
+        @media (max-width: 600px) {
+            .json-panel {
+                border-radius: 6px;
+            }
         }
         .json-panel h3 {
             margin: 0;
@@ -291,6 +302,12 @@
             font-size: 0.9rem;
             font-weight: 600;
             color: #2d3748;
+        }
+        @media (max-width: 600px) {
+            .json-panel h3 {
+                padding: 0.75rem;
+                font-size: 0.85rem;
+            }
         }
         .image-preview-panel {
             background: #f7fafc;
@@ -315,11 +332,33 @@
             min-height: 400px;
             background: #ffffff;
         }
+        @media (max-width: 768px) {
+            .image-preview-content {
+                min-height: 300px;
+                padding: 1rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .image-preview-content {
+                min-height: 250px;
+                padding: 0.75rem;
+            }
+        }
         .image-preview-content img {
             max-width: 100%;
             max-height: 500px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 768px) {
+            .image-preview-content img {
+                max-height: 350px;
+            }
+        }
+        @media (max-width: 600px) {
+            .image-preview-content img {
+                max-height: 280px;
+            }
         }
         .image-info {
             margin-top: 1rem;
@@ -374,6 +413,18 @@
             border-radius: 8px;
             margin: 0;
             color: #2d3748;
+        }
+        @media (max-width: 768px) {
+            #jsonContent {
+                font-size: 12px;
+                line-height: 1.5;
+            }
+        }
+        @media (max-width: 600px) {
+            #jsonContent {
+                font-size: 11px;
+                line-height: 1.4;
+            }
         }
         .example-urls {
             margin-top: 1rem;
@@ -605,6 +656,22 @@
             position: relative;
             display: inline-block;
         }
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        @media (max-width: 600px) {
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .action-buttons > a,
+            .action-buttons > button {
+                min-width: auto !important;
+                flex: 1 !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -771,6 +838,65 @@
             
             // Restore body scroll
             document.body.style.overflow = 'auto';
+        }
+        
+        /**
+         * Download photo from URL
+         */
+        function downloadPhoto(photoUrl, albumName) {
+            console.log('[Download] Starting photo download...');
+            
+            // Create a temporary link element
+            const link = document.createElement('a');
+            link.href = photoUrl;
+            
+            // Generate filename with timestamp
+            const timestamp = new Date().toISOString().split('T')[0];
+            const sanitizedAlbumName = (albumName || 'photo').replace(/[^a-z0-9]/gi, '-').toLowerCase();
+            link.download = `${sanitizedAlbumName}-${timestamp}.jpg`;
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log(`[Download] Photo downloaded as ${link.download}`);
+        }
+        
+        /**
+         * Copy JSON response to clipboard
+         */
+        function copyToClipboard(text) {
+            console.log('[Clipboard] Copying to clipboard...');
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    console.log('[Clipboard] ✓ Copied successfully');
+                    
+                    // Show brief success feedback
+                    const copyBtn = event.target;
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = '✓ Copied!';
+                    copyBtn.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+                    
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                        copyBtn.style.background = 'linear-gradient(135deg, #9f7aea 0%, #805ad5 100%)';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('[Clipboard] ✗ Failed to copy:', err);
+                    alert('Failed to copy to clipboard');
+                });
+            } else {
+                // Fallback for older browsers
+                console.warn('[Clipboard] Clipboard API not available, using fallback');
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            }
         }
         
         // Close lightbox on Escape key
@@ -948,10 +1074,39 @@
                     console.log('[API] Loading photo preview...');
                     imagePreviewContent.innerHTML = `<img src="${data.photo_url}" alt="${data.caption || 'Photo from album'}" />`;
                     imageInfo.style.display = 'block';
+                    
+                    // Build metadata display
+                    const metadataItems = [];
+                    if (data.metadata && data.metadata.original_width && data.metadata.original_height) {
+                        metadataItems.push(`<div class="metadata-item"><span class="metadata-label">📐 Dimensions:</span><span class="metadata-value">${data.metadata.original_width} × ${data.metadata.original_height}px</span></div>`);
+                    }
+                    if (data.aspect_ratio) {
+                        metadataItems.push(`<div class="metadata-item"><span class="metadata-label">📏 Aspect Ratio:</span><span class="metadata-value">${data.aspect_ratio}</span></div>`);
+                    }
+                    if (data.megapixels) {
+                        metadataItems.push(`<div class="metadata-item"><span class="metadata-label">🎨 Megapixels:</span><span class="metadata-value">${data.megapixels} MP</span></div>`);
+                    }
+                    
                     imageInfo.innerHTML = `
-                        <strong>Caption:</strong> ${data.caption || 'No caption'}<br>
-                        <strong>Album:</strong> ${data.album_name || 'Unknown'} (${data.photo_count || 0} photos)<br>
-                        <a href="${data.photo_url}" target="_blank">Open full size →</a>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="margin-bottom: 0.5rem;"><strong>📝 Caption:</strong></div>
+                            <div style="color: #4a5568; font-style: italic;">${data.caption || 'No caption available'}</div>
+                        </div>
+                        
+                        <div class="metadata-container" style="margin-top: 1rem; margin-bottom: 1rem;">
+                            <h4 style="margin: 0 0 1rem 0;">🖼️ Photo Details</h4>
+                            ${metadataItems.join('')}
+                            <div class="metadata-item">
+                                <span class="metadata-label">📚 Album:</span>
+                                <span class="metadata-value">${data.album_name || 'Unknown'} (${data.photo_count || 0} photos)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <a href="${data.photo_url}" target="_blank" style="flex: 1; min-width: 120px; padding: 0.75rem 1rem; background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; text-decoration: none; border-radius: 8px; text-align: center; font-weight: 600; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(66, 153, 225, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #4299e1 0%, #3182ce 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(66, 153, 225, 0.2)';">🔗 Open Full Size</a>
+                            <button onclick="downloadPhoto('${data.photo_url}', '${data.album_name || 'photo'}')" style="flex: 1; min-width: 120px; padding: 0.75rem 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(72, 187, 120, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #38a169 0%, #2f855a 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(72, 187, 120, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #48bb78 0%, #38a169 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(72, 187, 120, 0.2)';">⬇️ Download</button>
+                            <button onclick="copyToClipboard(JSON.stringify(${JSON.stringify(data)}, null, 2))" style="flex: 1; min-width: 120px; padding: 0.75rem 1rem; background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(159, 122, 234, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #805ad5 0%, #6b46c1 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(159, 122, 234, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #9f7aea 0%, #805ad5 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(159, 122, 234, 0.2)';">📋 Copy JSON</button>
+                        </div>
                     `;
                 } else {
                     imagePreviewContent.innerHTML = '<div style="color: #999; text-align: center;">📷<br>No photo available</div>';
