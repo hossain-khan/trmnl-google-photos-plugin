@@ -349,7 +349,7 @@ export function convertToPhotoData(
   const photoUrl = optimizePhotoUrl(photo.url);
   const thumbnailUrl = optimizePhotoUrl(photo.url, 400, 300);
   const caption = sanitizeCaption(null); // Google Photos API doesn't expose captions
-  const albumName = sanitizeAlbumName('Google Photos Shared Album');
+  const albumName = sanitizeAlbumName('Google Photos Album');
   const photoCount = validatePhotoCount(totalPhotos);
   const timestamp = validateTimestamp(new Date().toISOString());
   const imageUpdateDate = validateTimestamp(new Date(photo.imageUpdateDate).toISOString());

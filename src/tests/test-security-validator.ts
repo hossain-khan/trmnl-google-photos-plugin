@@ -115,12 +115,12 @@ describe('Caption Sanitization', (): void => {
 describe('Album Name Sanitization', (): void => {
   it('should return default for empty album names', (): void => {
     const result = sanitizeAlbumName('');
-    assert.strictEqual(result, 'Google Photos Shared Album');
+    assert.strictEqual(result, 'Google Photos Album');
   });
 
   it('should return default for null/undefined', (): void => {
-    assert.strictEqual(sanitizeAlbumName(null), 'Google Photos Shared Album');
-    assert.strictEqual(sanitizeAlbumName(undefined), 'Google Photos Shared Album');
+    assert.strictEqual(sanitizeAlbumName(null), 'Google Photos Album');
+    assert.strictEqual(sanitizeAlbumName(undefined), 'Google Photos Album');
   });
 
   it('should trim whitespace from album names', (): void => {
@@ -138,7 +138,7 @@ describe('Album Name Sanitization', (): void => {
   it('should return default for excessively long album names', (): void => {
     const longName = 'a'.repeat(SECURITY_LIMITS.MAX_ALBUM_NAME_LENGTH + 1);
     const result = sanitizeAlbumName(longName);
-    assert.strictEqual(result, 'Google Photos Shared Album');
+    assert.strictEqual(result, 'Google Photos Album');
   });
 });
 

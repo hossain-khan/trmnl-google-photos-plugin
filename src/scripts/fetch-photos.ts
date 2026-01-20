@@ -132,7 +132,7 @@ function selectRandomPhoto(photos: Photo[]): Photo | null {
 function extractAlbumName(_url: string): string {
   // For now, just use a generic name
   // In future, could parse album title from HTML
-  return 'Google Photos Shared Album';
+  return 'Google Photos Album';
 }
 
 /**

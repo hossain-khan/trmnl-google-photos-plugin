@@ -101,7 +101,7 @@ app.get('/health', (c) => {
  * {
  *   "photo_url": "https://lh3.googleusercontent.com/...",
  *   "caption": null,
- *   "album_name": "Google Photos Shared Album",
+ *   "album_name": "Google Photos Album",
  *   "photo_count": 142,
  *   "timestamp": "2026-01-18T20:00:00.000Z"
  * }
