@@ -199,35 +199,35 @@ console.log('  node scripts/fetch-photos.js <album-url>');
 
 describe('Photo Fetcher Helper Functions', () => {
   describe('calculateAspectRatio', () => {
-    it('should identify portrait orientation', () => {
+    it('should calculate portrait aspect ratio', () => {
       const result = calculateAspectRatio(1080, 1920); // Portrait (9:16)
-      assert.equal(result, '📐 Portrait');
+      assert.equal(result, '9:16');
     });
 
-    it('should identify landscape orientation', () => {
+    it('should calculate landscape aspect ratio', () => {
       const result = calculateAspectRatio(1920, 1080); // Landscape (16:9)
-      assert.equal(result, '🎬 Landscape');
+      assert.equal(result, '16:9');
     });
 
-    it('should identify square images', () => {
+    it('should calculate square aspect ratio', () => {
       const result = calculateAspectRatio(1000, 1000); // Perfect square
-      assert.equal(result, '◻️ Square');
+      assert.equal(result, '1:1');
     });
 
-    it('should identify near-square images (within 5% tolerance)', () => {
-      const result = calculateAspectRatio(1000, 1040); // 4% difference
-      assert.equal(result, '◻️ Square');
+    it('should simplify aspect ratio to lowest terms', () => {
+      const result = calculateAspectRatio(1000, 1040); // GCD = 40
+      assert.equal(result, '25:26');
     });
 
-    it('should not identify images outside tolerance as square', () => {
-      const result = calculateAspectRatio(1000, 1100); // 10% difference
-      assert.equal(result, '📐 Portrait');
+    it('should handle different aspect ratios', () => {
+      const result = calculateAspectRatio(1000, 1100); // GCD = 100
+      assert.equal(result, '10:11');
     });
 
     it('should handle various real-world photo dimensions', () => {
-      assert.equal(calculateAspectRatio(3024, 4032), '📐 Portrait'); // iPhone photo
-      assert.equal(calculateAspectRatio(4000, 3000), '🎬 Landscape'); // DSLR landscape
-      assert.equal(calculateAspectRatio(2048, 2048), '◻️ Square'); // Instagram square
+      assert.equal(calculateAspectRatio(3024, 4032), '3:4'); // iPhone photo (3:4 ratio)
+      assert.equal(calculateAspectRatio(4000, 3000), '4:3'); // DSLR landscape (4:3 ratio)
+      assert.equal(calculateAspectRatio(2048, 2048), '1:1'); // Instagram square
     });
   });
 

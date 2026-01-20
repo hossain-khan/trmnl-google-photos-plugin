@@ -255,23 +255,36 @@ export function optimizePhotoUrl(
 }
 
 /**
- * Calculate aspect ratio category from image dimensions
+ * Calculate greatest common divisor using Euclidean algorithm
+ * Helper function for simplifying aspect ratios
+ *
+ * @param a - First number
+ * @param b - Second number
+ * @returns Greatest common divisor
+ */
+function gcd(a: number, b: number): number {
+  return b === 0 ? a : gcd(b, a % b);
+}
+
+/**
+ * Calculate aspect ratio from image dimensions
+ * Returns standard width:height format (e.g., 16:9, 4:3, 1:1)
  *
  * @param width - Image width in pixels
  * @param height - Image height in pixels
- * @returns Aspect ratio string with emoji (e.g., "📐 Portrait", "🎬 Landscape", "◻️ Square")
+ * @returns Aspect ratio in width:height format (e.g., "16:9", "4:3", "1:1")
+ *
+ * @example
+ * calculateAspectRatio(1920, 1080) // Returns "16:9"
+ * calculateAspectRatio(1080, 1920) // Returns "9:16" (portrait)
+ * calculateAspectRatio(1000, 1000) // Returns "1:1" (square)
  */
 export function calculateAspectRatio(width: number, height: number): string {
-  const ratio = width / height;
-  const threshold = 0.05; // 5% tolerance for "square"
+  const divisor = gcd(width, height);
+  const simplifiedWidth = width / divisor;
+  const simplifiedHeight = height / divisor;
 
-  if (Math.abs(ratio - 1) < threshold) {
-    return '◻️ Square';
-  } else if (height > width) {
-    return '📐 Portrait';
-  } else {
-    return '🎬 Landscape';
-  }
+  return `${simplifiedWidth}:${simplifiedHeight}`;
 }
 
 /**
