@@ -325,7 +325,7 @@ export function formatRelativeDate(isoDate: string): string {
     } else {
       return 'Just now';
     }
-  } catch (error) {
+  } catch {
     // Fallback to extracting just the year if parsing fails
     const yearMatch = isoDate.match(/^\d{4}/);
     return yearMatch ? yearMatch[0] : 'Unknown';
