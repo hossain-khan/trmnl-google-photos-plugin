@@ -172,29 +172,32 @@ export function validateTimestamp(timestamp: string | null | undefined): string 
  * @param photoData - The photo data to validate
  * @returns True if all fields are valid, false otherwise
  */
-export function validatePhotoData(photoData: any): boolean {
+export function validatePhotoData(photoData: unknown): boolean {
   // Type guard - ensure photoData is an object
   if (!photoData || typeof photoData !== 'object') {
     console.error('Invalid photo data: not an object');
     return false;
   }
 
+  // Type assertion after validation
+  const data = photoData as Record<string, unknown>;
+
   // Validate photo URL (required)
-  const photoUrl = photoData.photo_url as unknown;
+  const photoUrl = data.photo_url;
   if (!isValidPhotoUrl(typeof photoUrl === 'string' ? photoUrl : null)) {
     console.error('Invalid photo URL detected in response');
     return false;
   }
 
   // Validate thumbnail URL if present
-  const thumbnailUrl = photoData.thumbnail_url as unknown;
+  const thumbnailUrl = data.thumbnail_url;
   if (thumbnailUrl && !isValidPhotoUrl(typeof thumbnailUrl === 'string' ? thumbnailUrl : null)) {
     console.error('Invalid thumbnail URL detected in response');
     return false;
   }
 
   // Validate photo count is within acceptable range (before clamping)
-  const rawCount = photoData.photo_count as unknown;
+  const rawCount = data.photo_count;
   if (
     typeof rawCount === 'number' &&
     (rawCount < SECURITY_LIMITS.MIN_PHOTO_COUNT || rawCount > SECURITY_LIMITS.MAX_PHOTO_COUNT)

@@ -219,14 +219,14 @@ describe('Caption Sanitization', (): void => {
     const caption = 'Test "caption" with \\backslashes and \nnewlines';
     // Validate that JSON.stringify handles these correctly
     const jsonStr = JSON.stringify({ caption });
-    const parsed = JSON.parse(jsonStr);
+    const parsed = JSON.parse(jsonStr) as { caption: string };
     assert.strictEqual(parsed.caption, caption);
   });
 
   it('should handle captions with Unicode and emoji', (): void => {
     const caption = 'Beautiful sunset 🌅 with friends 👫';
     const jsonStr = JSON.stringify({ caption });
-    const parsed = JSON.parse(jsonStr);
+    const parsed = JSON.parse(jsonStr) as { caption: string };
     assert.strictEqual(parsed.caption, caption);
   });
 });

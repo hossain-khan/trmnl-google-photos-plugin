@@ -33,7 +33,7 @@ interface Targets {
   urlParse: number;
 }
 
-interface MeasurementResult<T = any> {
+interface MeasurementResult<T = unknown> {
   name: string;
   duration: number;
   success: boolean;
@@ -123,7 +123,10 @@ async function measureTime<T>(
  */
 async function testUrlParsing(): Promise<MeasurementResult<unknown>[]> {
   // Load URL parser
-  const { parseAlbumUrl } = await import(join(projectRoot, 'src', 'lib', 'url-parser'));
+  const urlParserModule = (await import(join(projectRoot, 'src', 'lib', 'url-parser'))) as {
+    parseAlbumUrl: (url: string) => unknown;
+  };
+  const { parseAlbumUrl } = urlParserModule;
 
   const testUrls: string[] = [
     'https://photos.app.goo.gl/ENK6C44K85QgVHPH8',
@@ -135,7 +138,6 @@ async function testUrlParsing(): Promise<MeasurementResult<unknown>[]> {
 
   for (const url of testUrls) {
     const result = await measureTime(`Parse: ${url.substring(0, 40)}...`, () => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return parseAlbumUrl(url);
     });
     results.push(result);

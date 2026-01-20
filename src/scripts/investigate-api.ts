@@ -98,8 +98,11 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
       validateStatus: (status) => status < 400,
     });
 
-    findings.redirectedUrl =
-      (response.request.res as { responseUrl?: string }).responseUrl || albumUrl;
+    // Get final URL after redirects
+    // Type assertion needed because axios types response.request.res as any
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const resWithUrl = response.request.res as { responseUrl?: string } | undefined;
+    findings.redirectedUrl = resWithUrl?.responseUrl ?? albumUrl;
     console.log(`✓ Final URL: ${findings.redirectedUrl}`);
 
     // Step 2: Extract album ID from URL
@@ -144,7 +147,8 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
       if ($(script).attr('type') === 'application/ld+json') {
         console.log('✓ Found JSON-LD structured data');
         try {
-          const jsonData = JSON.parse($(script).html() || '{}');
+          const htmlContent = $(script).html();
+          const jsonData: unknown = htmlContent ? JSON.parse(htmlContent) : {};
           findings.metadata.jsonLd = jsonData;
         } catch {
           console.log('⚠️  Failed to parse JSON-LD data');
