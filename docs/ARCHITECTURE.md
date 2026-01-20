@@ -179,10 +179,15 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 ```json
 {
   "photo_url": "https://lh3.googleusercontent.com/...",
-  "caption": "Beautiful sunset",
+  "thumbnail_url": "https://lh3.googleusercontent.com/...",
+  "caption": null,
   "timestamp": "2026-01-18T19:00:00Z",
-  "album_name": "Summer Vacation 2026",
-  "photo_count": 142
+  "image_update_date": "2023-01-07T18:13:24.232Z",
+  "album_name": "Google Photos Shared Album",
+  "photo_count": 142,
+  "relative_date": "4 months ago",
+  "aspect_ratio": "4:3",
+  "megapixels": 12.5
 }
 ```
 
