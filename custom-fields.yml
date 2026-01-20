@@ -63,3 +63,10 @@
   name: Show Photo Year
   description: "Display the photo year in the bottom right corner"
   help_text: When enabled, the year from the photo's date appears in the bottom right corner with a white stroke for visibility. Disable if you prefer a cleaner photo display.
+- keyname: show_metadata
+  field_type: boolean
+  default: true
+  optional: true
+  name: Show Photo Metadata
+  description: "Display photo date, resolution, and count in the title bar"
+  help_text: When enabled, shows photo metadata in the title bar (e.g., '2 years ago • 12MP • 142 photos'). When disabled, only shows photo count as a separate badge for a minimal display.

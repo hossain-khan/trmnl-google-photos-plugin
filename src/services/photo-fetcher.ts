@@ -255,6 +255,84 @@ export function optimizePhotoUrl(
 }
 
 /**
+ * Calculate aspect ratio category from image dimensions
+ *
+ * @param width - Image width in pixels
+ * @param height - Image height in pixels
+ * @returns Aspect ratio string with emoji (e.g., "📐 Portrait", "🎬 Landscape", "◻️ Square")
+ */
+export function calculateAspectRatio(width: number, height: number): string {
+  const ratio = width / height;
+  const threshold = 0.05; // 5% tolerance for "square"
+
+  if (Math.abs(ratio - 1) < threshold) {
+    return '◻️ Square';
+  } else if (height > width) {
+    return '📐 Portrait';
+  } else {
+    return '🎬 Landscape';
+  }
+}
+
+/**
+ * Calculate megapixels from image dimensions
+ * Rounds to nearest 0.5 MP for cleaner display
+ *
+ * @param width - Image width in pixels
+ * @param height - Image height in pixels
+ * @returns Megapixels rounded to nearest 0.5 (e.g., 12, 12.5, 13)
+ *
+ * @example
+ * calculateMegapixels(3024, 4032) // = 12.2 → 12 MP
+ * calculateMegapixels(1920, 1080) // = 2.1 → 2 MP
+ * calculateMegapixels(4000, 3000) // = 12 → 12 MP
+ */
+export function calculateMegapixels(width: number, height: number): number {
+  const megapixels = (width * height) / 1_000_000;
+  // Round to nearest 0.5
+  return Math.round(megapixels * 2) / 2;
+}
+
+/**
+ * Convert ISO timestamp to relative date format
+ * Examples: "2 years ago", "3 months ago", "5 days ago", "Just now"
+ *
+ * @param isoDate - ISO 8601 timestamp string
+ * @returns Relative date string
+ */
+export function formatRelativeDate(isoDate: string): string {
+  try {
+    const date = new Date(isoDate);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    const diffMonths = Math.floor(diffDays / 30);
+    const diffYears = Math.floor(diffDays / 365);
+
+    if (diffYears > 0) {
+      return diffYears === 1 ? '1 year ago' : `${diffYears} years ago`;
+    } else if (diffMonths > 0) {
+      return diffMonths === 1 ? '1 month ago' : `${diffMonths} months ago`;
+    } else if (diffDays > 0) {
+      return diffDays === 1 ? '1 day ago' : `${diffDays} days ago`;
+    } else if (diffHours > 0) {
+      return diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`;
+    } else if (diffMinutes > 0) {
+      return diffMinutes === 1 ? '1 minute ago' : `${diffMinutes} minutes ago`;
+    } else {
+      return 'Just now';
+    }
+  } catch {
+    // Fallback to extracting just the year if parsing fails
+    const yearMatch = isoDate.match(/^\d{4}/);
+    return yearMatch ? yearMatch[0] : 'Unknown';
+  }
+}
+
+/**
  * Convert Google Photo to PhotoData format for templates
  *
  * @param photo - Google Photo object
@@ -275,6 +353,9 @@ export function convertToPhotoData(
   const photoCount = validatePhotoCount(totalPhotos);
   const timestamp = validateTimestamp(new Date().toISOString());
   const imageUpdateDate = validateTimestamp(new Date(photo.imageUpdateDate).toISOString());
+  const relativeDate = formatRelativeDate(imageUpdateDate);
+  const aspectRatio = calculateAspectRatio(photo.width, photo.height);
+  const megapixels = calculateMegapixels(photo.width, photo.height);
 
   const photoData: PhotoData = {
     photo_url: photoUrl,
@@ -284,6 +365,9 @@ export function convertToPhotoData(
     image_update_date: imageUpdateDate,
     album_name: albumName,
     photo_count: photoCount,
+    relative_date: relativeDate,
+    aspect_ratio: aspectRatio,
+    megapixels: megapixels,
     metadata: {
       uid: photo.uid,
       original_width: photo.width,

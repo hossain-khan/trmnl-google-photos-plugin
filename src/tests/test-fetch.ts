@@ -7,6 +7,14 @@
  * without requiring actual network access.
  */
 
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  calculateAspectRatio,
+  calculateMegapixels,
+  formatRelativeDate,
+} from '../services/photo-fetcher.js';
+
 interface MockPhoto {
   uid: string;
   url: string;
@@ -184,3 +192,174 @@ console.log('  ✓ Output data structure validated (not saved - worker fetches d
 console.log('\n✅ All tests passed!');
 console.log('\nNote: This is a mock test. To test with real albums, run:');
 console.log('  node scripts/fetch-photos.js <album-url>');
+
+// ============================================================================
+// Unit Tests for Photo Fetcher Helper Functions
+// ============================================================================
+
+describe('Photo Fetcher Helper Functions', () => {
+  describe('calculateAspectRatio', () => {
+    it('should identify portrait orientation', () => {
+      const result = calculateAspectRatio(1080, 1920); // Portrait (9:16)
+      assert.equal(result, '📐 Portrait');
+    });
+
+    it('should identify landscape orientation', () => {
+      const result = calculateAspectRatio(1920, 1080); // Landscape (16:9)
+      assert.equal(result, '🎬 Landscape');
+    });
+
+    it('should identify square images', () => {
+      const result = calculateAspectRatio(1000, 1000); // Perfect square
+      assert.equal(result, '◻️ Square');
+    });
+
+    it('should identify near-square images (within 5% tolerance)', () => {
+      const result = calculateAspectRatio(1000, 1040); // 4% difference
+      assert.equal(result, '◻️ Square');
+    });
+
+    it('should not identify images outside tolerance as square', () => {
+      const result = calculateAspectRatio(1000, 1100); // 10% difference
+      assert.equal(result, '📐 Portrait');
+    });
+
+    it('should handle various real-world photo dimensions', () => {
+      assert.equal(calculateAspectRatio(3024, 4032), '📐 Portrait'); // iPhone photo
+      assert.equal(calculateAspectRatio(4000, 3000), '🎬 Landscape'); // DSLR landscape
+      assert.equal(calculateAspectRatio(2048, 2048), '◻️ Square'); // Instagram square
+    });
+  });
+
+  describe('calculateMegapixels', () => {
+    it('should calculate megapixels for typical phone camera', () => {
+      const result = calculateMegapixels(3024, 4032); // iPhone 12 MP
+      assert.equal(result, 12); // 12.192768 → 12
+    });
+
+    it('should calculate megapixels for Full HD', () => {
+      const result = calculateMegapixels(1920, 1080); // 1080p
+      assert.equal(result, 2); // 2.0736 → 2
+    });
+
+    it('should calculate megapixels for 4K', () => {
+      const result = calculateMegapixels(3840, 2160); // 4K
+      assert.equal(result, 8.5); // 8.294400 → 8.5
+    });
+
+    it('should calculate megapixels for high-resolution DSLR', () => {
+      const result = calculateMegapixels(6000, 4000); // 24 MP DSLR
+      assert.equal(result, 24); // 24.0 → 24
+    });
+
+    it('should round to nearest 0.5 MP', () => {
+      assert.equal(calculateMegapixels(2000, 1500), 3); // 3.0 → 3
+      assert.equal(calculateMegapixels(2200, 1500), 3.5); // 3.3 → 3.5
+      assert.equal(calculateMegapixels(2500, 1500), 4); // 3.75 → 4
+    });
+
+    it('should handle very small images (thumbnails)', () => {
+      const result = calculateMegapixels(400, 300); // Thumbnail
+      assert.equal(result, 0); // 0.12 → 0
+    });
+
+    it('should handle very large images (professional cameras)', () => {
+      const result = calculateMegapixels(8688, 5792); // 50 MP medium format
+      assert.equal(result, 50.5); // 50.331696 → 50.5
+    });
+
+    it('should handle square images', () => {
+      const result = calculateMegapixels(2048, 2048); // Instagram square
+      assert.equal(result, 4); // 4.194304 → 4
+    });
+  });
+
+  describe('formatRelativeDate', () => {
+    it('should format dates from years ago', () => {
+      const twoYearsAgo = new Date();
+      twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+      const result = formatRelativeDate(twoYearsAgo.toISOString());
+      assert.equal(result, '2 years ago');
+    });
+
+    it('should format dates from one year ago', () => {
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      const result = formatRelativeDate(oneYearAgo.toISOString());
+      assert.equal(result, '1 year ago');
+    });
+
+    it('should format dates from months ago', () => {
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      const result = formatRelativeDate(threeMonthsAgo.toISOString());
+      assert.equal(result, '3 months ago');
+    });
+
+    it('should format dates from one month ago', () => {
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      const result = formatRelativeDate(oneMonthAgo.toISOString());
+      assert.equal(result, '1 month ago');
+    });
+
+    it('should format dates from days ago', () => {
+      const fiveDaysAgo = new Date();
+      fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+      const result = formatRelativeDate(fiveDaysAgo.toISOString());
+      assert.equal(result, '5 days ago');
+    });
+
+    it('should format dates from one day ago', () => {
+      const oneDayAgo = new Date();
+      oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+      const result = formatRelativeDate(oneDayAgo.toISOString());
+      assert.equal(result, '1 day ago');
+    });
+
+    it('should format dates from hours ago', () => {
+      const threeHoursAgo = new Date();
+      threeHoursAgo.setHours(threeHoursAgo.getHours() - 3);
+      const result = formatRelativeDate(threeHoursAgo.toISOString());
+      assert.equal(result, '3 hours ago');
+    });
+
+    it('should format dates from one hour ago', () => {
+      const oneHourAgo = new Date();
+      oneHourAgo.setHours(oneHourAgo.getHours() - 1);
+      const result = formatRelativeDate(oneHourAgo.toISOString());
+      assert.equal(result, '1 hour ago');
+    });
+
+    it('should format dates from minutes ago', () => {
+      const tenMinutesAgo = new Date();
+      tenMinutesAgo.setMinutes(tenMinutesAgo.getMinutes() - 10);
+      const result = formatRelativeDate(tenMinutesAgo.toISOString());
+      assert.equal(result, '10 minutes ago');
+    });
+
+    it('should format dates from one minute ago', () => {
+      const oneMinuteAgo = new Date();
+      oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
+      const result = formatRelativeDate(oneMinuteAgo.toISOString());
+      assert.equal(result, '1 minute ago');
+    });
+
+    it('should format very recent dates as "Just now"', () => {
+      const now = new Date();
+      const result = formatRelativeDate(now.toISOString());
+      assert.equal(result, 'Just now');
+    });
+
+    it('should handle invalid ISO dates by returning Just now (NaN calculation)', () => {
+      // Invalid ISO format - new Date() creates Invalid Date, getTime() returns NaN
+      // NaN calculations result in all conditions failing → "Just now"
+      const result1 = formatRelativeDate('2020-99-99T99:99:99Z');
+      assert.equal(result1, 'Just now');
+
+      // Completely invalid format also results in Invalid Date
+      const result2 = formatRelativeDate('not-a-date-at-all');
+      assert.equal(result2, 'Just now');
+    });
+  });
+});
