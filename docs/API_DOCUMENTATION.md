@@ -21,7 +21,7 @@ Returns basic information about the service.
 
 ```http
 GET / HTTP/1.1
-Host: trmnl-google-photos.workers.dev
+Host: trmnl-google-photos.gohk.xyz
 ```
 
 **Response (200 OK):**
@@ -30,7 +30,7 @@ Host: trmnl-google-photos.workers.dev
 {
   "status": "ok",
   "service": "trmnl-google-photos-plugin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "environment": "production",
   "timestamp": "2026-01-18T20:48:00.000Z",
   "message": "TRMNL Google Photos Plugin is running"
@@ -49,7 +49,7 @@ Dedicated health check endpoint for monitoring.
 
 ```http
 GET /health HTTP/1.1
-Host: trmnl-google-photos.workers.dev
+Host: trmnl-google-photos.gohk.xyz
 ```
 
 **Response (200 OK):**
@@ -58,7 +58,7 @@ Host: trmnl-google-photos.workers.dev
 {
   "status": "healthy",
   "service": "trmnl-google-photos-plugin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "environment": "production",
   "timestamp": "2026-01-18T20:48:00.000Z",
   "uptime": "N/A"
@@ -84,9 +84,10 @@ Host: trmnl-google-photos.gohk.xyz
 
 **Query Parameters:**
 
-| Parameter   | Type   | Required | Description                    |
-| ----------- | ------ | -------- | ------------------------------ |
-| `album_url` | string | Yes      | Google Photos shared album URL |
+| Parameter        | Type   | Required | Description                                                   |
+| ---------------- | ------ | -------- | ------------------------------------------------------------- |
+| `album_url`      | string | Yes      | Google Photos shared album URL                                |
+| `enable_caching` | string | No       | Enable/disable caching: 'true'/'false'/'1'/'0' (default true) |
 
 **Supported Album URL Formats:**
 
@@ -599,6 +600,6 @@ For issues or questions:
 
 ---
 
-**API Version**: 0.1.0  
+**API Version**: 0.2.0  
 **Last Updated**: January 19, 2026  
 **Status**: Production Ready

@@ -58,7 +58,7 @@ This plugin is built with privacy at its core:
 - ✅ **Public Albums Only** - Only accesses albums you've explicitly shared
 - ✅ **Direct Access** - Photos load directly from Google's servers to your device
 
-**What's cached (when enabled)?** Only album metadata (photo URLs) for 1 hour. Your actual photos stay on Google's servers and are never stored by us. You can disable caching entirely in the plugin settings if you prefer—though this will result in slower loading times (3-5 seconds vs 67ms).
+**What's cached (when enabled)?** Only album metadata (photo URLs) for 1 hour. Your actual photos stay on Google's servers and are never stored by us. You can disable caching entirely in the plugin settings if you prefer—though this will result in slower loading times (1-2 seconds vs 67ms).
 
 Your photos stay private. We simply help your TRMNL display them.
 

@@ -300,7 +300,7 @@ For contributors adding new features:
 
 | Date       | Version | Update                          |
 | ---------- | ------- | ------------------------------- |
-| 2026-01-19 | 0.1.0   | Initial security implementation |
+| 2026-01-19 | 0.2.0   | Initial security implementation |
 
 ## References
 

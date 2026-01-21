@@ -499,8 +499,8 @@ Planned GitHub Actions workflow:
 
 ```yaml
 strategy: polling
-polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}
-refresh_frequency: 60 # minutes (1 hour)
+polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}
+refresh_frequency: 3600 # seconds (1 hour)
 ```
 
 **Why Not Webhook?**
