@@ -146,10 +146,21 @@ app.get('/api/photo', async (c) => {
           'https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/images/google-photos-demo-picture-small.jpg',
         thumbnail_url:
           'https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/images/google-photos-demo-picture-thumb.jpg',
-        caption: 'Demo photo from Google Photos Shared Album TRMNL plugin',
+        caption: null,
         timestamp: '2024-06-25T12:00:00.000Z',
+        image_update_date: '2024-06-25T12:00:00.000Z',
         album_name: 'TRMNL Demo Album - Google Photos',
         photo_count: 142,
+        relative_date: '1 year ago',
+        aspect_ratio: '4:3',
+        megapixels: 12,
+        metadata: {
+          uid: 'demo-photo-001',
+          original_width: 1024,
+          original_height: 768,
+          image_update_date: '2024-06-25T12:00:00.000Z',
+          album_add_date: '2024-06-25T12:00:00.000Z',
+        },
       };
 
       // Add response headers
