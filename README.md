@@ -113,6 +113,29 @@ This plugin uses **reverse-engineered endpoints** from Google Photos to access s
 
 **Use at your own risk.** This plugin is similar to other community plugins (e.g., Apple Photos) that use reverse-engineered APIs.
 
+## 🎯 Generic Template for TRMNL Plugins
+
+This repository includes a **generic `copilot-instructions.md` template** that can be used as a starting point for any TRMNL plugin project. The template includes:
+
+- ✅ Comprehensive TRMNL Framework v2 documentation
+- ✅ Device specifications and responsive breakpoints
+- ✅ Common design patterns and best practices
+- ✅ Layout system guidelines (full, half, quadrant)
+- ✅ Error handling patterns
+- ✅ Testing strategies
+- ✅ Code style guidelines
+- ✅ Quick reference for framework classes
+
+### Using the Template
+
+1. **Copy** `copilot-instructions.md` to your new TRMNL plugin project
+2. **Replace** placeholder text with your project-specific information
+3. **Customize** sections to match your plugin's unique requirements
+4. **Remove** sections that don't apply to your project
+5. **Add** project-specific patterns and conventions
+
+The template emphasizes using TRMNL Framework utilities extensively and follows best practices from the [TRMNL Plugin Guides](https://help.usetrmnl.com/en/collections/7820559-plugin-guides).
+
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details
