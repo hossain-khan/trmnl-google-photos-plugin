@@ -134,6 +134,8 @@ This repository includes a **generic `copilot-instructions.md` template** that c
 4. **Remove** sections that don't apply to your project
 5. **Add** project-specific patterns and conventions
 
+For detailed step-by-step instructions, see [TEMPLATE_USAGE.md](TEMPLATE_USAGE.md).
+
 The template emphasizes using TRMNL Framework utilities extensively and follows best practices from the [TRMNL Plugin Guides](https://help.usetrmnl.com/en/collections/7820559-plugin-guides).
 
 ## 📄 License
