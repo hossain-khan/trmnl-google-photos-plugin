@@ -38,68 +38,6 @@ function closeLightbox() {
   document.body.style.overflow = 'auto';
 }
 
-/**
- * Download photo from URL
- */
-function downloadPhoto(photoUrl, albumName) {
-  console.log('[Download] Starting photo download...');
-
-  // Create a temporary link element
-  const link = document.createElement('a');
-  link.href = photoUrl;
-
-  // Generate filename with timestamp
-  const timestamp = new Date().toISOString().split('T')[0];
-  const sanitizedAlbumName = (albumName || 'photo').replace(/[^a-z0-9]/gi, '-').toLowerCase();
-  link.download = `${sanitizedAlbumName}-${timestamp}.jpg`;
-
-  // Trigger download
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  console.log(`[Download] Photo downloaded as ${link.download}`);
-}
-
-/**
- * Copy JSON response to clipboard
- */
-function copyToClipboard(text) {
-  console.log('[Clipboard] Copying to clipboard...');
-
-  if (navigator.clipboard) {
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        console.log('[Clipboard] ✓ Copied successfully');
-
-        // Show brief success feedback
-        const copyBtn = event.target;
-        const originalText = copyBtn.textContent;
-        copyBtn.textContent = '✓ Copied!';
-        copyBtn.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
-
-        setTimeout(() => {
-          copyBtn.textContent = originalText;
-          copyBtn.style.background = 'linear-gradient(135deg, #9f7aea 0%, #805ad5 100%)';
-        }, 2000);
-      })
-      .catch((err) => {
-        console.error('[Clipboard] ✗ Failed to copy:', err);
-        alert('Failed to copy to clipboard');
-      });
-  } else {
-    // Fallback for older browsers
-    console.warn('[Clipboard] Clipboard API not available, using fallback');
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textArea);
-  }
-}
-
 // Close lightbox on Escape key
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') {
@@ -318,12 +256,6 @@ async function fetchPhotoData() {
                         <span class="metadata-label">📚 Album:</span>
                         <span class="metadata-value">${data.album_name || 'Unknown'} (${data.photo_count || 0} photos)</span>
                     </div>
-                </div>
-                
-                <div class="action-buttons">
-                    <a href="${data.photo_url}" target="_blank" style="flex: 1; min-width: 120px; padding: 0.75rem 1rem; background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; text-decoration: none; border-radius: 8px; text-align: center; font-weight: 600; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #3182ce 0%, #2c5aa0 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(66, 153, 225, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #4299e1 0%, #3182ce 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(66, 153, 225, 0.2)';">🔗 Open Full Size</a>
-                    <button onclick="downloadPhoto('${data.photo_url}', '${data.album_name || 'photo'}')" style="flex: 1; min-width: 120px; padding: 0.75rem 1rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(72, 187, 120, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #38a169 0%, #2f855a 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(72, 187, 120, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #48bb78 0%, #38a169 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(72, 187, 120, 0.2)';">⬇️ Download</button>
-                    <button onclick="copyToClipboard(JSON.stringify(${JSON.stringify(data)}, null, 2))" style="flex: 1; min-width: 120px; padding: 0.75rem 1rem; background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(159, 122, 234, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #805ad5 0%, #6b46c1 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(159, 122, 234, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #9f7aea 0%, #805ad5 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(159, 122, 234, 0.2)';">📋 Copy JSON</button>
                 </div>
             `;
     } else {

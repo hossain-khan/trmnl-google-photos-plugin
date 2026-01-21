@@ -10,7 +10,7 @@ Main stylesheet for the demo page. Contains:
 
 - Responsive design with mobile-first approach
 - Media queries for breakpoints: 1024px (desktop), 768px (tablet), 600px (mobile)
-- Component styles: demo-section, metadata-container, action-buttons, status-badge, etc.
+- Component styles: demo-section, metadata-container, status-badge, etc.
 - Animations: pulse, spin, fadeIn, zoomIn
 - Lightbox and preview panel styles
 
