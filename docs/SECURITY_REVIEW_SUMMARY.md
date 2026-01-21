@@ -1,7 +1,7 @@
 # Security Review Summary - JSON API
 
 **Date**: January 19, 2026  
-**Version**: 0.1.0  
+**Version**: 0.2.0  
 **Reviewer**: GitHub Copilot (AI Security Review)  
 **Status**: ✅ **PASSED - Ready for Production**
 
