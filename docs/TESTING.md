@@ -151,15 +151,12 @@ Validates that the output JSON matches the expected format for TRMNL.
   "thumbnail_url": "https://lh3.googleusercontent.com/...=w400-h300",
   "caption": null,
   "timestamp": "2026-01-18T15:48:35.334Z",
+  "image_update_date": "2011-10-02T10:45:14.000Z",
   "album_name": "Google Photos Shared Album",
   "photo_count": 3,
-  "metadata": {
-    "uid": "AF1QipO4_...",
-    "original_width": 640,
-    "original_height": 480,
-    "image_update_date": "2011-10-02T10:45:14.000Z",
-    "album_add_date": "2019-07-27T12:12:38.506Z"
-  }
+  "relative_date": "14 years ago",
+  "aspect_ratio": "4:3",
+  "megapixels": 0.3
 }
 ```
 
@@ -168,8 +165,11 @@ Validates that the output JSON matches the expected format for TRMNL.
 - ✅ `photo_url` includes size parameters
 - ✅ `thumbnail_url` has smaller dimensions
 - ✅ `timestamp` is ISO 8601 format
+- ✅ `image_update_date` is ISO 8601 format
 - ✅ `photo_count` is correct
-- ✅ `metadata` includes all required fields
+- ✅ `relative_date` is human-readable
+- ✅ `aspect_ratio` is extracted
+- ✅ `megapixels` is calculated
 
 **Result**: ✅ Output structure is correct
 
