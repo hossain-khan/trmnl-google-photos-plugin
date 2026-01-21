@@ -13,6 +13,7 @@ export default tseslint.config(
       '*.min.js',
       'coverage/**',
       'worker-configuration.d.ts',
+      'assets/**',
     ],
   },
   eslint.configs.recommended,
