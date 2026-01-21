@@ -330,28 +330,4 @@ document.getElementById('albumUrl').addEventListener('keypress', function (e) {
   }
 });
 
-/**
- * Toggle badge tooltip visibility
- */
-function toggleBadgeTooltip() {
-  const tooltip = document.getElementById('badgeTooltip');
-  tooltip.classList.toggle('show');
-
-  // Auto-hide after 3 seconds
-  if (tooltip.classList.contains('show')) {
-    setTimeout(() => {
-      tooltip.classList.remove('show');
-    }, 3000);
-  }
-}
-
-// Close tooltip when clicking outside
-document.addEventListener('click', function (e) {
-  const badge = document.getElementById('showTrmnlBadge');
-  const tooltip = document.getElementById('badgeTooltip');
-  if (badge && tooltip && !badge.contains(e.target)) {
-    tooltip.classList.remove('show');
-  }
-});
-
 console.log('[TRMNL] All event listeners registered');
