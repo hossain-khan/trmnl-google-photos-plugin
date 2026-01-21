@@ -5,21 +5,7 @@
   field_type: author_bio
   category: images,personal
   description: |
-    Google Photos Shared Album brings your cherished memories to your TRMNL device by displaying random photos from your Google Photos shared albums—no authentication required.
-    <br><br>
-    <strong>🔑 Privacy-First Design:</strong><br>
-    🔒 No OAuth or Google account linking required<br>
-    🚫 No personal data storage—never stores your photos or account info<br>
-    ⚙️ User-controlled caching—enable for speed (80% faster) or disable for maximum privacy<br>
-    🔗 Simply paste your shared album link and photos appear<br>
-    🌐 Open source and transparent—review the code anytime
-    <br><br>
-    <strong>Features:</strong><br>
-    📸 Random photo selection from your shared albums<br>
-    ⏰ Automatic hourly refresh with new photos<br>
-    🎨 Four optimized layouts for all TRMNL device sizes<br>
-    📱 Responsive design across all e-ink displays<br>
-    🖼️ Photo count display
+    Google Photos Shared Album brings your cherished memories to your TRMNL device by displaying random photos from your Google Photos shared albums — no authentication required.
     <br><br>
     <strong>How It Works:</strong><br>
     1. Create a shared album in Google Photos<br>
@@ -28,15 +14,14 @@
     4. Photos automatically appear on your TRMNL device<br>
     5. New random photo displayed every hour or day based on your refresh configuration
     <br><br>
-    <strong>Perfect For:</strong><br>
-    👨‍👩‍👧‍👦 Family photo galleries<br>
-    🏖️ Vacation memories<br>
-    🎉 Event highlights<br>
-    🐾 Pet photo collections<br>
-    🎨 Photography portfolios<br>
-    💝 Gift displays for loved ones
+    <strong>Features:</strong><br>
+    📸 Random photo selection from your shared albums<br>
+    ⏰ Automatic refresh with new random photos<br>
+    🎨 Four optimized layouts for all TRMNL device sizes<br>
+    📱 Responsive design across all e-ink displays<br>
+    🖼️ Display photo metadata
     <br><br>
-    <strong>Data Privacy:</strong> This plugin prioritizes your privacy. You control whether album metadata is cached: enable caching for 80% faster performance (1-hour cache), or disable it for fresh API calls every time. When caching is enabled, only album metadata (photo URLs) is temporarily cached—your actual photos are never stored and remain on Google's servers. Your album URL is only used to fetch photos in real-time. No cookies, no tracking, no personal data retention. Fully GDPR and privacy compliant.
+    <strong>Privacy-First Design:</strong> This plugin prioritizes your privacy—no OAuth or Google account linking required. No cookies, no tracking, no personal data retention. 
   github_url: https://github.com/hossain-khan/trmnl-google-photos-plugin
   learn_more_url: https://hossain-khan.github.io/trmnl-google-photos-plugin/
   email_address: trmnl@hossain.dev
