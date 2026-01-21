@@ -28,7 +28,7 @@ curl http://localhost:8787/
 # {
 #   "status": "ok",
 #   "service": "trmnl-google-photos-plugin",
-#   "version": "0.1.0",
+#   "version": "0.2.0",
 #   "environment": "production",
 #   "timestamp": "2026-01-19T09:00:00.000Z",
 #   "message": "TRMNL Google Photos Plugin is running"
