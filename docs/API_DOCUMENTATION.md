@@ -84,9 +84,10 @@ Host: trmnl-google-photos.gohk.xyz
 
 **Query Parameters:**
 
-| Parameter   | Type   | Required | Description                    |
-| ----------- | ------ | -------- | ------------------------------ |
-| `album_url` | string | Yes      | Google Photos shared album URL |
+| Parameter        | Type   | Required | Description                                                   |
+| ---------------- | ------ | -------- | ------------------------------------------------------------- |
+| `album_url`      | string | Yes      | Google Photos shared album URL                                |
+| `enable_caching` | string | No       | Enable/disable caching: 'true'/'false'/'1'/'0' (default true) |
 
 **Supported Album URL Formats:**
 
