@@ -5,7 +5,7 @@
   field_type: author_bio
   category: images,personal
   description: |
-    Google Photos Shared Album brings your cherished memories to your TRMNL device by displaying random photos from your Google Photos shared albums — no authentication required.
+    Google Photos Shared Album brings your cherished memories to your TRMNL device by displaying random photos from your Google Photos shared albums — no sign-in needed.
     <br><br>
     <strong>How It Works:</strong><br>
     1. Create a shared album in Google Photos<br>
@@ -21,7 +21,7 @@
     📱 Responsive design across all e-ink displays<br>
     🖼️ Display photo metadata
     <br><br>
-    <strong>Privacy-First Design:</strong> This plugin prioritizes your privacy - no OAuth or Google account linking required. No cookies, no tracking and no personal data retention. 
+    <strong>Privacy-First Design:</strong> This plugin prioritizes your privacy - no need to sign in with Google. No cookies, no tracking, and we never save your personal information. 
   github_url: https://github.com/hossain-khan/trmnl-google-photos-plugin
   learn_more_url: https://hossain-khan.github.io/trmnl-google-photos-plugin/
   email_address: trmnl@hossain.dev
@@ -52,13 +52,13 @@
   field_type: boolean
   default: true
   optional: true
-  name: Show Photo Metadata
-  description: "Display photo date, resolution, and count in the title bar"
-  help_text: When enabled, shows photo metadata in the title bar (e.g., '2 years ago • 12MP • 142 photos'). When disabled, only shows photo count as a separate badge for a minimal display.
+  name: Show Photo Details
+  description: "Display photo date, size, and count in the title bar"
+  help_text: When enabled, shows photo details like date, size, and total count (e.g., '2 years ago • 12MP • 142 photos'). When disabled, only shows photo count for a cleaner look.
 - keyname: enable_caching
   field_type: boolean
   default: true
   optional: true
   name: Enable Performance Caching
-  description: "Cache album metadata for faster loading (recommended for most users)"
-  help_text: When enabled, album metadata (photo URLs) is cached for 1 hour to improve performance by 80%. Your photos are never stored—only the list of photo URLs is temporarily cached. Disable this to ensure zero data is stored anywhere along the process—every request will fetch fresh data directly from Google Photos (slower loading 2-3 seconds vs 100ms, but maximum privacy guaranteed).
+  description: "Save photo information temporarily for faster loading (recommended)"
+  help_text: When enabled, we temporarily remember which photos are in your album for 1 hour so everything loads instantly. Your actual photos are never saved - we just remember they exist. Disable this to always fetch fresh photos directly from Google (takes a few seconds longer, but nothing is saved).
