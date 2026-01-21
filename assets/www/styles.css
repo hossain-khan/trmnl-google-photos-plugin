@@ -633,19 +633,4 @@ p {
     position: relative;
     display: inline-block;
 }
-.action-buttons {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-@media (max-width: 600px) {
-    .action-buttons {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    .action-buttons > a,
-    .action-buttons > button {
-        min-width: auto !important;
-        flex: 1 !important;
-    }
-}
+
