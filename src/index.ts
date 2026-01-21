@@ -147,8 +147,8 @@ app.get('/api/photo', async (c) => {
         thumbnail_url:
           'https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/images/google-photos-demo-picture-thumb.jpg',
         caption: 'Demo photo from Google Photos Shared Album TRMNL plugin',
-        timestamp: new Date().toISOString(),
-        album_name: 'Demo Album - Google Photos',
+        timestamp: '2024-06-25T12:00:00.000Z',
+        album_name: 'TRMNL Demo Album - Google Photos',
         photo_count: 142,
       };
 
