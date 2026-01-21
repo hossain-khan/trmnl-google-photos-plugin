@@ -154,13 +154,6 @@ app.get('/api/photo', async (c) => {
         relative_date: '1 year ago',
         aspect_ratio: '4:3',
         megapixels: 12,
-        metadata: {
-          uid: 'demo-photo-001',
-          original_width: 1024,
-          original_height: 768,
-          image_update_date: '2024-06-25T12:00:00.000Z',
-          album_add_date: '2024-06-25T12:00:00.000Z',
-        },
       };
 
       // Add response headers
