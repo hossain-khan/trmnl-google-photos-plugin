@@ -38,10 +38,10 @@ See how your photos look across different TRMNL layouts:
 </table>
 
 <p align="right">
-  <a href="#-installation">
+  <a href="https://usetrmnl.com/recipes/227153" target="_blank">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="assets/trmnl-brand/trmnl-badge-works-with-dark.svg">
-      <source media="(prefers-color-scheme: light)" srcset="assets/trmnl-brand/trmnl-badge-works-with-light.svg">
+      <source media="(prefers-color-scheme: dark)" srcset="assets/trmnl-brand/trmnl-badge-show-it-on-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="assets/trmnl-brand/trmnl-badge-show-it-on-light.svg">
       <img alt="Show it on TRMNL" src="assets/trmnl-brand/trmnl-badge-show-it-on-dark.svg" height="40">
     </picture>
   </a>
@@ -64,13 +64,12 @@ Your photos stay private. We simply help your TRMNL display them.
 
 ## 📦 Installation
 
-1. Visit [TRMNL Recipes](https://usetrmnl.com/recipes)
-2. Search for "**Google Photos**"
-3. Click **Install**
-4. Create a shared album in Google Photos (if you haven't already)
-5. Copy the shared album link from Google Photos
-6. Paste the link in the plugin settings
-7. Add to your [Playlist](https://usetrmnl.com/playlists)
+1. Visit [TRMNL Recipes - Google Photos](https://usetrmnl.com/recipes/227153)
+2. Click **Install** to add the recipe to your TRMNL account
+3. Create a shared album in Google Photos (if you haven't already)
+4. Copy the shared album link from Google Photos
+5. Paste the link in the plugin settings
+6. Add to your [Playlist](https://usetrmnl.com/playlists)
 
 That's it! Your photos will automatically refresh every hour with a new random photo from your album.
 
