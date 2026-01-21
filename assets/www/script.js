@@ -130,11 +130,15 @@ async function fetchPhotoData() {
     return;
   }
 
-  // Validate URL format
-  if (!albumUrl.includes('photos.app.goo.gl') && !albumUrl.includes('photos.google.com')) {
+  // Validate URL format (allow 'demo' as special case)
+  if (
+    albumUrl.toLowerCase() !== 'demo' &&
+    !albumUrl.includes('photos.app.goo.gl') &&
+    !albumUrl.includes('photos.google.com')
+  ) {
     console.warn('[API] Validation failed: Invalid URL format');
     errorContainer.innerHTML =
-      '<div class="error-message"><strong>⚠️ Invalid URL:</strong> Please enter a valid Google Photos shared album URL (photos.app.goo.gl/... or photos.google.com/share/...)</div>';
+      '<div class="error-message"><strong>⚠️ Invalid URL:</strong> Please enter a valid Google Photos shared album URL (photos.app.goo.gl/... or photos.google.com/share/...) or type "demo"</div>';
     return;
   }
 
