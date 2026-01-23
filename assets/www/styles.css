@@ -597,38 +597,6 @@ p {
     from { transform: scale(0.8); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
-.badge-tooltip {
-    position: absolute;
-    top: -45px;
-    right: 0;
-    background: #1a202c;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease;
-    pointer-events: none;
-    z-index: 100;
-}
-.badge-tooltip.show {
-    opacity: 1;
-    visibility: visible;
-    top: -50px;
-}
-.badge-tooltip::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    right: 15px;
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid #1a202c;
-}
 .badge-container {
     position: relative;
     display: inline-block;
