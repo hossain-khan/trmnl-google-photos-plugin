@@ -434,10 +434,11 @@ export async function convertToPhotoData(
   const megapixels = calculateMegapixels(photo.width, photo.height);
 
   // Conditionally analyze image brightness for adaptive background
+  // Use thumbnail URL for efficiency (brightness analysis doesn't need full resolution)
   let backgroundShade: string | undefined;
   if (analyzeImage) {
     try {
-      backgroundShade = await analyzeImageBrightness(photoUrl);
+      backgroundShade = await analyzeImageBrightness(thumbnailUrl);
       // Only include if analysis succeeded (non-empty string)
       if (!backgroundShade) {
         backgroundShade = undefined;
