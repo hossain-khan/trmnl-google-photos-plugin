@@ -298,9 +298,9 @@ For contributors adding new features:
 
 ## Security Updates
 
-| Date       | Version | Update                          |
-| ---------- | ------- | ------------------------------- |
-| 2026-01-19 | 0.2.0   | Initial security implementation |
+| Date       | Version | Update                                  |
+| ---------- | ------- | --------------------------------------- |
+| 2026-01-24 | 1.1.0   | Adaptive background brightness analysis |
 
 ## References
 
