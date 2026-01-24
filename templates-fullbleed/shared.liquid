@@ -69,8 +69,8 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAQAAACQ9RH5AAAAAXNSR0IArs
   with image edges or overall brightness.
 {% endcomment %}
 {% liquid
-  assign edge_brightness = edge_brightness_score | default: brightness_score | default: 50
-  assign overall_brightness = brightness_score | default: 50
+  assign edge_brightness = edge_brightness_score | default: brightness_score | default: 100
+  assign overall_brightness = brightness_score | default: 100
   
   case edge_brightness
   when 0
@@ -108,50 +108,6 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAQAAACQ9RH5AAAAAXNSR0IArs
   when 94,95,96,97,98,99,100
     assign bg_class = 'bg--white'
   else
-    assign bg_class = 'bg--gray-50'
+    assign bg_class = 'bg--white'
   endcase
 %}
-
-{% comment %}
-  Photo data is provided by the backend API endpoint (/api/photo)
-  The following variables are available from the JSON response:
-  
-  - photo_url: Optimized full-resolution photo URL (1040×780 for TRMNL X)
-  - thumbnail_url: Lower resolution version (400×300, optional)
-  - caption: Photo caption/description (may be empty)
-  - timestamp: When photo was taken/updated (ISO 8601 format)
-  - album_name: Name of the source album
-  - photo_count: Total number of photos in album
-  - brightness_score: Overall image brightness (0-100, optional)
-  - edge_brightness_score: Edge brightness for light background detection (0-100, optional)
-{% endcomment %}
-
-{% comment %}
-  ====================================================================================
-  REUSABLE LIQUID TEMPLATES
-  ====================================================================================
-  These templates follow TRMNL best practices for DRY (Don't Repeat Yourself) code.
-  Reference: https://docs.usetrmnl.com/go/reusing-markup
-{% endcomment %}
-
-{% comment %}
-  Error State Template
-  ----------------------
-  Displays a helpful error message when no photo is available (plugin not configured).
-  Provides clear instructions to guide users to configure their shared album URL.
-  
-  This template is used in full-bleed full-screen image layouts when photo_url is empty.
-  
-  Usage in full-screen templates:
-    {% if photo_url and photo_url != '' %}
-      <!-- Show photo -->
-    {% else %}
-      <div class="flex flex--col flex--center-x flex--center-y gap--medium h--full">
-        <div class="value value--large text--center">📷</div>
-        <div class="title title--medium text--center">No Photos Available</div>
-        <div class="description text--center">
-          Please configure your Google Photos shared album URL in the plugin settings.
-        </div>
-      </div>
-    {% endif %}
-{% endcomment %}
