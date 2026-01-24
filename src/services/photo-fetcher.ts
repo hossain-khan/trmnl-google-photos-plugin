@@ -114,6 +114,11 @@ import {
   validatePhotoData,
 } from './security-validator';
 
+// Privacy-first image brightness analysis service
+// Your photos are safe: zero storage, in-memory processing only, no data retention
+// See: https://github.com/hossain-khan/image-insights-api
+import { analyzeImageBrightness } from './brightness-service';
+
 /**
  * Fetch photos from a Google Photos shared album
  *
@@ -411,13 +416,15 @@ export function formatRelativeDate(isoDate: string): string {
  * @param photo - Google Photo object
  * @param albumUrl - Original album URL
  * @param totalPhotos - Total number of photos in album
+ * @param analyzeImage - Whether to analyze image brightness for adaptive background
  * @returns PhotoData object for template rendering
  */
-export function convertToPhotoData(
+export async function convertToPhotoData(
   photo: GooglePhoto,
   albumUrl: string,
-  totalPhotos: number
-): PhotoData {
+  totalPhotos: number,
+  analyzeImage: boolean = false
+): Promise<PhotoData> {
   // Validate and sanitize all fields before creating PhotoData
   const photoUrl = optimizePhotoUrl(photo.url);
   const thumbnailUrl = optimizePhotoUrl(photo.url, 400, 300);
@@ -430,6 +437,30 @@ export function convertToPhotoData(
   const aspectRatio = calculateAspectRatio(photo.width, photo.height);
   const megapixels = calculateMegapixels(photo.width, photo.height);
 
+  // Conditionally analyze image brightness for adaptive background
+  // Use thumbnail URL for efficiency (brightness analysis doesn't need full resolution)
+  //
+  // PRIVACY NOTE: Image analysis is performed by Image Insights API with privacy-first design:
+  // - Zero image storage - never saved to disk or database
+  // - In-memory processing only - immediately discarded after analysis
+  // - Stateless architecture - no tracking, sessions, or user data retention
+  // - Your photos remain private and secure
+  // Learn more: https://github.com/hossain-khan/image-insights-api
+  let edgeBrightnessScore: number | undefined;
+  let brightnessScore: number | undefined;
+  if (analyzeImage) {
+    try {
+      const scores = await analyzeImageBrightness(thumbnailUrl);
+      if (scores) {
+        edgeBrightnessScore = scores.edge_brightness_score;
+        brightnessScore = scores.brightness_score;
+      }
+    } catch (error) {
+      console.error('[Photo Fetcher] Brightness analysis error:', error);
+      // Graceful fallback - leave scores undefined
+    }
+  }
+
   const photoData: PhotoData = {
     photo_url: photoUrl,
     thumbnail_url: thumbnailUrl,
@@ -441,6 +472,8 @@ export function convertToPhotoData(
     relative_date: relativeDate,
     aspect_ratio: aspectRatio,
     megapixels: megapixels,
+    edge_brightness_score: edgeBrightnessScore, // Raw brightness data for templates
+    brightness_score: brightnessScore, // Raw brightness data for templates
     metadata: {
       uid: photo.uid,
       original_width: photo.width,
@@ -463,16 +496,21 @@ export function convertToPhotoData(
  *
  * @param albumUrl - The shared album URL
  * @param kv - Optional Cloudflare KV namespace for caching
+ * @param analyzeImage - Whether to analyze image brightness for adaptive background
  * @returns PhotoData object ready for template rendering
  * @throws Error if fetching or processing fails
  */
-export async function fetchRandomPhoto(albumUrl: string, kv?: KVNamespace): Promise<PhotoData> {
+export async function fetchRandomPhoto(
+  albumUrl: string,
+  kv?: KVNamespace,
+  analyzeImage: boolean = false
+): Promise<PhotoData> {
   // Fetch all photos from the album (may use cache)
   const photos = await fetchAlbumPhotos(albumUrl, kv);
 
   // Select a random photo
   const selectedPhoto = selectRandomPhoto(photos);
 
-  // Convert to PhotoData format
-  return convertToPhotoData(selectedPhoto, albumUrl, photos.length);
+  // Convert to PhotoData format (with optional brightness analysis)
+  return await convertToPhotoData(selectedPhoto, albumUrl, photos.length, analyzeImage);
 }

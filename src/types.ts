@@ -42,6 +42,8 @@ export interface PhotoData {
   relative_date?: string;
   aspect_ratio?: string;
   megapixels?: number;
+  edge_brightness_score?: number; // Edge brightness (0-100) for background selection
+  brightness_score?: number; // Overall brightness (0-100)
   metadata?: {
     uid: string;
     original_width: number;

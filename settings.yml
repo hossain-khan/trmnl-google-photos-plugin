@@ -9,7 +9,7 @@ strategy: polling  # TRMNL polls Cloudflare Worker for JSON photo data
 refresh_frequency: 3600  # 1 hour (will fetch new random photo hourly)
 
 # Polling URL - TRMNL will call this endpoint with form field values
-polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}
+polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}&adaptive_background={{ adaptive_background }}
 polling_verb: GET
 polling_headers: ""  # No custom headers needed
 

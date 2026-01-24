@@ -127,6 +127,7 @@ app.get('/api/photo', async (c) => {
     // Extract album_url from query parameters
     const album_url = c.req.query('album_url');
     const enable_caching = c.req.query('enable_caching');
+    const adaptive_background = c.req.query('adaptive_background');
 
     // Demo Data: If album_url is empty, 'demo', or '0', return demo photo data
     // This allows the plugin to display a preview in the TRMNL marketplace without requiring
@@ -207,17 +208,23 @@ app.get('/api/photo', async (c) => {
     const useCaching = enable_caching !== 'false' && enable_caching !== '0';
     const kvNamespace = useCaching ? c.env.PHOTOS_CACHE : undefined;
 
-    logger.info('Cache preference', {
+    // Determine if adaptive background should be analyzed
+    // adaptive_background can be: 'true', 'false', '1', '0', or undefined (defaults to false)
+    const analyzeImage = adaptive_background === 'true' || adaptive_background === '1';
+
+    logger.info('Request preferences', {
       enable_caching,
       useCaching,
       kvConfigured: !!c.env.PHOTOS_CACHE,
+      adaptive_background,
+      analyzeImage,
     });
 
-    // Fetch random photo from album (with optional caching based on user preference)
+    // Fetch random photo from album (with optional caching and brightness analysis)
     let photoData;
     const fetchStartTime = Date.now();
     try {
-      photoData = await fetchRandomPhoto(urlValidation.url, kvNamespace);
+      photoData = await fetchRandomPhoto(urlValidation.url, kvNamespace, analyzeImage);
       const fetchDuration = Date.now() - fetchStartTime;
       cacheHit = fetchDuration < CACHE_HIT_THRESHOLD_MS; // Likely cached if <500ms
 
@@ -226,6 +233,8 @@ app.get('/api/photo', async (c) => {
         count: photoData.photo_count,
         fetchDuration,
         cached: cacheHit,
+        brightnessAnalyzed: analyzeImage,
+        edgeBrightnessScore: photoData.edge_brightness_score,
       });
     } catch (error) {
       const fetchDuration = Date.now() - fetchStartTime;
@@ -264,9 +273,11 @@ app.get('/api/photo', async (c) => {
     }
 
     // Return JSON response (flat structure for TRMNL templates)
-    const response = {
+    const response: Record<string, unknown> = {
       photo_url: photoData.photo_url,
       thumbnail_url: photoData.thumbnail_url,
+      edge_brightness_score: photoData.edge_brightness_score, // Raw brightness data (undefined if disabled)
+      brightness_score: photoData.brightness_score, // Raw brightness data (undefined if disabled)
       caption: photoData.caption,
       timestamp: photoData.timestamp,
       image_update_date: photoData.image_update_date,
