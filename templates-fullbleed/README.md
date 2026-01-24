@@ -12,12 +12,14 @@ These templates prioritize **image-first display**, removing titles, captions, m
 ### When to Use Full-Bleed Templates
 
 ✅ **Use these templates if you want:**
+
 - Full-screen centered images with minimal UI
 - Clean, distraction-free photo display
 - Adaptive background colors that blend with photo edges
 - Focus on the photo itself, not metadata
 
 ❌ **Use the standard templates if you want:**
+
 - Photo metadata (date, size, photo count) in title bar
 - Photo captions and descriptions
 - Year display overlay
@@ -34,12 +36,12 @@ These templates prioritize **image-first display**, removing titles, captions, m
 - **Image dithering** — Optimal quality on monochrome displays
 - **Simple error states** — Minimal "No Photos Available" message
 
-
 ## Adaptive Background Feature
 
 Full-bleed templates automatically select a background color based on image brightness:
 
 **Brightness Mapping (0-100 scale → 16 TRMNL shades)**
+
 - `edge_brightness_score` preferred (light background detection)
 - `brightness_score` fallback (overall brightness)
 - Default: white (`bg--white`) when data unavailable
@@ -60,6 +62,7 @@ This creates seamless visual integration where light-colored photos blend smooth
 ## Image Quality
 
 All images include:
+
 - **`image-dither` class** — Creates grayscale illusion on 1-bit (monochrome) displays
 - **`image--contain` class** — Maintains aspect ratio without cropping
 - **`object-fit: contain`** — Ensures photos fit without distortion
@@ -73,7 +76,7 @@ See [custom-fields.yml](custom-fields.yml) for plugin settings:
 - `enable_caching` — Cache photo data for faster loading
 
 ### Polling URL Example
+
 ```
 https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}&adaptive_background={{ adaptive_background }}
 ```
-
