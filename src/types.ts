@@ -42,6 +42,7 @@ export interface PhotoData {
   relative_date?: string;
   aspect_ratio?: string;
   megapixels?: number;
+  background_shade?: string; // Adaptive background class (e.g., "bg--gray-50")
   metadata?: {
     uid: string;
     original_width: number;

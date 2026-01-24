@@ -1,4 +1,4 @@
-<div class="layout" style="position: relative;">
+<div class="layout {% if background_shade %}{{ background_shade }}{% endif %}" style="position: relative;">
   {% if photo_url and photo_url != '' %}
   <div class="flex flex--col gap--xsmall h--full">
     <!-- Photo Display Area (most of the space) -->
