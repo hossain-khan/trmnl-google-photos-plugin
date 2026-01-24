@@ -83,12 +83,11 @@ https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&
 
 ### Visual Comparison
 
-
-| Standard Recipe                                           | Full-Bleed                                               |
-| --------------------------------------------------------- | -------------------------------------------------------- |
-| ![Standard Cat](./preview-compare/preview-cat-recipe.png) | ![Fullbleed Cat](./preview-compare/preview-cat-full.png) |
+| Standard Recipe                                                   | Full-Bleed                                                         |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------ |
+| ![Standard Cat](./preview-compare/preview-cat-recipe.png)         | ![Fullbleed Cat](./preview-compare/preview-cat-full.png)           |
 | ![Recipe Portrait A](./preview-compare/preview-port-a-recipe.png) | ![Fullbleed Portrait A](./preview-compare/preview-port-a-full.png) |
 | ![Recipe Portrait B](./preview-compare/preview-port-b-recipe.png) | ![Fullbleed Portrait B](./preview-compare/preview-port-b-full.png) |
 | ![Recipe Portrait C](./preview-compare/preview-port-c-recipe.png) | ![Fullbleed Portrait C](./preview-compare/preview-port-c-full.png) |
-| ![Recipe Dog](./preview-compare/preview-port-dog-recipe.png) | ![Fullbleed Dog](./preview-compare/preview-port-dog-full.png) |
-| ![Recipe Zebra](./preview-compare/preview-zebra-recipe.png)  | ![Fullbleed Zebra](./preview-compare/preview-zebra-full.png)  |
+| ![Recipe Dog](./preview-compare/preview-port-dog-recipe.png)      | ![Fullbleed Dog](./preview-compare/preview-port-dog-full.png)      |
+| ![Recipe Zebra](./preview-compare/preview-zebra-recipe.png)       | ![Fullbleed Zebra](./preview-compare/preview-zebra-full.png)       |
