@@ -12,8 +12,20 @@
  *
  * **Integration:**
  * - Service: https://image-insights.gohk.uk/
+ * - Open Source: https://github.com/hossain-khan/image-insights-api
  * - Algorithm: Rec. 709 perceptual luminance
  * - Edge Mode: left_right (portrait photo optimization)
+ *
+ * **Privacy-First Design:**
+ * Your photos are safe and private:
+ * - ✅ Zero Image Storage: Images never saved to disk or database
+ * - ✅ In-Memory Processing: Processed in RAM, immediately discarded
+ * - ✅ Stateless Architecture: No tracking, sessions, or user profiles
+ * - ✅ No Data Retention: Image data garbage collected after analysis
+ * - ✅ Safe Logging: URLs redacted, no pixel data logged
+ * - ✅ No Third-Party Sharing: All processing local to the deployment
+ *
+ * Each request is independent and isolated. What happens inside stays inside.
  */
 
 /**
@@ -66,6 +78,7 @@ export function mapBrightnessToBackground(edgeBrightnessScore: number): string {
   const score = Math.max(0, Math.min(100, edgeBrightnessScore));
 
   // Map to 16 levels (0-100 → 16 classes)
+  // https://usetrmnl.com/framework/background
   if (score < 6.25) {
     return 'bg--black'; // 0-6
   } else if (score < 12.5) {

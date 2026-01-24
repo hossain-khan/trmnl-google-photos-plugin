@@ -113,6 +113,10 @@ import {
   validateTimestamp,
   validatePhotoData,
 } from './security-validator';
+
+// Privacy-first image brightness analysis service
+// Your photos are safe: zero storage, in-memory processing only, no data retention
+// See: https://github.com/hossain-khan/image-insights-api
 import { analyzeImageBrightness } from './brightness-service';
 
 /**
@@ -435,6 +439,13 @@ export async function convertToPhotoData(
 
   // Conditionally analyze image brightness for adaptive background
   // Use thumbnail URL for efficiency (brightness analysis doesn't need full resolution)
+  //
+  // PRIVACY NOTE: Image analysis is performed by Image Insights API with privacy-first design:
+  // - Zero image storage - never saved to disk or database
+  // - In-memory processing only - immediately discarded after analysis
+  // - Stateless architecture - no tracking, sessions, or user data retention
+  // - Your photos remain private and secure
+  // Learn more: https://github.com/hossain-khan/image-insights-api
   let backgroundShade: string | undefined;
   if (analyzeImage) {
     try {
