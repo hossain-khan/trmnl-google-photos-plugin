@@ -1,0 +1,99 @@
+{% comment %}
+  Shared template for Google Photos plugin
+  This file contains reusable assets and variables for all layout templates:
+  - Google Photos icon (base64-encoded) for title bars
+  - Photo selection logic (currently handled by backend API)
+{% endcomment %}
+
+{% comment %}
+  Google Photos icon for title bars (59x59px, base64-encoded PNG)
+  Usage in templates:
+    <img src="{{ icon_google_photos }}" class="icon" alt="Google Photos">
+  
+  This icon is a stylized version of the Google Photos logo optimized for e-ink displays:
+  - 59x59px resolution (optimal for TRMNL title bars)
+  - PNG format with transparency
+  - Base64-encoded for direct embedding
+{% endcomment %}
+{%- capture icon_google_photos -%}
+data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAQAAACQ9RH5AAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAABThJREFUeNrFmM9vG0UUxzc/mtRNuZTEm+x+36xdXH6lUYl6zCXcyqVIUMgpEjQnxAH+AvgDeqiqikiFG0hpkgvlBHe49BACVKFNWlSRNE7ASkqapPZ6HT/8ZDsjZHdnN2AzX8kHz+x85r15895orCO2TvnBNWJsYRFfuR87o9X/M71WS1uXZdlJbClGoFixLMCdxbh0pY63GJy2sU6MAgL4YGLF8N1pu8+yhntabHENzGCUUCBf4FhEptLf3UJw0ka2Bq7Lp6JirDsvyYhWg30wtA7wVDFW3Ocl0NoJFu17TPOWtI72gg/E4e6ldoNFBcX4xeoWdDvBIl8xvfl/gPOKMRN/Wllp56E6KooLDoixZvfFsFkwxv/N4HJFTGc1OCJ04CRG8AZN0AQu0Fm7T/dHBLNENi5EOc31IV100b2JNbCqCYxVzNBFgckoI1iH14QZ3FGdFm/hZ4GROCsgn3wE1QIgB8S9dIjuNFqswSYsTtGsAFBAHiWUofcrQB6+9NE8Tom9/5WrBZvBssfI66TfoAJ8j/EAZ6o1N3304NLYIQ+PFNMOOFRl7CumzVRKPhsc+FfHSToyvfhRMZ4YsDo13BGLycH6kRKIBtNVj7ErFoVDddjgc8tyKMTiQoSU6YwS62AyS0YSu+fOH8O2gBt7kY9UJGheSVBxDPCBOHK4BzliFBr7xV68bcCq0wiMTm6suIw/MY67qhn4icc0Z7wI0IeKyQfHBpdxhRY0uL542vEY9yJcfWhOMRVjQDXie1r656LJx57HWI102XN/JcYB+Ahap00Jy9pSfDmOHuO2Om3ESsM2FSUnRVRB7s+QM1DLchJqCFBWnGJiXBcnOycyvcM9YapsA7FiiizFImKdFsG1GTZoGiMxLhq4hi08QtagdWSxjRzu0gIt0SZ8lOtJlB7iW3yCcacfCTvpkDeUGvSGmkv6yEnblrS0bSftZNJ+ltL24AA5Dp0/Ntzjvo4r9AOyyNfAEpiPsYoV3McacsjRpkEb2KAd3LCiN/c1zCCHmqO1q1HfhBgbRiynrStUHc4Jy0ICX9SjQVdc7IMPXV6KrECSjNFOqUP0Au4IVCK4orqlj+lhvKOorwi0EAHrvUIbimtI/Tnjd3ynGEFssO8xvgzFyrOCncRvMj0EqlUmxgo+Jb3TUVUCK8ZH4RciCalvFKPU4NCSYtzHOP5QDD8WWCrXlnsuhIuEZdFlYmrmTgGvOf00nWLsxsnyssPuzRDscI+gsfiMElIiRg4JjBBTjOpGPomHxg32upPa3mZgO2lZuO6xTifhkgBV7H4mJTN0f2lWh1UjmDYcsiynH7c9xlOUzViJZ1rof07CNiSeU4O4p0OnCXjTG5KxOINVqcuGgxUgUFKrXxZvhjpajWGXmIrh4IGTlZGvYlkxBN7MP2UEVCRWcgBHZG5D4nDfRXWHQ8FSeeVyj6+JVXW8T0WxDyUBwkdQ67mVGpRabcxYmKIIYMFWbaD3sNhYLFQV+hNdljEaawaXTBbXY0IW4E7SHJaxh3o52cOyO+tOCtDwyhnT1frdsqtqtwSlM1b5dgpT7jvOWNKuR43hHqaDy9HBZQDrpINE89lklLnp47RsPk4NU3ZlepFAInVchESmt9FSc4HQCcQMjt/MKbNFYHORaB9Yl8X3STBB28B6n3FLbEa5nWCJbak+DxQj3zawRrsvIitoHLQJrIMslcKiJ7gCyu0CS+sWy+kqcbX0URElASPbUrB+v3RGaQ6l+oMjMf3VcrB+t/XS9AHNYkmyOG7Iko76Bv8323ftNhD5Mp0AAAAASUVORK5CYII=
+{%- endcapture -%}
+
+{% comment %}
+  Photo data is provided by the backend API endpoint (/api/photo)
+  The following variables are available from the JSON response:
+  
+  - photo_url: Optimized full-resolution photo URL (1040×780 for TRMNL X)
+  - thumbnail_url: Lower resolution version (400×300, optional)
+  - caption: Photo caption/description (may be empty)
+  - timestamp: When photo was taken/updated (ISO 8601 format)
+  - album_name: Name of the source album
+  - photo_count: Total number of photos in album
+{% endcomment %}
+
+{% comment %}
+  ====================================================================================
+  REUSABLE LIQUID TEMPLATES
+  ====================================================================================
+  These templates follow TRMNL best practices for DRY (Don't Repeat Yourself) code.
+  Reference: https://docs.usetrmnl.com/go/reusing-markup
+{% endcomment %}
+
+{% comment %}
+  Photo Display Template
+  ----------------------
+  Renders a photo with optimal settings for e-ink displays.
+  
+  Parameters:
+  - photo_url: URL of the photo to display (required)
+  - caption: Alt text for accessibility (optional)
+  
+  Usage:
+    {% render "photo_display", photo_url: photo_url, caption: caption %}
+{% endcomment %}
+{% template photo_display %}
+<!-- Custom max-width/max-height ensures images fit without cut-off (handles portrait/landscape/any aspect ratio) -->
+<img src="{{ photo_url }}" 
+     alt="{{ caption }}" 
+     class="image image--contain image-dither"
+     style="max-width: 100%; max-height: 100%; object-fit: contain;">
+{% endtemplate %}
+
+{% comment %}
+  Error State Template
+  ----------------------
+  Displays a helpful error message when no photo is available (plugin not configured).
+  Provides clear instructions to guide users to configure their shared album URL.
+  
+  Parameters:
+  - size: Layout size variant ('full', 'half', 'quadrant') - controls spacing and text sizing
+  
+  Usage:
+    {% render "error_state", size: "full" %}
+    {% render "error_state", size: "half" %}
+    {% render "error_state", size: "quadrant" %}
+{% endcomment %}
+{% template error_state %}
+{% if size == 'full' %}
+<div class="flex flex--col flex--center-x flex--center-y gap--medium md:gap--large h--full">
+  <div class="value value--large md:value--xlarge lg:value--xxlarge text--center">📷</div>
+  <div class="title title--medium md:title--large lg:title--xlarge text--center">No Photos Available</div>
+  <div class="description md:title md:title--small lg:title lg:title--medium text--center">
+    Please configure your Google Photos shared album URL in the plugin settings.
+  </div>
+</div>
+{% elsif size == 'half' %}
+<div class="flex flex--col flex--center-x flex--center-y gap--small md:gap--medium h--full">
+  <div class="value value--medium md:value--large lg:value--xlarge">📷</div>
+  <div class="title title--small md:title--medium lg:title--large text--center">No Photos</div>
+  <div class="description md:title md:title--small text--center">
+    Configure your shared album URL in settings
+  </div>
+</div>
+{% elsif size == 'quadrant' %}
+<div class="flex flex--col flex--center-x flex--center-y gap--xsmall h--full">
+  <div class="value value--small md:value--medium">📷</div>
+  <div class="description md:title md:title--small text--center">No Photos</div>
+</div>
+{% endif %}
+{% endtemplate %}

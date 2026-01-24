@@ -1,5 +1,11 @@
 # This file contains custom fields for the TRMNL Google Photos Shared Album Plugin
 # Dev Documentation: https://help.usetrmnl.com/en/articles/10513740-custom-plugin-form-builder
+
+# ℹ️ Must set this new polling URL with adaptive brightness
+# ================================================================
+# Polling URL - TRMNL will call this endpoint with form field values
+# polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}&adaptive_background={{ adaptive_background }}
+# ================================================================
 - keyname: author_bio
   name: About This Plugin
   field_type: author_bio
@@ -62,3 +68,10 @@
   name: Enable Performance Caching
   description: "Save photo information temporarily for faster loading (recommended)"
   help_text: When enabled, we temporarily remember which photos are in your album for 1 hour so everything loads instantly. Your actual photos are never saved - we just remember they exist. Disable this to always fetch fresh photos directly from Google (takes a few seconds longer, but nothing is saved).
+- keyname: adaptive_background
+  field_type: boolean
+  default: false
+  optional: true
+  name: Adaptive Background (Experimental)
+  description: "Automatically adjust background color to match photo brightness"
+  help_text: When enabled, analyzes each photo's edge brightness and applies a matching background shade for seamless e-ink display. This reduces harsh white gaps around portrait/letterboxed photos. Adds ~100-200ms to photo loading. Leave disabled for fastest performance.
