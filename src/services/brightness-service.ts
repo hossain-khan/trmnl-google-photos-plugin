@@ -6,7 +6,7 @@
  *
  * **Features:**
  * - Edge-based brightness analysis (left/right 10% of image)
- * - Maps brightness score (0-100) to 16-level TRMNL palette
+ * - Returns raw brightness scores (0-100) for template layer to map to TRMNL palette
  * - 1-second timeout with graceful fallback
  * - Comprehensive performance logging
  *
