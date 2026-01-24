@@ -1,5 +1,7 @@
-<!-- Full-Screen Image Display - No Metadata -->
-<div class="layout h--full">
+{% render "shared" %}
+
+<!-- Full-Screen Image Display - Adaptive Background Based on Image Brightness -->
+<div class="layout h--full {{ bg_class }}">
   {% if photo_url and photo_url != '' %}
   <div class="flex flex--center-x flex--center-y h--full">
     <img src="{{ photo_url }}"

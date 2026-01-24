@@ -1,4 +1,6 @@
-<div class="layout h--full">
+{% render "shared" %}
+
+<div class="layout h--full {{ bg_class }}">
   {% if photo_url and photo_url != '' %}
   <div class="flex flex--center-x flex--center-y h--full">
     <img src="{{ photo_url }}"
