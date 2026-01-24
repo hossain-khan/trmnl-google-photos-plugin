@@ -116,27 +116,26 @@ Content-Type: application/json
   "photo_count": 142,
   "relative_date": "4 months ago",
   "aspect_ratio": "4:3",
-  "megapixels": 12.5,
-  "edge_brightness_score": 75,
-  "brightness_score": 82
+  "megapixels": 12.5
 }
 ```
 
 **Response Fields:**
 
-| Field               | Type           | Description                                                                                                   |
-| ------------------- | -------------- | ------------------------------------------------------------------------------------------------------------- |
-| `photo_url`         | string         | Full-resolution photo URL (optimized)                                                                         |
-| `thumbnail_url`     | string         | Lower resolution version                                                                                      |
-| `caption`           | string \| null | Photo caption (always `null` - not available from shared albums)                                              |
-| `timestamp`         | string         | ISO 8601 timestamp                                                                                            |
-| `image_update_date` | string         | ISO 8601 timestamp when photo was last updated/taken                                                          |
-| `album_name`        | string         | Album name (always "Google Photos Shared Album" - actual name not available)                                  |
-| `photo_count`       | number         | Total photos in album                                                                                         |
-| `relative_date`     | string         | Human-readable relative date (e.g., "4 months ago")                                                           |
-| `aspect_ratio`      | string         | Photo aspect ratio (e.g., "4:3", "16:9")                                                                      |
-| `megapixels`        | number         | Photo megapixels (calculated from width × height)                                                             |
-| `background_shade`  | string \| null | TRMNL background class (e.g., "bg--gray-50") based on photo brightness (only when `adaptive_background=true`) |
+| Field                   | Type           | Description                                                                  |
+| ----------------------- | -------------- | ---------------------------------------------------------------------------- |
+| `photo_url`             | string         | Full-resolution photo URL (optimized)                                        |
+| `thumbnail_url`         | string         | Lower resolution version                                                     |
+| `caption`               | string \| null | Photo caption (always `null` - not available from shared albums)             |
+| `timestamp`             | string         | ISO 8601 timestamp                                                           |
+| `image_update_date`     | string         | ISO 8601 timestamp when photo was last updated/taken                         |
+| `album_name`            | string         | Album name (always "Google Photos Shared Album" - actual name not available) |
+| `photo_count`           | number         | Total photos in album                                                        |
+| `relative_date`         | string         | Human-readable relative date (e.g., "4 months ago")                          |
+| `aspect_ratio`          | string         | Photo aspect ratio (e.g., "4:3", "16:9")                                     |
+| `megapixels`            | number         | Photo megapixels (calculated from width × height)                            |
+| `edge_brightness_score` | number \| null | Edge brightness score 0-100 (only when `adaptive_background=true`)           |
+| `brightness_score`      | number \| null | Overall brightness score 0-100 (only when `adaptive_background=true`)        |
 
 **Error: Missing URL (400 Bad Request):**
 
