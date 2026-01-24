@@ -115,18 +115,25 @@ export function mapBrightnessToBackground(edgeBrightnessScore: number): string {
 }
 
 /**
+ * Brightness scores returned from analysis
+ */
+export interface BrightnessScores {
+  edge_brightness_score: number; // Edge brightness (0-100) - Primary metric for background selection
+  brightness_score: number; // Overall brightness (0-100)
+}
+
+/**
  * Analyze image brightness using external Image Insights API
  *
  * **Process:**
  * 1. Call Image Insights API with photo URL
- * 2. Extract edge brightness score (0-100)
- * 3. Map score to TRMNL background class
- * 4. Return background class string
+ * 2. Extract brightness scores (overall and edge)
+ * 3. Return raw scores for template layer to use
  *
  * **Error Handling:**
  * - 1-second timeout enforced
- * - Returns empty string on any error (graceful fallback)
- * - Photo displays normally without background
+ * - Returns null on any error (graceful fallback)
+ * - Photo displays normally without brightness data
  *
  * **Performance:**
  * - Expected: 50-150ms (API latency)
@@ -134,13 +141,13 @@ export function mapBrightnessToBackground(edgeBrightnessScore: number): string {
  * - Logged for monitoring
  *
  * @param photoUrl - Google Photos CDN URL to analyze
- * @returns TRMNL background class (e.g., "bg--gray-50") or empty string on error
+ * @returns Brightness scores object or null on error
  *
  * @example
- * const bgClass = await analyzeImageBrightness("https://lh3.googleusercontent.com/...");
- * // Returns: "bg--gray-50"
+ * const scores = await analyzeImageBrightness("https://lh3.googleusercontent.com/...");
+ * // Returns: { edge_brightness_score: 75.5, brightness_score: 82.3 }
  */
-export async function analyzeImageBrightness(photoUrl: string): Promise<string> {
+export async function analyzeImageBrightness(photoUrl: string): Promise<BrightnessScores | null> {
   const startTime = performance.now();
   console.log('[Brightness Analysis] Starting edge brightness analysis...');
 
@@ -176,26 +183,27 @@ export async function analyzeImageBrightness(photoUrl: string): Promise<string> 
       console.error(
         `[Brightness Analysis] API error after ${elapsed.toFixed(2)}ms: ${response.status} ${response.statusText}`
       );
-      return ''; // No background on API error
+      return null; // No brightness data on API error
     }
 
     const data: ImageAnalysisResponse = await response.json();
 
-    // Extract edge brightness score (0-100)
-    const edgeScore = data.edge_brightness_score;
-    console.log(
-      `[Brightness Analysis] Edge score received: ${edgeScore.toFixed(1)} (edge_mode: ${data.edge_mode}, ${data.width}x${data.height})`
-    );
+    // Extract brightness scores (0-100)
+    const scores: BrightnessScores = {
+      edge_brightness_score: data.edge_brightness_score,
+      brightness_score: data.brightness_score,
+    };
 
-    // Map brightness to background class
-    const backgroundShade = mapBrightnessToBackground(edgeScore);
+    console.log(
+      `[Brightness Analysis] Scores received - Edge: ${scores.edge_brightness_score.toFixed(1)}, Overall: ${scores.brightness_score.toFixed(1)} (${data.width}x${data.height}, ${data.edge_mode})`
+    );
 
     const totalTime = performance.now() - startTime;
     console.log(
-      `[Brightness Analysis] Complete in ${totalTime.toFixed(2)}ms - Score: ${edgeScore.toFixed(1)}, Background: ${backgroundShade}`
+      `[Brightness Analysis] Complete in ${totalTime.toFixed(2)}ms - Returning raw scores for template layer`
     );
 
-    return backgroundShade;
+    return scores;
   } catch (error) {
     const totalTime = performance.now() - startTime;
 
@@ -214,6 +222,6 @@ export async function analyzeImageBrightness(photoUrl: string): Promise<string> 
       console.error(`[Brightness Analysis] Unknown error after ${totalTime.toFixed(2)}ms:`, error);
     }
 
-    return ''; // No background on error (graceful fallback)
+    return null; // No brightness data on error (graceful fallback)
   }
 }

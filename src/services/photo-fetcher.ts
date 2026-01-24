@@ -446,17 +446,18 @@ export async function convertToPhotoData(
   // - Stateless architecture - no tracking, sessions, or user data retention
   // - Your photos remain private and secure
   // Learn more: https://github.com/hossain-khan/image-insights-api
-  let backgroundShade: string | undefined;
+  let edgeBrightnessScore: number | undefined;
+  let brightnessScore: number | undefined;
   if (analyzeImage) {
     try {
-      backgroundShade = await analyzeImageBrightness(thumbnailUrl);
-      // Only include if analysis succeeded (non-empty string)
-      if (!backgroundShade) {
-        backgroundShade = undefined;
+      const scores = await analyzeImageBrightness(thumbnailUrl);
+      if (scores) {
+        edgeBrightnessScore = scores.edge_brightness_score;
+        brightnessScore = scores.brightness_score;
       }
     } catch (error) {
       console.error('[Photo Fetcher] Brightness analysis error:', error);
-      backgroundShade = undefined; // Graceful fallback
+      // Graceful fallback - leave scores undefined
     }
   }
 
@@ -471,7 +472,8 @@ export async function convertToPhotoData(
     relative_date: relativeDate,
     aspect_ratio: aspectRatio,
     megapixels: megapixels,
-    background_shade: backgroundShade, // Adaptive background class
+    edge_brightness_score: edgeBrightnessScore, // Raw brightness data for templates
+    brightness_score: brightnessScore, // Raw brightness data for templates
     metadata: {
       uid: photo.uid,
       original_width: photo.width,

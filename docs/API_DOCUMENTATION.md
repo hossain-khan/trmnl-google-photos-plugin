@@ -117,7 +117,8 @@ Content-Type: application/json
   "relative_date": "4 months ago",
   "aspect_ratio": "4:3",
   "megapixels": 12.5,
-  "background_shade": "bg--gray-50"
+  "edge_brightness_score": 75,
+  "brightness_score": 82
 }
 ```
 
@@ -223,9 +224,24 @@ The optional `adaptive_background` parameter enables intelligent background colo
 **How It Works:**
 
 1. Photo thumbnail (400×300px) is analyzed for brightness using [Image Insights API](https://image-insights.gohk.uk/)
-2. Brightness score (0-100) is mapped to one of 16 TRMNL background shades (bg--black to bg--white)
-3. Edge brightness analysis (left_right mode) ensures optimal contrast with photo edges
+2. Two brightness scores (0-100) are returned: `edge_brightness_score` (edges) and `brightness_score` (overall)
+3. Templates map `edge_brightness_score` to one of 16 TRMNL background shades (bg--black to bg--white)
 4. Result cached with album data for subsequent requests
+
+**Template Layer Mapping:**
+
+The API returns raw brightness scores, and TRMNL templates handle the mapping:
+
+```liquid
+{% render "map_brightness_to_background", edge_score: edge_brightness_score %}
+<div class="layout {% if bg_class %}{{ bg_class }}{% endif %}">
+```
+
+This separation allows:
+
+- Service layer focuses on data collection
+- Template layer controls presentation logic
+- Different layouts can use different mapping strategies
 
 **Privacy-First Design:**
 
@@ -237,7 +253,7 @@ The optional `adaptive_background` parameter enables intelligent background colo
 **Performance Impact:**
 
 - Adds ~100-200ms latency (brightness analysis time)
-- 1-second timeout with graceful fallback (no background_shade if analysis fails)
+- 1-second timeout with graceful fallback (no brightness scores if analysis fails)
 - Analysis uses 400×300 thumbnail (6× smaller than full photo)
 - Default: OFF (opt-in via query parameter or custom field)
 
@@ -247,12 +263,13 @@ The optional `adaptive_background` parameter enables intelligent background colo
 curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/...&adaptive_background=true"
 ```
 
-**Example Response with Background Shade:**
+**Example Response with Brightness Scores:**
 
 ```json
 {
   "photo_url": "https://lh3.googleusercontent.com/...=w1040-h780",
-  "background_shade": "bg--gray-50",
+  "edge_brightness_score": 75,
+  "brightness_score": 82,
   ...
 }
 ```
@@ -355,7 +372,8 @@ curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.ap
   "relative_date": "1 year ago",
   "aspect_ratio": "4:3",
   "megapixels": 12.5,
-  "background_shade": "bg--gray-50"
+  "edge_brightness_score": 75,
+  "brightness_score": 82
 }
 ```
 
