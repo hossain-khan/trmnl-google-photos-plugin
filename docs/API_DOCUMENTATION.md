@@ -84,10 +84,11 @@ Host: trmnl-google-photos.gohk.xyz
 
 **Query Parameters:**
 
-| Parameter        | Type   | Required | Description                                                   |
-| ---------------- | ------ | -------- | ------------------------------------------------------------- |
-| `album_url`      | string | Yes      | Google Photos shared album URL                                |
-| `enable_caching` | string | No       | Enable/disable caching: 'true'/'false'/'1'/'0' (default true) |
+| Parameter             | Type   | Required | Description                                                                            |
+| --------------------- | ------ | -------- | -------------------------------------------------------------------------------------- |
+| `album_url`           | string | Yes      | Google Photos shared album URL                                                         |
+| `enable_caching`      | string | No       | Enable/disable caching: 'true'/'false'/'1'/'0' (default true)                          |
+| `adaptive_background` | string | No       | Enable adaptive background: 'true'/'false'/'1'/'0' (default false, ~100-200ms latency) |
 
 **Supported Album URL Formats:**
 
@@ -115,24 +116,26 @@ Content-Type: application/json
   "photo_count": 142,
   "relative_date": "4 months ago",
   "aspect_ratio": "4:3",
-  "megapixels": 12.5
+  "megapixels": 12.5,
+  "background_shade": "bg--gray-50"
 }
 ```
 
 **Response Fields:**
 
-| Field               | Type           | Description                                                                  |
-| ------------------- | -------------- | ---------------------------------------------------------------------------- |
-| `photo_url`         | string         | Full-resolution photo URL (optimized)                                        |
-| `thumbnail_url`     | string         | Lower resolution version                                                     |
-| `caption`           | string \| null | Photo caption (always `null` - not available from shared albums)             |
-| `timestamp`         | string         | ISO 8601 timestamp                                                           |
-| `image_update_date` | string         | ISO 8601 timestamp when photo was last updated/taken                         |
-| `album_name`        | string         | Album name (always "Google Photos Shared Album" - actual name not available) |
-| `photo_count`       | number         | Total photos in album                                                        |
-| `relative_date`     | string         | Human-readable relative date (e.g., "4 months ago")                          |
-| `aspect_ratio`      | string         | Photo aspect ratio (e.g., "4:3", "16:9")                                     |
-| `megapixels`        | number         | Photo megapixels (calculated from width × height)                            |
+| Field               | Type           | Description                                                                                                   |
+| ------------------- | -------------- | ------------------------------------------------------------------------------------------------------------- |
+| `photo_url`         | string         | Full-resolution photo URL (optimized)                                                                         |
+| `thumbnail_url`     | string         | Lower resolution version                                                                                      |
+| `caption`           | string \| null | Photo caption (always `null` - not available from shared albums)                                              |
+| `timestamp`         | string         | ISO 8601 timestamp                                                                                            |
+| `image_update_date` | string         | ISO 8601 timestamp when photo was last updated/taken                                                          |
+| `album_name`        | string         | Album name (always "Google Photos Shared Album" - actual name not available)                                  |
+| `photo_count`       | number         | Total photos in album                                                                                         |
+| `relative_date`     | string         | Human-readable relative date (e.g., "4 months ago")                                                           |
+| `aspect_ratio`      | string         | Photo aspect ratio (e.g., "4:3", "16:9")                                                                      |
+| `megapixels`        | number         | Photo megapixels (calculated from width × height)                                                             |
+| `background_shade`  | string \| null | TRMNL background class (e.g., "bg--gray-50") based on photo brightness (only when `adaptive_background=true`) |
 
 **Error: Missing URL (400 Bad Request):**
 
@@ -213,14 +216,60 @@ X-Request-ID: a1b2c3d4
 - **X-Response-Time**: Track API performance and identify slow requests
 - **X-Request-ID**: Correlate client requests with server logs for debugging
 
+#### Adaptive Background Feature
+
+The optional `adaptive_background` parameter enables intelligent background color selection based on photo brightness analysis.
+
+**How It Works:**
+
+1. Photo thumbnail (400×300px) is analyzed for brightness using [Image Insights API](https://image-insights.gohk.uk/)
+2. Brightness score (0-100) is mapped to one of 16 TRMNL background shades (bg--black to bg--white)
+3. Edge brightness analysis (left_right mode) ensures optimal contrast with photo edges
+4. Result cached with album data for subsequent requests
+
+**Privacy-First Design:**
+
+- Zero image storage - never saved to disk or database
+- In-memory processing only - immediately discarded after analysis
+- Stateless architecture - no tracking, sessions, or user data retention
+- Open source: [Image Insights API](https://github.com/hossain-khan/image-insights-api)
+
+**Performance Impact:**
+
+- Adds ~100-200ms latency (brightness analysis time)
+- 1-second timeout with graceful fallback (no background_shade if analysis fails)
+- Analysis uses 400×300 thumbnail (6× smaller than full photo)
+- Default: OFF (opt-in via query parameter or custom field)
+
+**Example Request:**
+
+```bash
+curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/...&adaptive_background=true"
+```
+
+**Example Response with Background Shade:**
+
+```json
+{
+  "photo_url": "https://lh3.googleusercontent.com/...=w1040-h780",
+  "background_shade": "bg--gray-50",
+  ...
+}
+```
+
+**TRMNL Background Palette** (16 levels):
+
+`bg--black`, `bg--gray-10`, `bg--gray-15`, `bg--gray-20`, `bg--gray-25`, `bg--gray-30`, `bg--gray-35`, `bg--gray-40`, `bg--gray-45`, `bg--gray-50`, `bg--gray-55`, `bg--gray-60`, `bg--gray-65`, `bg--gray-70`, `bg--gray-75`, `bg--white`
+
 #### Performance Characteristics
 
-| Metric                   | Value    |
-| ------------------------ | -------- |
-| Response Time (cached)   | 67ms     |
-| Response Time (uncached) | 1-2s     |
-| JSON Size                | 300-500B |
-| CPU Time                 | <50ms    |
+| Metric                                      | Value      |
+| ------------------------------------------- | ---------- |
+| Response Time (cached)                      | 67ms       |
+| Response Time (uncached)                    | 1-2s       |
+| Response Time (adaptive_background enabled) | +100-200ms |
+| JSON Size                                   | 300-500B   |
+| CPU Time                                    | <50ms      |
 
 #### Error Codes
 
@@ -286,13 +335,37 @@ curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.ap
 }
 ```
 
-### Example 2: With Different Album
+### Example 2: With Adaptive Background
+
+```bash
+curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8&adaptive_background=true"
+```
+
+**Response:**
+
+```json
+{
+  "photo_url": "https://lh3.googleusercontent.com/...=w1040-h780",
+  "thumbnail_url": "https://lh3.googleusercontent.com/...=w400-h300",
+  "caption": null,
+  "timestamp": "2026-01-24T09:00:00.000Z",
+  "image_update_date": "2023-01-07T18:13:24.232Z",
+  "album_name": "Google Photos Shared Album",
+  "photo_count": 142,
+  "relative_date": "1 year ago",
+  "aspect_ratio": "4:3",
+  "megapixels": 12.5,
+  "background_shade": "bg--gray-50"
+}
+```
+
+### Example 3: With Different Album
 
 ```bash
 curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.google.com/share/AF1QipMZN..."
 ```
 
-### Example 3: Testing Locally
+### Example 4: Testing Locally
 
 ```bash
 # Start local dev server first: npm run dev
