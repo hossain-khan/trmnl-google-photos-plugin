@@ -80,7 +80,7 @@ async function checkServiceStatus() {
       badge.textContent = '🟢 Online';
       badge.setAttribute(
         'data-tooltip',
-        `API healthy • ${responseTime}ms • v${data.version || '0.2.0'} • Click to refresh`
+        `API healthy • ${responseTime}ms • v${data.version || '1.1.0'} • Click to refresh`
       );
 
       console.log(`[Status] ✓ Service is healthy (${data.status}) - ${responseTime}ms`);

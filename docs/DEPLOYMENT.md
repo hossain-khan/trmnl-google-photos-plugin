@@ -87,7 +87,7 @@ Expected response:
 {
   "status": "ok",
   "service": "trmnl-google-photos-plugin",
-  "version": "0.2.0",
+  "version": "1.1.0",
   "environment": "production",
   "timestamp": "2026-01-18T19:00:00.000Z",
   "message": "TRMNL Google Photos Plugin is running"
