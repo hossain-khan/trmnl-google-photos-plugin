@@ -273,7 +273,7 @@ app.get('/api/photo', async (c) => {
     }
 
     // Return JSON response (flat structure for TRMNL templates)
-    const response = {
+    const response: Record<string, unknown> = {
       photo_url: photoData.photo_url,
       thumbnail_url: photoData.thumbnail_url,
       edge_brightness_score: photoData.edge_brightness_score, // Raw brightness data (undefined if disabled)
