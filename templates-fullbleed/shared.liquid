@@ -1,0 +1,113 @@
+{% comment %}
+  Shared template for Google Photos plugin
+  This file contains reusable assets and utilities for all layout templates:
+  - Google Photos icon (base64-encoded)
+  - Brightness mapping utilities for adaptive backgrounds
+  - Reusable error state template
+  - Photo data is provided by backend API endpoint (/api/photo)
+{% endcomment %}
+
+{% comment %}
+  Google Photos icon for title bars (59x59px, base64-encoded PNG)
+  Usage in templates:
+    <img src="{{ icon_google_photos }}" class="icon" alt="Google Photos">
+  
+  This icon is a stylized version of the Google Photos logo optimized for e-ink displays:
+  - 59x59px resolution (optimal for TRMNL title bars)
+  - PNG format with transparency
+  - Base64-encoded for direct embedding
+{% endcomment %}
+{%- capture icon_google_photos -%}
+data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAQAAACQ9RH5AAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAABThJREFUeNrFmM9vG0UUxzc/mtRNuZTEm+x+36xdXH6lUYl6zCXcyqVIUMgpEjQnxAH+AvgDeqiqikiFG0hpkgvlBHe49BACVKFNWlSRNE7ASkqapPZ6HT/8ZDsjZHdnN2AzX8kHz+x85r15895orCO2TvnBNWJsYRFfuR87o9X/M71WS1uXZdlJbClGoFixLMCdxbh0pY63GJy2sU6MAgL4YGLF8N1pu8+yhntabHENzGCUUCBf4FhEptLf3UJw0ka2Bq7Lp6JirDsvyYhWg30wtA7wVDFW3Ocl0NoJFu17TPOWtI72gg/E4e6ldoNFBcX4xeoWdDvBIl8xvfl/gPOKMRN/Wllp56E6KooLDoixZvfFsFkwxv/N4HJFTGc1OCJ04CRG8AZN0AQu0Fm7T/dHBLNENi5EOc31IV100b2JNbCqCYxVzNBFgckoI1iH14QZ3FGdFm/hZ4GROCsgn3wE1QIgB8S9dIjuNFqswSYsTtGsAFBAHiWUofcrQB6+9NE8Tom9/5WrBZvBssfI66TfoAJ8j/EAZ6o1N3304NLYIQ+PFNMOOFRl7CumzVRKPhsc+FfHSToyvfhRMZ4YsDo13BGLycH6kRKIBtNVj7ErFoVDddjgc8tyKMTiQoSU6YwS62AyS0YSu+fOH8O2gBt7kY9UJGheSVBxDPCBOHK4BzliFBr7xV68bcCq0wiMTm6suIw/MY67qhn4icc0Z7wI0IeKyQfHBpdxhRY0uL542vEY9yJcfWhOMRVjQDXie1r656LJx57HWI102XN/JcYB+Ahap00Jy9pSfDmOHuO2Om3ESsM2FSUnRVRB7s+QM1DLchJqCFBWnGJiXBcnOycyvcM9YapsA7FiiizFImKdFsG1GTZoGiMxLhq4hi08QtagdWSxjRzu0gIt0SZ8lOtJlB7iW3yCcacfCTvpkDeUGvSGmkv6yEnblrS0bSftZNJ+ltL24AA5Dp0/Ntzjvo4r9AOyyNfAEpiPsYoV3McacsjRpkEb2KAd3LCiN/c1zCCHmqO1q1HfhBgbRiynrStUHc4Jy0ICX9SjQVdc7IMPXV6KrECSjNFOqUP0Au4IVCK4orqlj+lhvKOorwi0EAHrvUIbimtI/Tnjd3ynGEFssO8xvgzFyrOCncRvMj0EqlUmxgo+Jb3TUVUCK8ZH4RciCalvFKPU4NCSYtzHOP5QDD8WWCrXlnsuhIuEZdFlYmrmTgGvOf00nWLsxsnyssPuzRDscI+gsfiMElIiRg4JjBBTjOpGPomHxg32upPa3mZgO2lZuO6xTifhkgBV7H4mJTN0f2lWh1UjmDYcsiynH7c9xlOUzViJZ1rof07CNiSeU4O4p0OnCXjTG5KxOINVqcuGgxUgUFKrXxZvhjpajWGXmIrh4IGTlZGvYlkxBN7MP2UEVCRWcgBHZG5D4nDfRXWHQ8FSeeVyj6+JVXW8T0WxDyUBwkdQ67mVGpRabcxYmKIIYMFWbaD3sNhYLFQV+hNdljEaawaXTBbXY0IW4E7SHJaxh3o52cOyO+tOCtDwyhnT1frdsqtqtwSlM1b5dgpT7jvOWNKuR43hHqaDy9HBZQDrpINE89lklLnp47RsPk4NU3ZlepFAInVchESmt9FSc4HQCcQMjt/MKbNFYHORaB9Yl8X3STBB28B6n3FLbEa5nWCJbak+DxQj3zawRrsvIitoHLQJrIMslcKiJ7gCyu0CS+sWy+kqcbX0URElASPbUrB+v3RGaQ6l+oMjMf3VcrB+t/XS9AHNYkmyOG7Iko76Bv8323ftNhD5Mp0AAAAASUVORK5CYII=
+{%- endcapture -%}
+
+{% comment %}
+  ====================================================================================
+  BRIGHTNESS MAPPING UTILITIES
+  ====================================================================================
+  Maps image brightness scores (0-100 scale) to all 16 TRMNL Framework background colors
+  for adaptive background styling in full-screen image layouts.
+  
+  Available from API response:
+  - brightness_score: Overall image brightness (0-100)
+  - edge_brightness_score: Brightness at edges (0-100) - better for detecting light backgrounds
+  
+  TRMNL Framework background classes (all 16 shades):
+  - bg--black (0% brightness)
+  - bg--gray-10, bg--gray-15, bg--gray-20, bg--gray-25
+  - bg--gray-30, bg--gray-35, bg--gray-40, bg--gray-45
+  - bg--gray-50, bg--gray-55, bg--gray-60, bg--gray-65
+  - bg--gray-70, bg--gray-75, bg--white (100% brightness)
+  
+  Reference: https://usetrmnl.com/framework/background
+{% endcomment %}
+
+{% comment %}
+  Map brightness score to TRMNL background color class using all 16 shades
+  Uses edge_brightness_score if available (better for light backgrounds behind images),
+  falls back to overall brightness_score
+  
+  Brightness ranges mapped to 16 shades (0-100 scale):
+  - 0-6: bg--black
+  - 7-13: bg--gray-10
+  - 14-19: bg--gray-15
+  - 20-25: bg--gray-20
+  - 26-31: bg--gray-25
+  - 32-37: bg--gray-30
+  - 38-43: bg--gray-35
+  - 44-50: bg--gray-40
+  - 51-56: bg--gray-45
+  - 57-62: bg--gray-50
+  - 63-68: bg--gray-55
+  - 69-74: bg--gray-60
+  - 75-81: bg--gray-65
+  - 82-87: bg--gray-70
+  - 88-93: bg--gray-75
+  - 94-100: bg--white
+  
+  This provides fine-grained color matching for optimal visual integration
+  with image edges or overall brightness.
+{% endcomment %}
+{% liquid
+  assign edge_brightness = edge_brightness_score | default: brightness_score | default: 100
+  assign overall_brightness = brightness_score | default: 100
+  
+  case edge_brightness
+  when 0
+    assign bg_class = 'bg--black'
+  when 1,2,3,4,5,6
+    assign bg_class = 'bg--black'
+  when 7,8,9,10,11,12,13
+    assign bg_class = 'bg--gray-10'
+  when 14,15,16,17,18,19
+    assign bg_class = 'bg--gray-15'
+  when 20,21,22,23,24,25
+    assign bg_class = 'bg--gray-20'
+  when 26,27,28,29,30,31
+    assign bg_class = 'bg--gray-25'
+  when 32,33,34,35,36,37
+    assign bg_class = 'bg--gray-30'
+  when 38,39,40,41,42,43
+    assign bg_class = 'bg--gray-35'
+  when 44,45,46,47,48,49,50
+    assign bg_class = 'bg--gray-40'
+  when 51,52,53,54,55,56
+    assign bg_class = 'bg--gray-45'
+  when 57,58,59,60,61,62
+    assign bg_class = 'bg--gray-50'
+  when 63,64,65,66,67,68
+    assign bg_class = 'bg--gray-55'
+  when 69,70,71,72,73,74
+    assign bg_class = 'bg--gray-60'
+  when 75,76,77,78,79,80,81
+    assign bg_class = 'bg--gray-65'
+  when 82,83,84,85,86,87
+    assign bg_class = 'bg--gray-70'
+  when 88,89,90,91,92,93
+    assign bg_class = 'bg--gray-75'
+  when 94,95,96,97,98,99,100
+    assign bg_class = 'bg--white'
+  else
+    assign bg_class = 'bg--white'
+  endcase
+%}
