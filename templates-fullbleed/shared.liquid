@@ -1,8 +1,10 @@
 {% comment %}
   Shared template for Google Photos plugin
-  This file contains reusable assets and variables for all layout templates:
-  - Google Photos icon (base64-encoded) for title bars
-  - Photo selection logic (currently handled by backend API)
+  This file contains reusable assets and utilities for all layout templates:
+  - Google Photos icon (base64-encoded)
+  - Brightness mapping utilities for adaptive backgrounds
+  - Reusable error state template
+  - Photo data is provided by backend API endpoint (/api/photo)
 {% endcomment %}
 
 {% comment %}
@@ -20,6 +22,57 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAQAAACQ9RH5AAAAAXNSR0IArs
 {%- endcapture -%}
 
 {% comment %}
+  ====================================================================================
+  BRIGHTNESS MAPPING UTILITIES
+  ====================================================================================
+  Maps image brightness scores (0-100 scale) to TRMNL Framework background colors
+  for adaptive background styling in full-screen image layouts.
+  
+  Available from API response:
+  - brightness_score: Overall image brightness (0-100)
+  - edge_brightness_score: Brightness at edges (0-100) - better for detecting light backgrounds
+  
+  TRMNL Framework background classes:
+  - bg--white (100% brightness)
+  - bg--gray-25 (75% brightness)
+  - bg--gray-50 (50% brightness)
+  - bg--gray-75 (25% brightness)
+  - bg--black (0% brightness)
+{% endcomment %}
+
+{% comment %}
+  Map brightness score to TRMNL background color class
+  Uses edge_brightness_score if available (better for light backgrounds behind images),
+  falls back to overall brightness_score
+  
+  Parameters:
+  - brightness_overall: Overall image brightness (0-100)
+  - brightness_edge: Edge brightness for light background detection (0-100)
+  
+  Returns: TRMNL Framework background class (e.g., "bg--white", "bg--gray-50", "bg--black")
+  
+  Logic:
+  - Use edge_brightness_score if available (better for detecting light edges/backgrounds)
+  - If edges are bright (>75), use white background to blend with light image edges
+  - Otherwise use overall brightness to determine best background match
+  - Thresholds: 75=white, 50=gray-25, 25=gray-50, else=black
+{% endcomment %}
+{% liquid
+  assign edge_brightness = edge_brightness_score | default: brightness_score | default: 50
+  assign overall_brightness = brightness_score | default: 50
+  
+  if edge_brightness > 75
+    assign bg_class = 'bg--white'
+  elsif edge_brightness > 50
+    assign bg_class = 'bg--gray-25'
+  elsif edge_brightness > 25
+    assign bg_class = 'bg--gray-50'
+  else
+    assign bg_class = 'bg--gray-75'
+  endif
+%}
+
+{% comment %}
   Photo data is provided by the backend API endpoint (/api/photo)
   The following variables are available from the JSON response:
   
@@ -29,6 +82,8 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAQAAACQ9RH5AAAAAXNSR0IArs
   - timestamp: When photo was taken/updated (ISO 8601 format)
   - album_name: Name of the source album
   - photo_count: Total number of photos in album
+  - brightness_score: Overall image brightness (0-100, optional)
+  - edge_brightness_score: Edge brightness for light background detection (0-100, optional)
 {% endcomment %}
 
 {% comment %}
@@ -40,60 +95,23 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAQAAACQ9RH5AAAAAXNSR0IArs
 {% endcomment %}
 
 {% comment %}
-  Photo Display Template
-  ----------------------
-  Renders a photo with optimal settings for e-ink displays.
-  
-  Parameters:
-  - photo_url: URL of the photo to display (required)
-  - caption: Alt text for accessibility (optional)
-  
-  Usage:
-    {% render "photo_display", photo_url: photo_url, caption: caption %}
-{% endcomment %}
-{% template photo_display %}
-<!-- Custom max-width/max-height ensures images fit without cut-off (handles portrait/landscape/any aspect ratio) -->
-<img src="{{ photo_url }}" 
-     alt="{{ caption }}" 
-     class="image image--contain image-dither"
-     style="max-width: 100%; max-height: 100%; object-fit: contain;">
-{% endtemplate %}
-
-{% comment %}
   Error State Template
   ----------------------
   Displays a helpful error message when no photo is available (plugin not configured).
   Provides clear instructions to guide users to configure their shared album URL.
   
-  Parameters:
-  - size: Layout size variant ('full', 'half', 'quadrant') - controls spacing and text sizing
+  This template is used in full-bleed full-screen image layouts when photo_url is empty.
   
-  Usage:
-    {% render "error_state", size: "full" %}
-    {% render "error_state", size: "half" %}
-    {% render "error_state", size: "quadrant" %}
+  Usage in full-screen templates:
+    {% if photo_url and photo_url != '' %}
+      <!-- Show photo -->
+    {% else %}
+      <div class="flex flex--col flex--center-x flex--center-y gap--medium h--full">
+        <div class="value value--large text--center">📷</div>
+        <div class="title title--medium text--center">No Photos Available</div>
+        <div class="description text--center">
+          Please configure your Google Photos shared album URL in the plugin settings.
+        </div>
+      </div>
+    {% endif %}
 {% endcomment %}
-{% template error_state %}
-{% if size == 'full' %}
-<div class="flex flex--col flex--center-x flex--center-y gap--medium md:gap--large h--full">
-  <div class="value value--large md:value--xlarge lg:value--xxlarge text--center">📷</div>
-  <div class="title title--medium md:title--large lg:title--xlarge text--center">No Photos Available</div>
-  <div class="description md:title md:title--small lg:title lg:title--medium text--center">
-    Please configure your Google Photos shared album URL in the plugin settings.
-  </div>
-</div>
-{% elsif size == 'half' %}
-<div class="flex flex--col flex--center-x flex--center-y gap--small md:gap--medium h--full">
-  <div class="value value--medium md:value--large lg:value--xlarge">📷</div>
-  <div class="title title--small md:title--medium lg:title--large text--center">No Photos</div>
-  <div class="description md:title md:title--small text--center">
-    Configure your shared album URL in settings
-  </div>
-</div>
-{% elsif size == 'quadrant' %}
-<div class="flex flex--col flex--center-x flex--center-y gap--xsmall h--full">
-  <div class="value value--small md:value--medium">📷</div>
-  <div class="description md:title md:title--small text--center">No Photos</div>
-</div>
-{% endif %}
-{% endtemplate %}
