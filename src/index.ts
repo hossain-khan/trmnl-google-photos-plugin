@@ -233,8 +233,8 @@ app.get('/api/photo', async (c) => {
         count: photoData.photo_count,
         fetchDuration,
         cached: cacheHit,
-        backgroundAnalyzed: analyzeImage,
-        backgroundShade: photoData.background_shade,
+        brightnessAnalyzed: analyzeImage,
+        edgeBrightnessScore: photoData.edge_brightness_score,
       });
     } catch (error) {
       const fetchDuration = Date.now() - fetchStartTime;
@@ -276,7 +276,8 @@ app.get('/api/photo', async (c) => {
     const response = {
       photo_url: photoData.photo_url,
       thumbnail_url: photoData.thumbnail_url,
-      background_shade: photoData.background_shade, // Adaptive background (undefined if disabled)
+      edge_brightness_score: photoData.edge_brightness_score, // Raw brightness data (undefined if disabled)
+      brightness_score: photoData.brightness_score, // Raw brightness data (undefined if disabled)
       caption: photoData.caption,
       timestamp: photoData.timestamp,
       image_update_date: photoData.image_update_date,
