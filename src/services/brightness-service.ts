@@ -59,62 +59,6 @@ const ANALYSIS_TIMEOUT_MS = 1000; // 1 second maximum
 const EDGE_MODE = 'left_right'; // Analyze left/right edges (10% each)
 
 /**
- * Map edge brightness score (0-100) to TRMNL background shade class
- *
- * **Strategy**: Match/Blend - Dark edges → Dark background
- *
- * TRMNL Framework has 16-level palette:
- * - bg--black (darkest)
- * - bg--gray-10 through bg--gray-75 (14 gray shades)
- * - bg--white (lightest)
- *
- * Each level covers ~6.25 points on 0-100 scale (100 / 16 = 6.25)
- *
- * @param edgeBrightnessScore - Brightness score from 0 (dark) to 100 (bright)
- * @returns TRMNL background class (e.g., "bg--gray-50")
- */
-export function mapBrightnessToBackground(edgeBrightnessScore: number): string {
-  // Clamp to valid range
-  const score = Math.max(0, Math.min(100, edgeBrightnessScore));
-
-  // Map to 16 levels (0-100 → 16 classes)
-  // https://usetrmnl.com/framework/background
-  if (score < 6.25) {
-    return 'bg--black'; // 0-6
-  } else if (score < 12.5) {
-    return 'bg--gray-10'; // 7-12
-  } else if (score < 18.75) {
-    return 'bg--gray-15'; // 13-18
-  } else if (score < 25) {
-    return 'bg--gray-20'; // 19-25
-  } else if (score < 31.25) {
-    return 'bg--gray-25'; // 26-31
-  } else if (score < 37.5) {
-    return 'bg--gray-30'; // 32-37
-  } else if (score < 43.75) {
-    return 'bg--gray-35'; // 38-43
-  } else if (score < 50) {
-    return 'bg--gray-40'; // 44-50
-  } else if (score < 56.25) {
-    return 'bg--gray-45'; // 51-56
-  } else if (score < 62.5) {
-    return 'bg--gray-50'; // 57-62
-  } else if (score < 68.75) {
-    return 'bg--gray-55'; // 63-68
-  } else if (score < 75) {
-    return 'bg--gray-60'; // 69-75
-  } else if (score < 81.25) {
-    return 'bg--gray-65'; // 76-81
-  } else if (score < 87.5) {
-    return 'bg--gray-70'; // 82-87
-  } else if (score < 93.75) {
-    return 'bg--gray-75'; // 88-93
-  } else {
-    return 'bg--white'; // 94-100
-  }
-}
-
-/**
  * Brightness scores returned from analysis
  */
 export interface BrightnessScores {

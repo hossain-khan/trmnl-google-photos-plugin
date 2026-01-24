@@ -39,51 +39,11 @@ When `adaptive_background=false` (default), these fields are `undefined`.
 
 **File**: `src/services/brightness-service.ts`
 
+The brightness service exports the `analyzeImageBrightness()` function that integrates with the Image Insights API to analyze photo brightness. The API service calls this function and returns the raw brightness scores.
+
 #### Test Cases
 
-##### mapBrightnessToBackground()
-
-Tests the brightness-to-background mapping function:
-
-```typescript
-// Dark brightness (0-10) → bg--black
-mapBrightnessToBackground(0); // 'bg--black'
-mapBrightnessToBackground(5); // 'bg--black'
-mapBrightnessToBackground(10); // 'bg--gray-10'
-
-// Mid-tone brightness (40-60) → gray-40 to gray-50
-mapBrightnessToBackground(50); // 'bg--gray-40' or 'bg--gray-45'
-
-// Bright brightness (85-100) → bg--white
-mapBrightnessToBackground(85); // 'bg--gray-65'
-mapBrightnessToBackground(100); // 'bg--white'
-
-// Edge cases
-mapBrightnessToBackground(-10); // 'bg--black' (clamped)
-mapBrightnessToBackground(150); // 'bg--white' (clamped)
-```
-
-**Manual Test:**
-
-```bash
-# Add to test file:
-import { mapBrightnessToBackground } from '../services/brightness-service';
-
-const testCases = [
-  { input: 0, expected: 'bg--black' },
-  { input: 25, expected: 'bg--gray-20' },
-  { input: 50, expected: 'bg--gray-40' },
-  { input: 75, expected: 'bg--gray-60' },
-  { input: 100, expected: 'bg--white' },
-];
-
-testCases.forEach(({ input, expected }) => {
-  const result = mapBrightnessToBackground(input);
-  console.assert(result === expected, `Failed: ${input} → ${result} (expected ${expected})`);
-});
-```
-
-##### analyzeImageBrightness()
+##### analyzeImageBrightness() - API Integration
 
 Tests the Image Insights API integration:
 
