@@ -1,4 +1,4 @@
-# TRMNL Fullscreen Google Photos Plugin — Custom Fields
+# TRMNL Google Photos Canvas Plugin — Custom Fields
 # For distraction-free, fullscreen photo display (no metadata, no captions)
 # Dev Documentation: https://help.usetrmnl.com/en/articles/10513740-custom-plugin-form-builder
 
@@ -10,12 +10,12 @@
   field_type: author_bio
   category: images,personal
   description: |
-    <strong>TRMNL Fullscreen Google Photos</strong> displays your Google Photos shared album in a clean, immersive, fullscreen layout — no captions, no metadata, just your photos edge to edge.
+    <strong>TRMNL Google Photos Canvas</strong> displays your Google Photos shared album in a clean, immersive, fullscreen layout — no captions, no metadata, just your photos edge to edge.
     <br><br>
     <strong>How It Works:</strong><br>
     1. Create a shared album in Google Photos<br>
     2. Copy the shared album link<br>
-    3. Paste it below<br>
+    3. Paste it below in the recipe settings<br>
     4. Enjoy a new random photo every hour or day (based on your TRMNL refresh settings)
     <br><br>
     <strong>Features:</strong><br>
@@ -34,17 +34,17 @@
   default: ""
   optional: false
   help_text: "To create a shared album: Google Photos → Create → Shared Album → Get Link. Make sure link sharing is enabled. Leave blank to see a demo photo."
+- keyname: adaptive_background
+  field_type: boolean
+  default: false
+  optional: true
+  name: Adaptive Background
+  description: "Match background color to photo edge for seamless display"
+  help_text: "When enabled, the background shade adapts to each photo for a more immersive look. Adds ~100-200ms to loading. Disable for pure white background."
 - keyname: enable_caching
   field_type: boolean
   default: true
   optional: true
   name: Enable Performance Caching
-  description: "Cache photo info for faster loading (recommended)"
+  description: "Cache photo info for faster loading"
   help_text: "When enabled, the plugin remembers your album's photos for 1 hour for instant loading. No actual photos are stored. Disable for always-fresh photos (slower)."
-- keyname: adaptive_background
-  field_type: boolean
-  default: false
-  optional: true
-  name: Adaptive Background (Recommended)
-  description: "Match background color to photo edge for seamless display"
-  help_text: "When enabled, the background shade adapts to each photo for a more immersive look. Adds ~100-200ms to loading. Disable for pure white background."
