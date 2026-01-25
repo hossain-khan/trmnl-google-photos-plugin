@@ -432,13 +432,16 @@ Useful Liquid snippets used throughout templates:
 Examples for more complex layouts and device-specific handling:
 
 - **Grid example:**
+
 ```liquid
 <div class="grid grid--cols-2 gap--medium md:grid--cols-3">
   <div class="item">...</div>
   <div class="item">...</div>
 </div>
 ```
+
 - **Device / bit-depth example:**
+
 ```liquid
 <div class="hidden md:1bit:block md:2bit:flex lg:4bit:grid">
   <!-- Simplified for 1-bit, enhanced for 4-bit -->
@@ -448,11 +451,13 @@ Examples for more complex layouts and device-specific handling:
 ## Accessibility & Contrast Guidance
 
 - **Alt text:** Always include descriptive alt text (use caption fallback):
+
 ```liquid
 <img src="{{ photo_url }}" alt="{{ caption | default: 'Photo from Google Photos' }}" aria-label="{{ caption | default: 'Photo from Google Photos' }}" class="image image--contain">
 ```
 
 - **Adaptive background contrast:** Ensure error and UI text remain readable when `bg_class` is dark. Example mapping in `shared.liquid`:
+
 ```liquid
 {% case bg_class %}
 {% when 'bg--black','bg--gray-10','bg--gray-15','bg--gray-20','bg--gray-25','bg--gray-30','bg--gray-35','bg--gray-40' %}
@@ -465,9 +470,11 @@ Examples for more complex layouts and device-specific handling:
 ## Template Debugging & Preview QA
 
 - Use the polling URL with `adaptive_background` to test background adaptation:
+
 ```
 https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&adaptive_background={{ adaptive_background }}
 ```
+
 - Keep `templates/preview/` versions in sync with production templates for faster visual QA.
 - Add tests to assert shared includes, preview parity, accessibility attributes, and adaptive background behavior.
 
