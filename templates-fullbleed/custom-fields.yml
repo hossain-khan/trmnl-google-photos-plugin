@@ -1,33 +1,28 @@
-# This file contains custom fields for the TRMNL Google Photos Shared Album Plugin
+# TRMNL Google Photos Canvas Plugin — Custom Fields
+# For distraction-free, fullscreen photo display (no metadata, no captions)
 # Dev Documentation: https://help.usetrmnl.com/en/articles/10513740-custom-plugin-form-builder
 
-# ℹ️ Must set this new polling URL with adaptive brightness
-# ================================================================
-# Polling URL - TRMNL will call this endpoint with form field values
+# ℹ️ Use this polling URL for adaptive background support:
 # polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}&adaptive_background={{ adaptive_background }}
-# ================================================================
+
 - keyname: author_bio
   name: About This Plugin
   field_type: author_bio
   category: images,personal
   description: |
-    Google Photos Shared Album brings your cherished memories to your TRMNL device by displaying random photos from your Google Photos shared albums — no sign-in needed.
+    <strong>TRMNL Google Photos Canvas</strong> displays your Google Photos shared album in a clean, immersive, fullscreen layout — no captions, no metadata, just your photos edge to edge.
     <br><br>
     <strong>How It Works:</strong><br>
     1. Create a shared album in Google Photos<br>
     2. Copy the shared album link<br>
-    3. Paste it into the plugin settings<br>
-    4. Photos automatically appear on your TRMNL device<br>
-    5. New random photo displayed every hour or day based on your refresh configuration
+    3. Paste it below in the recipe settings<br>
+    4. Enjoy a new random photo every hour or day (based on your TRMNL refresh settings)
     <br><br>
     <strong>Features:</strong><br>
-    📸 Random photo selection from your shared albums<br>
-    ⏰ Automatic refresh with new random photos<br>
-    🎨 Four optimized layouts for all TRMNL device sizes<br>
-    📱 Responsive design across all e-ink displays<br>
-    🖼️ Display photo metadata
-    <br><br>
-    <strong>Privacy-First Design:</strong> This plugin prioritizes your privacy - no need to sign in with Google. No cookies, no tracking, and we never save your personal information. 
+    🖼️ Fullscreen, distraction-free photo display<br>
+    🌈 Adaptive background color based on image being displayed (optional)<br>
+    ⚡ Fast loading with optional caching<br>
+    🔒 No sign-in, no tracking, privacy-first
   github_url: https://github.com/hossain-khan/trmnl-google-photos-plugin
   learn_more_url: https://hossain-khan.github.io/trmnl-google-photos-plugin/
   email_address: trmnl@hossain.dev
@@ -37,41 +32,19 @@
   description: "Paste your Google Photos shared album link (e.g., https://photos.app.goo.gl/ABC123)"
   placeholder: "https://photos.app.goo.gl/..."
   default: ""
-  optional: true
-  help_text: To create a shared album, open Google Photos → Create → Shared Album → Get Link. Ensure link sharing is enabled. Leave blank to see a demo photo.
-- keyname: custom_title
-  field_type: string
-  name: Display Name
-  description: "Custom name to show in the title bar (optional)"
-  placeholder: "My Google Photos"
-  default: ""
-  optional: true
-  help_text: This name appears in the plugin's title bar. Leave blank to use the plugin name (Google Photos Shared Album).
-- keyname: show_year
+  optional: false
+  help_text: "To create a shared album: Google Photos → Create → Shared Album → Get Link. Make sure link sharing is enabled. Leave blank to see a demo photo."
+- keyname: adaptive_background
   field_type: boolean
-  default: true
+  default: false
   optional: true
-  name: Show Photo Year
-  description: "Display the photo year in the bottom right corner"
-  help_text: When enabled, the year from the photo's date appears in the bottom right corner with a white stroke for visibility. Disable if you prefer a cleaner photo display.
-- keyname: show_metadata
-  field_type: boolean
-  default: true
-  optional: true
-  name: Show Photo Details
-  description: "Display photo date, size, and count in the title bar"
-  help_text: When enabled, shows photo details like date, size, and total count (e.g., '2 years ago • 12MP • 142 photos'). When disabled, only shows photo count for a cleaner look.
+  name: Adaptive Background
+  description: "Match background color to photo edge for seamless display"
+  help_text: "When enabled, the background shade adapts to each photo for a more immersive look. Adds ~100-200ms to loading. Disable for pure white background."
 - keyname: enable_caching
   field_type: boolean
   default: true
   optional: true
   name: Enable Performance Caching
-  description: "Save photo information temporarily for faster loading (recommended)"
-  help_text: When enabled, we temporarily remember which photos are in your album for 1 hour so everything loads instantly. Your actual photos are never saved - we just remember they exist. Disable this to always fetch fresh photos directly from Google (takes a few seconds longer, but nothing is saved).
-- keyname: adaptive_background
-  field_type: boolean
-  default: false
-  optional: true
-  name: Adaptive Background (Experimental)
-  description: "Automatically adjust background color to match photo brightness"
-  help_text: When enabled, analyzes each photo's edge brightness and applies a matching background shade for seamless e-ink display. This reduces harsh white gaps around portrait/letterboxed photos. Adds ~100-200ms to photo loading. Leave disabled for fastest performance.
+  description: "Cache photo info for faster loading"
+  help_text: "When enabled, the plugin remembers your album's photos for 1 hour for instant loading. No actual photos are stored. Disable for always-fresh photos (slower)."
