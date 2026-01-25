@@ -5,7 +5,7 @@
 # ℹ️ Use this polling URL for adaptive background support:
 # polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}&adaptive_background={{ adaptive_background }}
 
-  keyname: author_bio
+- keyname: author_bio
   name: About This Plugin
   field_type: author_bio
   category: images,personal
