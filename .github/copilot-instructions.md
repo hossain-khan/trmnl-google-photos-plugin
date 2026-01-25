@@ -403,6 +403,76 @@ Always provide helpful error states for unconfigured plugins:
 
 Use consistent padding unless space constraints require reduction.
 
+---
+
+## Quick Reference
+
+A short set of commonly used TRMNL framework utilities for quick reference:
+
+- **Layout:** `flex flex--row flex--col flex--center-x flex--center-y gap--small gap--medium h--full w--full`
+- **Typography:** `title title--medium value value--xlarge description`
+- **Images:** `image image--contain image-dither`
+- **Responsive:** `sm: md: lg: portrait: 1bit: 2bit: 4bit:`
+- **Visual:** `bg--white bg--gray-50 bg--black rounded text--center text-stroke`
+
+## Common Liquid Patterns
+
+Useful Liquid snippets used throughout templates:
+
+```liquid
+{% if variable %}...{% else %}...{% endif %}
+{% case value %}{% when 'x' %}...{% endcase %}
+{% for item in items limit:5 %}...{% endfor %}
+{{ timestamp | date: "%B %d, %Y" }}
+{{ long_text | truncate: 100 }}
+```
+
+## Advanced Layout Patterns
+
+Examples for more complex layouts and device-specific handling:
+
+- **Grid example:**
+```liquid
+<div class="grid grid--cols-2 gap--medium md:grid--cols-3">
+  <div class="item">...</div>
+  <div class="item">...</div>
+</div>
+```
+- **Device / bit-depth example:**
+```liquid
+<div class="hidden md:1bit:block md:2bit:flex lg:4bit:grid">
+  <!-- Simplified for 1-bit, enhanced for 4-bit -->
+</div>
+```
+
+## Accessibility & Contrast Guidance
+
+- **Alt text:** Always include descriptive alt text (use caption fallback):
+```liquid
+<img src="{{ photo_url }}" alt="{{ caption | default: 'Photo from Google Photos' }}" aria-label="{{ caption | default: 'Photo from Google Photos' }}" class="image image--contain">
+```
+
+- **Adaptive background contrast:** Ensure error and UI text remain readable when `bg_class` is dark. Example mapping in `shared.liquid`:
+```liquid
+{% case bg_class %}
+{% when 'bg--black','bg--gray-10','bg--gray-15','bg--gray-20','bg--gray-25','bg--gray-30','bg--gray-35','bg--gray-40' %}
+  {% assign text_class = 'text--on-dark' %}
+{% else %}
+  {% assign text_class = '' %}
+{% endcase %}
+```
+
+## Template Debugging & Preview QA
+
+- Use the polling URL with `adaptive_background` to test background adaptation:
+```
+https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&adaptive_background={{ adaptive_background }}
+```
+- Keep `templates/preview/` versions in sync with production templates for faster visual QA.
+- Add tests to assert shared includes, preview parity, accessibility attributes, and adaptive background behavior.
+
+---
+
 ## Common Issues & Solutions
 
 ### Issue 1: Photo Not Displaying
@@ -530,14 +600,18 @@ Critical scenarios to test:
 
 ### Manual Testing Checklist
 
-- [ ] Test on TRMNL simulator for all device sizes
+- [ ] Test on TRMNL simulator for all device sizes (sm, md, lg)
 - [ ] Verify each layout (full, half_horizontal, half_vertical, quadrant)
 - [ ] Test with photos of different aspect ratios
 - [ ] Verify caption truncation with long text
-- [ ] Check error states display properly
+- [ ] Check error states display properly across background shades
 - [ ] Verify title bar shows correct instance name
 - [ ] Test portrait mode rendering (if applicable)
 - [ ] Check photo centering and sizing
+- [ ] Verify `templates/preview/` templates exist and mirror main templates
+- [ ] Confirm accessibility: `alt` attributes present and `aria-label` used where helpful
+- [ ] Test adaptive background (`adaptive_background=true`) and ensure UI text contrast
+- [ ] Validate 1-bit/2-bit/4-bit/8-bit rendering (dithering and legibility)
 
 ### Device Testing
 
