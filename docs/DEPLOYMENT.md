@@ -9,7 +9,8 @@ Before deploying, ensure you have:
 1. ✅ Cloudflare account (free tier is sufficient)
 2. ✅ Wrangler CLI installed (`npm install -D wrangler`)
 3. ✅ All dependencies installed (`npm install`)
-4. ✅ Worker code tested locally (`npm run dev`)
+4. ✅ Worker code tested locally (`x`)
+5. ✅ Discord webhook URL (if using alerting) - **KEEP SECRET!**
 
 ## Step 1: Login to Cloudflare
 
@@ -26,7 +27,61 @@ This will:
 3. Request permission to use Wrangler
 4. Save authentication credentials locally
 
-## Step 2: Configure Account ID (Optional)
+## Step 2: Configure Secrets (IMPORTANT!)
+
+### Set Discord Webhook URL (Required for Alerting)
+
+The Discord webhook URL **must be stored as an encrypted secret**, NOT in plain text.
+
+#### Option A: Using Cloudflare Dashboard (Recommended if CLI issues)
+
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. Navigate to **Workers & Pages**
+3. Click on your worker: `trmnl-google-photos`
+4. Go to **Settings** tab
+5. Scroll down to **Variables and Secrets** section
+6. Click **Add variable**
+7. Set:
+   - **Type**: Select **Secret** (not "Variable")
+   - **Variable name**: `DISCORD_WEBHOOK_URL`
+   - **Value**: Paste your Discord webhook URL
+8. Click **Save**
+9. **Deploy** the worker for changes to take effect
+
+#### Option B: Using Wrangler CLI
+
+```bash
+# Set webhook URL as encrypted secret
+npx wrangler secret put DISCORD_WEBHOOK_URL
+# Paste your webhook URL when prompted (input is hidden)
+```
+
+**⚠️ SECURITY WARNING:**
+- ❌ **NEVER** commit webhook URLs to git
+- ❌ **NEVER** store webhook URLs in `wrangler.toml`
+- ✅ **ALWAYS** use encrypted secrets (Dashboard or CLI)
+- ✅ **ROTATE** webhook URLs if accidentally exposed
+
+See [docs/SECURITY.md](./SECURITY.md) for detailed secrets management guide.
+
+### Verify Secrets
+
+**Via Dashboard:**
+1. Go to Workers & Pages → `trmnl-google-photos` → Settings
+2. Check **Variables and Secrets** section
+3. You should see `DISCORD_WEBHOOK_URL` listed as **Secret** type
+
+**Via CLI:**
+```bash
+npx wrangler secret list
+```
+
+Expected output:
+```
+📝 DISCORD_WEBHOOK_URL (set)
+```
+
+## Step 3: Configure Account ID (Optional)
 
 Wrangler will automatically detect your account ID. However, if you want to explicitly set it:
 
@@ -38,7 +93,7 @@ Wrangler will automatically detect your account ID. However, if you want to expl
 account_id = "your-account-id-here"
 ```
 
-## Step 3: Deploy to Production
+## Step 4: Deploy to Production
 
 Deploy the worker:
 
@@ -51,6 +106,7 @@ This will:
 - Build and bundle your TypeScript code
 - Upload to Cloudflare Workers
 - Deploy to: `https://trmnl-google-photos.gohk.xyz`
+- Secrets are automatically available (encrypted at rest)
 
 ### Expected Output
 
@@ -62,6 +118,8 @@ Your worker has access to the following bindings:
   - PHOTOS_CACHE: 737dfeaef9a142689b8896ed818fb615
 - Vars:
   - ENVIRONMENT: "production"
+- Secrets:
+  - DISCORD_WEBHOOK_URL (encrypted)
 Total Upload: XX.XX KiB / gzip: XX.XX KiB
 Uploaded trmnl-google-photos (X.XX sec)
 Published trmnl-google-photos (X.XX sec)
@@ -69,7 +127,7 @@ Published trmnl-google-photos (X.XX sec)
 Current Deployment ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-## Step 4: Verify Deployment
+## Step 5: Verify Deployment
 
 Test the deployed worker:
 

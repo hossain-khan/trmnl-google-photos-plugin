@@ -146,5 +146,13 @@ vite.config.ts.timestamp-*
 wrangler.toml.local
 worker-configuration.d.ts
 
+# Secrets and sensitive files (NEVER commit these!)
+# Discord webhook URLs, API keys, tokens, etc.
+*.secret
+*.secrets
+secrets.txt
+webhooks.txt
+credentials.json
+
 # Test artifacts
 api/
