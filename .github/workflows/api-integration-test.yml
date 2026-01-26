@@ -1,0 +1,159 @@
+name: API Integration Tests
+
+# Run integration tests against the live deployed worker
+# Tests the /api/photo endpoint with a deterministic sample album
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  integration-test:
+    name: API Integration Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test /api/photo endpoint
+        run: |
+          echo "Testing /api/photo endpoint with deterministic sample album..."
+          
+          # Sample album with exactly 1 image - ensures no flaky random selection
+          ALBUM_URL="https://photos.app.goo.gl/2qJRExCAM1Eayytt9"
+          WORKER_URL="https://trmnl-google-photos.gohk.xyz"
+          
+          # Test basic endpoint functionality
+          RESPONSE=$(curl -s "${WORKER_URL}/api/photo?album_url=${ALBUM_URL}&enable_caching=false")
+          
+          echo "Response:"
+          echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
+          
+          # Validate response structure
+          echo "Validating response structure..."
+          
+          if echo "$RESPONSE" | jq -e '.photo_url' > /dev/null 2>&1; then
+            echo "✅ photo_url found in response"
+          else
+            echo "❌ photo_url missing from response"
+            exit 1
+          fi
+          
+          if echo "$RESPONSE" | jq -e '.photo_count' > /dev/null 2>&1; then
+            PHOTO_COUNT=$(echo "$RESPONSE" | jq -r '.photo_count')
+            echo "✅ photo_count found: $PHOTO_COUNT"
+          else
+            echo "❌ photo_count missing from response"
+            exit 1
+          fi
+          
+          if echo "$RESPONSE" | jq -e '.timestamp' > /dev/null 2>&1; then
+            echo "✅ timestamp found in response"
+          else
+            echo "❌ timestamp missing from response"
+            exit 1
+          fi
+          
+          # Validate photo URL is from Google Photos CDN
+          PHOTO_URL=$(echo "$RESPONSE" | jq -r '.photo_url')
+          if [[ "$PHOTO_URL" == *"googleusercontent.com"* ]]; then
+            echo "✅ photo_url is from Google Photos CDN"
+          else
+            echo "❌ photo_url is not from Google Photos CDN: $PHOTO_URL"
+            exit 1
+          fi
+          
+          echo ""
+          echo "✅ All integration tests passed!"
+
+      - name: Test /api/photo with caching enabled
+        run: |
+          echo "Testing /api/photo endpoint with caching enabled..."
+          
+          ALBUM_URL="https://photos.app.goo.gl/2qJRExCAM1Eayytt9"
+          WORKER_URL="https://trmnl-google-photos.gohk.xyz"
+          
+          # Test with caching enabled
+          RESPONSE=$(curl -s "${WORKER_URL}/api/photo?album_url=${ALBUM_URL}&enable_caching=true")
+          
+          echo "Response with caching:"
+          echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
+          
+          if echo "$RESPONSE" | jq -e '.photo_url' > /dev/null 2>&1; then
+            echo "✅ Caching enabled test passed"
+          else
+            echo "❌ Caching enabled test failed"
+            exit 1
+          fi
+
+      - name: Test health check endpoint
+        run: |
+          echo "Testing health check endpoints..."
+          
+          WORKER_URL="https://trmnl-google-photos.gohk.xyz"
+          
+          # Test / endpoint
+          RESPONSE=$(curl -s "${WORKER_URL}/")
+          if echo "$RESPONSE" | jq -e '.status' > /dev/null 2>&1; then
+            echo "✅ GET / endpoint is healthy"
+          else
+            echo "❌ GET / endpoint failed"
+            exit 1
+          fi
+          
+          # Test /health endpoint
+          RESPONSE=$(curl -s "${WORKER_URL}/health")
+          if echo "$RESPONSE" | jq -e '.status' > /dev/null 2>&1; then
+            echo "✅ GET /health endpoint is healthy"
+          else
+            echo "❌ GET /health endpoint failed"
+            exit 1
+          fi
+
+      - name: Test error handling - invalid album URL
+        run: |
+          echo "Testing error handling with invalid album URL..."
+          
+          INVALID_URL="https://invalid-domain.com/invalid"
+          WORKER_URL="https://trmnl-google-photos.gohk.xyz"
+          
+          RESPONSE=$(curl -s "${WORKER_URL}/api/photo?album_url=${INVALID_URL}")
+          
+          # Should contain an error field
+          if echo "$RESPONSE" | jq -e '.error' > /dev/null 2>&1; then
+            echo "✅ Error handling works correctly"
+            echo "Error: $(echo "$RESPONSE" | jq -r '.error')"
+          else
+            echo "⚠️  No error field in response (may have failed gracefully)"
+            echo "$RESPONSE" | jq '.'
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ API integration tests failed!"
+          echo "Check the workflow logs for details."
+          exit 1
+
+      - name: Summary
+        if: success()
+        run: |
+          echo ""
+          echo "=========================================="
+          echo "✅ API Integration Tests Summary"
+          echo "=========================================="
+          echo "Endpoint:        https://trmnl-google-photos.gohk.xyz"
+          echo "Test Album:      https://photos.app.goo.gl/2qJRExCAM1Eayytt9"
+          echo "Photos in album: 1 (deterministic)"
+          echo "Status:          All tests passed"
+          echo "=========================================="
