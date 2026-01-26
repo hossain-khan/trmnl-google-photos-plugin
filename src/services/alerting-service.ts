@@ -79,7 +79,7 @@ export async function trackBrightnessEvent(
     // Create simplified event for storage
     const event: StoredBrightnessEvent = {
       timestamp: new Date().toISOString(),
-      status: metrics.status as 'success' | 'timeout' | 'error',
+      status: metrics.status,
       duration: metrics.duration,
     };
 

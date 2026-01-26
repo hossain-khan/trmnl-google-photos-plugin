@@ -24,9 +24,6 @@ type Bindings = {
   PHOTOS_CACHE?: KVNamespace; // Optional KV namespace for caching album data
   ANALYTICS?: AnalyticsEngineDataset; // Optional Analytics Engine (disabled on free tier)
 };
-  PHOTOS_CACHE?: KVNamespace; // Optional KV namespace for caching album data
-  ANALYTICS?: AnalyticsEngineDataset; // Optional Analytics Engine (disabled on free tier)
-};
 
 // Constants
 const CACHE_HIT_THRESHOLD_MS = 500; // Cache hits typically respond in <500ms

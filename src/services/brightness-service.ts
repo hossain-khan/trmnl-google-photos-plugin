@@ -196,8 +196,10 @@ export async function analyzeImageBrightness(
       };
       trackBrightnessMetrics(apiErrorMetrics);
 
-      // Check and alert if needed
-      await checkAndAlert(kv, webhookUrl, apiErrorMetrics);
+      // Check and alert if needed (fire-and-forget - don't block response)
+      checkAndAlert(kv, webhookUrl, apiErrorMetrics).catch((err) =>
+        console.error('[Brightness Analysis] Alert check failed:', err)
+      );
 
       return null; // No brightness data on API error
     }
@@ -229,8 +231,10 @@ export async function analyzeImageBrightness(
     };
     trackBrightnessMetrics(successMetrics);
 
-    // Check and alert if needed
-    await checkAndAlert(kv, webhookUrl, successMetrics);
+    // Check and alert if needed (fire-and-forget - don't block response)
+    checkAndAlert(kv, webhookUrl, successMetrics).catch((err) =>
+      console.error('[Brightness Analysis] Alert check failed:', err)
+    );
 
     return scores;
   } catch (error) {
@@ -252,8 +256,10 @@ export async function analyzeImageBrightness(
         };
         trackBrightnessMetrics(timeoutMetrics);
 
-        // Check and alert if needed
-        await checkAndAlert(kv, webhookUrl, timeoutMetrics);
+        // Check and alert if needed (fire-and-forget - don't block response)
+        checkAndAlert(kv, webhookUrl, timeoutMetrics).catch((err) =>
+          console.error('[Brightness Analysis] Alert check failed:', err)
+        );
       } else {
         console.error(
           `[Brightness Analysis] Failed after ${totalTime.toFixed(2)}ms:`,
@@ -270,8 +276,10 @@ export async function analyzeImageBrightness(
         };
         trackBrightnessMetrics(errorMetrics);
 
-        // Check and alert if needed
-        await checkAndAlert(kv, webhookUrl, errorMetrics);
+        // Check and alert if needed (fire-and-forget - don't block response)
+        checkAndAlert(kv, webhookUrl, errorMetrics).catch((err) =>
+          console.error('[Brightness Analysis] Alert check failed:', err)
+        );
       }
     } else {
       console.error(`[Brightness Analysis] Unknown error after ${totalTime.toFixed(2)}ms:`, error);
@@ -286,8 +294,10 @@ export async function analyzeImageBrightness(
       };
       trackBrightnessMetrics(unknownErrorMetrics);
 
-      // Check and alert if needed
-      await checkAndAlert(kv, webhookUrl, unknownErrorMetrics);
+      // Check and alert if needed (fire-and-forget - don't block response)
+      checkAndAlert(kv, webhookUrl, unknownErrorMetrics).catch((err) =>
+        console.error('[Brightness Analysis] Alert check failed:', err)
+      );
     }
 
     return null; // No brightness data on error (graceful fallback)
