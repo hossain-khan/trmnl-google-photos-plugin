@@ -28,7 +28,8 @@
  * Each request is independent and isolated. What happens inside stays inside.
  */
 
-import { trackBrightnessMetrics } from './monitoring-service';
+import { trackBrightnessMetrics, type BrightnessMetrics } from './monitoring-service';
+import { checkAndAlert } from './alerting-service';
 
 /**
  * Image Insights API response structure
@@ -125,18 +126,28 @@ export interface BrightnessScores {
  * **Metrics Tracking:**
  * - All attempts logged with structured metrics (success, timeout, error)
  * - Queryable in Cloudflare Dashboard for timeout rate analysis
+ * - Automatic Discord alerts when timeout rate exceeds 10% (optional)
  *
  * @param photoUrl - Google Photos CDN URL to analyze
  * @param requestId - Request ID for correlation with main request logs
+ * @param kv - Optional KV namespace for alerting (tracks sliding window)
+ * @param webhookUrl - Optional Discord webhook URL for alerts
  * @returns Brightness scores object or null on error
  *
  * @example
- * const scores = await analyzeImageBrightness("https://lh3.googleusercontent.com/...", "req123");
+ * const scores = await analyzeImageBrightness(
+ *   "https://lh3.googleusercontent.com/...",
+ *   "req123",
+ *   c.env.PHOTOS_CACHE,
+ *   c.env.DISCORD_WEBHOOK_URL
+ * );
  * // Returns: { edge_brightness_score: 75.5, brightness_score: 82.3 }
  */
 export async function analyzeImageBrightness(
   photoUrl: string,
-  requestId: string = 'unknown'
+  requestId: string = 'unknown',
+  kv?: KVNamespace,
+  webhookUrl?: string
 ): Promise<BrightnessScores | null> {
   const startTime = performance.now();
   console.log('[Brightness Analysis] Starting edge brightness analysis...');
@@ -175,14 +186,18 @@ export async function analyzeImageBrightness(
       );
 
       // Track API error metrics
-      trackBrightnessMetrics({
+      const apiErrorMetrics: BrightnessMetrics = {
         requestId,
         status: 'error',
         duration: elapsed,
         errorType: 'APIError',
         errorMessage: `HTTP ${response.status}: ${response.statusText}`,
         apiStatus: response.status,
-      });
+      };
+      trackBrightnessMetrics(apiErrorMetrics);
+
+      // Check and alert if needed
+      await checkAndAlert(kv, webhookUrl, apiErrorMetrics);
 
       return null; // No brightness data on API error
     }
@@ -205,13 +220,17 @@ export async function analyzeImageBrightness(
     );
 
     // Track successful analysis metrics
-    trackBrightnessMetrics({
+    const successMetrics: BrightnessMetrics = {
       requestId,
       status: 'success',
       duration: totalTime,
       edgeBrightnessScore: scores.edge_brightness_score,
       brightnessScore: scores.brightness_score,
-    });
+    };
+    trackBrightnessMetrics(successMetrics);
+
+    // Check and alert if needed
+    await checkAndAlert(kv, webhookUrl, successMetrics);
 
     return scores;
   } catch (error) {
@@ -224,13 +243,17 @@ export async function analyzeImageBrightness(
         );
 
         // Track timeout metrics
-        trackBrightnessMetrics({
+        const timeoutMetrics: BrightnessMetrics = {
           requestId,
           status: 'timeout',
           duration: totalTime,
           errorType: 'AbortError',
           errorMessage: `Request timeout after ${ANALYSIS_TIMEOUT_MS}ms`,
-        });
+        };
+        trackBrightnessMetrics(timeoutMetrics);
+
+        // Check and alert if needed
+        await checkAndAlert(kv, webhookUrl, timeoutMetrics);
       } else {
         console.error(
           `[Brightness Analysis] Failed after ${totalTime.toFixed(2)}ms:`,
@@ -238,25 +261,33 @@ export async function analyzeImageBrightness(
         );
 
         // Track error metrics
-        trackBrightnessMetrics({
+        const errorMetrics: BrightnessMetrics = {
           requestId,
           status: 'error',
           duration: totalTime,
           errorType: error.name,
           errorMessage: error.message,
-        });
+        };
+        trackBrightnessMetrics(errorMetrics);
+
+        // Check and alert if needed
+        await checkAndAlert(kv, webhookUrl, errorMetrics);
       }
     } else {
       console.error(`[Brightness Analysis] Unknown error after ${totalTime.toFixed(2)}ms:`, error);
 
       // Track unknown error metrics
-      trackBrightnessMetrics({
+      const unknownErrorMetrics: BrightnessMetrics = {
         requestId,
         status: 'error',
         duration: totalTime,
         errorType: 'UnknownError',
         errorMessage: String(error),
-      });
+      };
+      trackBrightnessMetrics(unknownErrorMetrics);
+
+      // Check and alert if needed
+      await checkAndAlert(kv, webhookUrl, unknownErrorMetrics);
     }
 
     return null; // No brightness data on error (graceful fallback)

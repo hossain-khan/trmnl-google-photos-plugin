@@ -418,6 +418,8 @@ export function formatRelativeDate(isoDate: string): string {
  * @param totalPhotos - Total number of photos in album
  * @param analyzeImage - Whether to analyze image brightness for adaptive background
  * @param requestId - Request ID for correlation with main request logs
+ * @param kv - Optional KV namespace for alerting (tracks sliding window)
+ * @param webhookUrl - Optional Discord webhook URL for alerts
  * @returns PhotoData object for template rendering
  */
 export async function convertToPhotoData(
@@ -425,7 +427,9 @@ export async function convertToPhotoData(
   albumUrl: string,
   totalPhotos: number,
   analyzeImage: boolean = false,
-  requestId: string = 'unknown'
+  requestId: string = 'unknown',
+  kv?: KVNamespace,
+  webhookUrl?: string
 ): Promise<PhotoData> {
   // Validate and sanitize all fields before creating PhotoData
   const photoUrl = optimizePhotoUrl(photo.url);
@@ -452,7 +456,7 @@ export async function convertToPhotoData(
   let brightnessScore: number | undefined;
   if (analyzeImage) {
     try {
-      const scores = await analyzeImageBrightness(thumbnailUrl, requestId);
+      const scores = await analyzeImageBrightness(thumbnailUrl, requestId, kv, webhookUrl);
       if (scores) {
         edgeBrightnessScore = scores.edge_brightness_score;
         brightnessScore = scores.brightness_score;
@@ -500,6 +504,7 @@ export async function convertToPhotoData(
  * @param kv - Optional Cloudflare KV namespace for caching
  * @param analyzeImage - Whether to analyze image brightness for adaptive background
  * @param requestId - Request ID for correlation with main request logs
+ * @param webhookUrl - Optional Discord webhook URL for alerts
  * @returns PhotoData object ready for template rendering
  * @throws Error if fetching or processing fails
  */
@@ -507,7 +512,8 @@ export async function fetchRandomPhoto(
   albumUrl: string,
   kv?: KVNamespace,
   analyzeImage: boolean = false,
-  requestId: string = 'unknown'
+  requestId: string = 'unknown',
+  webhookUrl?: string
 ): Promise<PhotoData> {
   // Fetch all photos from the album (may use cache)
   const photos = await fetchAlbumPhotos(albumUrl, kv);
@@ -516,5 +522,13 @@ export async function fetchRandomPhoto(
   const selectedPhoto = selectRandomPhoto(photos);
 
   // Convert to PhotoData format (with optional brightness analysis)
-  return await convertToPhotoData(selectedPhoto, albumUrl, photos.length, analyzeImage, requestId);
+  return await convertToPhotoData(
+    selectedPhoto,
+    albumUrl,
+    photos.length,
+    analyzeImage,
+    requestId,
+    kv,
+    webhookUrl
+  );
 }

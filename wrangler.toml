@@ -10,6 +10,8 @@ workers_dev = true
 # Environment variables
 [vars]
 ENVIRONMENT = "production"
+# Discord webhook for alerting (brightness analysis timeout notifications)
+DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1465364273361588245/GuXXz27e6zBkhW8bXobN0OQkSoFYmBVnJdDSdFyftd0BEXZUbuB4uOxnEDV_H3lHTwnC"
 
 # Observability - Logs and Traces for debugging
 [observability]
