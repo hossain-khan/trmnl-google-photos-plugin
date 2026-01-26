@@ -23,6 +23,7 @@ import { sendDiscordAlert } from './services/alerting-service';
 // Type definitions for Cloudflare Workers environment
 type Bindings = {
   ENVIRONMENT?: string;
+  ENABLE_TEST_API?: string; // Enable/disable test APIs (set to 'true' to enable)
   DISCORD_WEBHOOK_URL?: string; // Discord webhook for alerting
   PHOTOS_CACHE?: KVNamespace; // Optional KV namespace for caching album data
   ANALYTICS?: AnalyticsEngineDataset; // Optional Analytics Engine (disabled on free tier)
@@ -420,6 +421,11 @@ app.post('/markup', (c) => {
  * GET /api/test/discord?timeoutRate=0.25&totalAttempts=20&timeouts=5&errors=2&success=13
  */
 app.get('/api/test/discord', async (c) => {
+  // Check if test API is enabled
+  if (c.env.ENABLE_TEST_API !== 'true') {
+    return c.json({ error: 'Forbidden: Test API is disabled.' }, 403);
+  }
+
   const webhookUrl = c.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) {
     return c.json({ error: 'DISCORD_WEBHOOK_URL not configured in environment.' }, 400);
