@@ -10,6 +10,7 @@ workers_dev = true
 # Environment variables
 [vars]
 ENVIRONMENT = "production"
+ENABLE_TEST_API = "false" # Set to "false" to disable test APIs
 
 # Observability - Logs and Traces for debugging
 [observability]
