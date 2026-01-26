@@ -17,7 +17,6 @@ import {
 } from './services/monitoring-service';
 import { checkAndAlert } from './services/alerting-service';
 import type { AlertStats } from './services/alerting-service';
-import { version } from '../package.json';
 // Direct import for test endpoint
 import { sendDiscordAlert } from './services/alerting-service';
 

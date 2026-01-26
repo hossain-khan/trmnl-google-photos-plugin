@@ -48,7 +48,7 @@ interface StoredBrightnessEvent {
 /**
  * Alert statistics
  */
-interface AlertStats {
+export interface AlertStats {
   totalAttempts: number;
   timeouts: number;
   errors: number;
@@ -195,7 +195,7 @@ async function shouldSendAlert(kv: KVNamespace): Promise<{
  * @param webhookUrl - Discord webhook URL
  * @param stats - Alert statistics to include in notification
  */
-async function sendDiscordAlert(webhookUrl: string, stats: AlertStats): Promise<void> {
+export async function sendDiscordAlert(webhookUrl: string, stats: AlertStats): Promise<void> {
   try {
     const timeoutPercent = (stats.timeoutRate * 100).toFixed(1);
     const avgDurationMs = stats.avgDuration.toFixed(0);
