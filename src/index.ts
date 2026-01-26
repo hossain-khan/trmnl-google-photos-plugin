@@ -16,6 +16,10 @@ import {
   type BrightnessMetrics,
 } from './services/monitoring-service';
 import { checkAndAlert } from './services/alerting-service';
+import type { AlertStats } from './services/alerting-service';
+import { version } from '../package.json';
+// Direct import for test endpoint
+import { sendDiscordAlert } from './services/alerting-service';
 
 // Type definitions for Cloudflare Workers environment
 type Bindings = {
@@ -405,6 +409,64 @@ app.post('/markup', (c) => {
     },
     410 // Gone
   );
+});
+
+/**
+ * GET /api/test/discord - Test Discord Notification Endpoint
+ *
+ * Allows manual triggering of Discord alerts for testing purposes.
+ * Accepts query params to customize the alert payload.
+ *
+ * Example:
+ * GET /api/test/discord?timeoutRate=0.25&totalAttempts=20&timeouts=5&errors=2&success=13
+ */
+app.get('/api/test/discord', async (c) => {
+  const webhookUrl = c.env.DISCORD_WEBHOOK_URL;
+  if (!webhookUrl) {
+    return c.json({ error: 'DISCORD_WEBHOOK_URL not configured in environment.' }, 400);
+  }
+
+  // Parse query params with defaults
+  const timeoutRate = parseFloat(c.req.query('timeoutRate') ?? '0.25');
+  const totalAttempts = parseInt(c.req.query('totalAttempts') ?? '20', 10);
+  const timeouts = parseInt(c.req.query('timeouts') ?? '5', 10);
+  const errors = parseInt(c.req.query('errors') ?? '2', 10);
+  const success = parseInt(c.req.query('success') ?? '13', 10);
+  const avgDuration = parseInt(c.req.query('avgDuration') ?? '950', 10);
+  const windowStart = new Date(Date.now() - 3600000).toISOString();
+  const windowEnd = new Date().toISOString();
+
+  const stats: AlertStats = {
+    totalAttempts,
+    timeouts,
+    errors,
+    success,
+    timeoutRate,
+    avgDuration,
+    windowStart,
+    windowEnd,
+  };
+
+  try {
+    await sendDiscordAlert(webhookUrl, stats);
+    return c.json({
+      status: 'ok',
+      message: 'Discord alert sent successfully.',
+      stats,
+      webhookUrl: webhookUrl ? 'configured' : 'missing',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    return c.json(
+      {
+        error: 'Failed to send Discord alert',
+        details: error instanceof Error ? error.message : String(error),
+        stats,
+        timestamp: new Date().toISOString(),
+      },
+      500
+    );
+  }
 });
 
 /**
