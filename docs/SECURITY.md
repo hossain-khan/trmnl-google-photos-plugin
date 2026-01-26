@@ -50,22 +50,25 @@ You can set the webhook URL using either the Cloudflare Dashboard (easier) or Wr
 ##### Method 2: Wrangler CLI (Alternative)
 
 1. **Create Discord Webhook** (if not already created):
+
    ```bash
    # In Discord: Server Settings → Integrations → Webhooks → New Webhook
    # Copy the webhook URL (keep it secret!)
    ```
 
 2. **Set as Cloudflare Worker Secret**:
+
    ```bash
    # Login to Cloudflare (if not already)
    npx wrangler login
-   
+
    # Set webhook URL as encrypted secret
    npx wrangler secret put DISCORD_WEBHOOK_URL
    # Paste your webhook URL when prompted (input is hidden)
    ```
 
 3. **Verify Secret is Set**:
+
    ```bash
    # List all secrets (URLs are hidden)
    npx wrangler secret list
@@ -81,6 +84,7 @@ You can set the webhook URL using either the Cloudflare Dashboard (easier) or Wr
 If your webhook URL is accidentally exposed:
 
 **Via Cloudflare Dashboard:**
+
 1. **Revoke old webhook** in Discord (Server Settings → Integrations → Delete webhook)
 2. **Create new webhook** with a different URL
 3. **Update secret** in Cloudflare Dashboard:
@@ -92,6 +96,7 @@ If your webhook URL is accidentally exposed:
 4. **Deploy** the worker
 
 **Via Wrangler CLI:**
+
 1. **Revoke old webhook** in Discord (Server Settings → Integrations)
 2. **Create new webhook** with a different URL
 3. **Update secret**:

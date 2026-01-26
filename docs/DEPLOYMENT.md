@@ -57,6 +57,7 @@ npx wrangler secret put DISCORD_WEBHOOK_URL
 ```
 
 **⚠️ SECURITY WARNING:**
+
 - ❌ **NEVER** commit webhook URLs to git
 - ❌ **NEVER** store webhook URLs in `wrangler.toml`
 - ✅ **ALWAYS** use encrypted secrets (Dashboard or CLI)
@@ -67,16 +68,19 @@ See [docs/SECURITY.md](./SECURITY.md) for detailed secrets management guide.
 ### Verify Secrets
 
 **Via Dashboard:**
+
 1. Go to Workers & Pages → `trmnl-google-photos` → Settings
 2. Check **Variables and Secrets** section
 3. You should see `DISCORD_WEBHOOK_URL` listed as **Secret** type
 
 **Via CLI:**
+
 ```bash
 npx wrangler secret list
 ```
 
 Expected output:
+
 ```
 📝 DISCORD_WEBHOOK_URL (set)
 ```
