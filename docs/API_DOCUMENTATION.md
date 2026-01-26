@@ -326,6 +326,123 @@ curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.ap
 
 ---
 
+### 4. GET `/api/test/discord` - Test Discord Notification Endpoint
+
+Test endpoint for manually triggering Discord alert notifications. Useful for verifying Discord webhook configuration and alert formatting without waiting for real errors to occur.
+
+**Access Control**: Controlled by `ENABLE_TEST_API` environment variable (default: `true` in wrangler.toml).
+
+#### Request
+
+**Headers:**
+
+```http
+GET /api/test/discord?timeoutRate=0.25&totalAttempts=20&timeouts=5&errors=2&success=13 HTTP/1.1
+Host: trmnl-google-photos.gohk.xyz
+```
+
+**Query Parameters:**
+
+All parameters are optional and provide default values for testing.
+
+| Parameter       | Type   | Default | Range         | Description                                 |
+| --------------- | ------ | ------- | ------------- | ------------------------------------------- |
+| `timeoutRate`   | float  | 0.25    | 0.0 - 1.0     | Timeout rate percentage (as decimal)        |
+| `totalAttempts` | int    | 20      | 1 - 1000      | Total API requests in the window            |
+| `timeouts`      | int    | 5       | 0 - totalAttempts | Number of timeout failures                  |
+| `errors`        | int    | 2       | 0 - totalAttempts | Number of error responses                   |
+| `success`       | int    | 13      | 0 - totalAttempts | Number of successful requests               |
+| `avgDuration`   | int    | 950     | 0 - 10000     | Average request duration in milliseconds    |
+
+**Requirements:**
+
+- `DISCORD_WEBHOOK_URL` environment variable must be configured
+- `ENABLE_TEST_API` must be set to `"true"` (controlled via wrangler.toml)
+
+#### Response
+
+**Success (200 OK):**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "status": "ok",
+  "message": "Discord alert sent successfully.",
+  "stats": {
+    "totalAttempts": 20,
+    "timeouts": 5,
+    "errors": 2,
+    "success": 13,
+    "timeoutRate": 0.25,
+    "avgDuration": 950,
+    "windowStart": "2026-01-26T17:26:00.000Z",
+    "windowEnd": "2026-01-26T18:26:00.000Z"
+  },
+  "webhookUrl": "configured",
+  "timestamp": "2026-01-26T18:26:00.000Z"
+}
+```
+
+**Error: Test API Disabled (403 Forbidden):**
+
+```http
+HTTP/1.1 403 Forbidden
+Content-Type: application/json
+
+{
+  "success": false,
+  "error": "Forbidden: Test API is disabled."
+}
+```
+
+**Error: Missing Webhook (400 Bad Request):**
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "error": "DISCORD_WEBHOOK_URL not configured in environment."
+}
+```
+
+**Error: Discord Webhook Failed (500 Internal Server Error):**
+
+```http
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json
+
+{
+  "error": "Failed to send Discord alert",
+  "details": "Discord webhook request failed",
+  "stats": { ... },
+  "timestamp": "2026-01-26T18:26:00.000Z"
+}
+```
+
+#### Use Cases
+
+1. **Verify Discord Integration**: Test webhook configuration without triggering real errors
+2. **Alert Format Testing**: Validate Discord embed format and message content
+3. **Monitoring Integration**: Test monitoring system integration
+4. **CI/CD Validation**: Automated testing in GitHub Actions (api-integration-test.yml)
+
+#### Control
+
+**Enable/Disable Test API:**
+
+Set `ENABLE_TEST_API` in `wrangler.toml`:
+
+```toml
+[vars]
+ENABLE_TEST_API = "true"   # Enable test API (default)
+ENABLE_TEST_API = "false"  # Disable test API (returns 403)
+```
+
+---
+
 ## Request Examples
 
 ### Example 1: Basic Request (JSON API)
