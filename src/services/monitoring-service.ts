@@ -60,6 +60,25 @@ export interface ErrorContext {
 }
 
 /**
+ * Brightness analysis result status
+ */
+export type BrightnessStatus = 'success' | 'timeout' | 'error' | 'skipped';
+
+/**
+ * Brightness analysis metrics for tracking
+ */
+export interface BrightnessMetrics {
+  requestId: string;
+  status: BrightnessStatus; // success, timeout, error, skipped
+  duration?: number; // Time taken in milliseconds
+  edgeBrightnessScore?: number; // Edge brightness score (0-100)
+  brightnessScore?: number; // Overall brightness score (0-100)
+  errorType?: string; // Error type if failed (e.g., 'AbortError', 'NetworkError')
+  errorMessage?: string; // Error message if failed
+  apiStatus?: number; // HTTP status code from Image Insights API
+}
+
+/**
  * Logger class for structured logging
  */
 export class Logger {
@@ -218,6 +237,42 @@ export function trackError(context: ErrorContext): void {
       type: 'error_event',
       timestamp: new Date().toISOString(),
       ...context,
+    })
+  );
+}
+
+/**
+ * Track brightness analysis metrics
+ * Logs structured metrics for monitoring timeout rates and performance
+ *
+ * @param metrics - Brightness analysis metrics to track
+ *
+ * @example
+ * // Success case
+ * trackBrightnessMetrics({
+ *   requestId: 'abc123',
+ *   status: 'success',
+ *   duration: 850,
+ *   edgeBrightnessScore: 75.5,
+ *   brightnessScore: 82.3
+ * });
+ *
+ * @example
+ * // Timeout case
+ * trackBrightnessMetrics({
+ *   requestId: 'abc123',
+ *   status: 'timeout',
+ *   duration: 2000,
+ *   errorType: 'AbortError',
+ *   errorMessage: 'Request timeout after 2000ms'
+ * });
+ */
+export function trackBrightnessMetrics(metrics: BrightnessMetrics): void {
+  console.log(
+    JSON.stringify({
+      type: 'brightness_metric',
+      timestamp: new Date().toISOString(),
+      ...metrics,
     })
   );
 }

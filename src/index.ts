@@ -7,16 +7,20 @@ import {
   Logger,
   trackPerformance,
   trackError,
+  trackBrightnessMetrics,
   sendAnalytics,
   classifyErrorSeverity,
   getErrorType,
   type PerformanceMetrics,
   type ErrorContext,
+  type BrightnessMetrics,
 } from './services/monitoring-service';
+import { checkAndAlert } from './services/alerting-service';
 
 // Type definitions for Cloudflare Workers environment
 type Bindings = {
   ENVIRONMENT?: string;
+  DISCORD_WEBHOOK_URL?: string; // Discord webhook for alerting
   PHOTOS_CACHE?: KVNamespace; // Optional KV namespace for caching album data
   ANALYTICS?: AnalyticsEngineDataset; // Optional Analytics Engine (disabled on free tier)
 };
@@ -218,13 +222,32 @@ app.get('/api/photo', async (c) => {
       kvConfigured: !!c.env.PHOTOS_CACHE,
       adaptive_background,
       analyzeImage,
+      alertingEnabled: !!c.env.DISCORD_WEBHOOK_URL,
     });
+
+    // Track skipped brightness analysis (user preference)
+    if (!analyzeImage) {
+      const skipMetrics: BrightnessMetrics = {
+        requestId,
+        status: 'skipped',
+      };
+      trackBrightnessMetrics(skipMetrics);
+
+      // Check and alert (will track skipped event but not trigger alerts)
+      await checkAndAlert(c.env.PHOTOS_CACHE, c.env.DISCORD_WEBHOOK_URL, skipMetrics);
+    }
 
     // Fetch random photo from album (with optional caching and brightness analysis)
     let photoData;
     const fetchStartTime = Date.now();
     try {
-      photoData = await fetchRandomPhoto(urlValidation.url, kvNamespace, analyzeImage);
+      photoData = await fetchRandomPhoto(
+        urlValidation.url,
+        kvNamespace,
+        analyzeImage,
+        requestId,
+        c.env.DISCORD_WEBHOOK_URL
+      );
       const fetchDuration = Date.now() - fetchStartTime;
       cacheHit = fetchDuration < CACHE_HIT_THRESHOLD_MS; // Likely cached if <500ms
 

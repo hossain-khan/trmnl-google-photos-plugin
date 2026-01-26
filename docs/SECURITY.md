@@ -4,6 +4,126 @@
 
 The TRMNL Google Photos Plugin is designed with **security-first** principles. This document outlines the security measures, threat model, and vulnerability reporting process.
 
+## 🔒 Secrets Management
+
+### Discord Webhook URL (CRITICAL)
+
+The Discord webhook URL for alerting **must be stored as an encrypted Cloudflare Worker secret**, NOT as a plain text environment variable.
+
+#### Why This Matters
+
+- ❌ **DO NOT** store webhook URLs in `wrangler.toml` or commit to git
+- ❌ **DO NOT** use plain text environment variables for sensitive URLs
+- ✅ **DO** use Cloudflare Worker secrets (encrypted at rest)
+- ✅ **DO** rotate webhook URLs if exposed
+
+#### Setup Instructions
+
+You can set the webhook URL using either the Cloudflare Dashboard (easier) or Wrangler CLI.
+
+##### Method 1: Cloudflare Dashboard (Recommended)
+
+1. **Create Discord Webhook** (if not already created):
+   - In Discord: Server Settings → Integrations → Webhooks → New Webhook
+   - Copy the webhook URL (keep it secret!)
+
+2. **Set as Cloudflare Worker Secret**:
+   - Go to [Cloudflare Dashboard](https://dash.cloudflare.com/)
+   - Navigate to **Workers & Pages**
+   - Click on your worker: `trmnl-google-photos`
+   - Go to **Settings** tab
+   - Scroll to **Variables and Secrets** section
+   - Click **Add variable**
+   - Select **Secret** type (NOT "Variable")
+   - Variable name: `DISCORD_WEBHOOK_URL`
+   - Value: Paste your Discord webhook URL
+   - Click **Save**
+
+3. **Deploy Worker**:
+   - Click **Deploy** button in the dashboard, OR
+   - Run `npm run deploy` from terminal
+
+4. **Verify Secret is Set**:
+   - In Settings → Variables and Secrets
+   - You should see `DISCORD_WEBHOOK_URL` with type **Secret**
+
+##### Method 2: Wrangler CLI (Alternative)
+
+1. **Create Discord Webhook** (if not already created):
+
+   ```bash
+   # In Discord: Server Settings → Integrations → Webhooks → New Webhook
+   # Copy the webhook URL (keep it secret!)
+   ```
+
+2. **Set as Cloudflare Worker Secret**:
+
+   ```bash
+   # Login to Cloudflare (if not already)
+   npx wrangler login
+
+   # Set webhook URL as encrypted secret
+   npx wrangler secret put DISCORD_WEBHOOK_URL
+   # Paste your webhook URL when prompted (input is hidden)
+   ```
+
+3. **Verify Secret is Set**:
+
+   ```bash
+   # List all secrets (URLs are hidden)
+   npx wrangler secret list
+   ```
+
+4. **Deploy Worker**:
+   ```bash
+   npm run deploy
+   ```
+
+#### Secret Rotation (If Exposed)
+
+If your webhook URL is accidentally exposed:
+
+**Via Cloudflare Dashboard:**
+
+1. **Revoke old webhook** in Discord (Server Settings → Integrations → Delete webhook)
+2. **Create new webhook** with a different URL
+3. **Update secret** in Cloudflare Dashboard:
+   - Workers & Pages → `trmnl-google-photos` → Settings
+   - Find `DISCORD_WEBHOOK_URL` in Variables and Secrets
+   - Click **Edit** or **Delete** then **Add variable** again
+   - Paste new webhook URL
+   - Click **Save**
+4. **Deploy** the worker
+
+**Via Wrangler CLI:**
+
+1. **Revoke old webhook** in Discord (Server Settings → Integrations)
+2. **Create new webhook** with a different URL
+3. **Update secret**:
+   ```bash
+   npx wrangler secret put DISCORD_WEBHOOK_URL
+   # Enter new webhook URL
+   ```
+4. **Redeploy**:
+   ```bash
+   npm run deploy
+   ```
+
+#### How Secrets Work
+
+- **Encrypted at Rest**: Cloudflare encrypts secrets in their infrastructure
+- **Decrypted at Runtime**: Secrets are only decrypted when your Worker runs
+- **Not in Git**: Secrets are never stored in your repository
+- **Environment-Specific**: Different secrets for development/production
+
+### Other Secrets (Future)
+
+If you add other sensitive values (API keys, tokens, etc.), always use Cloudflare Worker secrets:
+
+```bash
+npx wrangler secret put SECRET_NAME
+```
+
 ## Security Architecture
 
 ### Key Security Principles
@@ -13,6 +133,7 @@ The TRMNL Google Photos Plugin is designed with **security-first** principles. T
 3. **Output Sanitization**: All JSON responses validated before sending to clients
 4. **Defense in Depth**: Multiple layers of security validation
 5. **Privacy by Design**: No PII collected or logged
+6. **Secrets Management**: All sensitive values stored as encrypted Cloudflare Worker secrets
 
 ## Threat Model
 
