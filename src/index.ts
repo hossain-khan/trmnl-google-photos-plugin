@@ -7,6 +7,7 @@ import {
   Logger,
   trackPerformance,
   trackError,
+  trackBrightnessMetrics,
   sendAnalytics,
   classifyErrorSeverity,
   getErrorType,
@@ -220,11 +221,19 @@ app.get('/api/photo', async (c) => {
       analyzeImage,
     });
 
+    // Track skipped brightness analysis (user preference)
+    if (!analyzeImage) {
+      trackBrightnessMetrics({
+        requestId,
+        status: 'skipped',
+      });
+    }
+
     // Fetch random photo from album (with optional caching and brightness analysis)
     let photoData;
     const fetchStartTime = Date.now();
     try {
-      photoData = await fetchRandomPhoto(urlValidation.url, kvNamespace, analyzeImage);
+      photoData = await fetchRandomPhoto(urlValidation.url, kvNamespace, analyzeImage, requestId);
       const fetchDuration = Date.now() - fetchStartTime;
       cacheHit = fetchDuration < CACHE_HIT_THRESHOLD_MS; // Likely cached if <500ms
 

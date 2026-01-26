@@ -7,8 +7,8 @@
  * **Features:**
  * - Edge-based brightness analysis (left/right 10% of image)
  * - Returns raw brightness scores (0-100) for template layer to map to TRMNL palette
- * - 1-second timeout with graceful fallback
- * - Comprehensive performance logging
+ * - 2-second timeout with graceful fallback
+ * - Comprehensive performance logging and metrics tracking
  *
  * **Integration:**
  * - Service: https://image-insights.gohk.uk/
@@ -27,6 +27,8 @@
  *
  * Each request is independent and isolated. What happens inside stays inside.
  */
+
+import { trackBrightnessMetrics } from './monitoring-service';
 
 /**
  * Image Insights API response structure
@@ -120,14 +122,22 @@ export interface BrightnessScores {
  * - Maximum: 2000ms (timeout - allows for network variance)
  * - Logged for monitoring
  *
+ * **Metrics Tracking:**
+ * - All attempts logged with structured metrics (success, timeout, error)
+ * - Queryable in Cloudflare Dashboard for timeout rate analysis
+ *
  * @param photoUrl - Google Photos CDN URL to analyze
+ * @param requestId - Request ID for correlation with main request logs
  * @returns Brightness scores object or null on error
  *
  * @example
- * const scores = await analyzeImageBrightness("https://lh3.googleusercontent.com/...");
+ * const scores = await analyzeImageBrightness("https://lh3.googleusercontent.com/...", "req123");
  * // Returns: { edge_brightness_score: 75.5, brightness_score: 82.3 }
  */
-export async function analyzeImageBrightness(photoUrl: string): Promise<BrightnessScores | null> {
+export async function analyzeImageBrightness(
+  photoUrl: string,
+  requestId: string = 'unknown'
+): Promise<BrightnessScores | null> {
   const startTime = performance.now();
   console.log('[Brightness Analysis] Starting edge brightness analysis...');
 
@@ -163,6 +173,17 @@ export async function analyzeImageBrightness(photoUrl: string): Promise<Brightne
       console.error(
         `[Brightness Analysis] API error after ${elapsed.toFixed(2)}ms: ${response.status} ${response.statusText}`
       );
+
+      // Track API error metrics
+      trackBrightnessMetrics({
+        requestId,
+        status: 'error',
+        duration: elapsed,
+        errorType: 'APIError',
+        errorMessage: `HTTP ${response.status}: ${response.statusText}`,
+        apiStatus: response.status,
+      });
+
       return null; // No brightness data on API error
     }
 
@@ -183,6 +204,15 @@ export async function analyzeImageBrightness(photoUrl: string): Promise<Brightne
       `[Brightness Analysis] Complete in ${totalTime.toFixed(2)}ms - Returning raw scores for template layer`
     );
 
+    // Track successful analysis metrics
+    trackBrightnessMetrics({
+      requestId,
+      status: 'success',
+      duration: totalTime,
+      edgeBrightnessScore: scores.edge_brightness_score,
+      brightnessScore: scores.brightness_score,
+    });
+
     return scores;
   } catch (error) {
     const totalTime = performance.now() - startTime;
@@ -192,14 +222,41 @@ export async function analyzeImageBrightness(photoUrl: string): Promise<Brightne
         console.error(
           `[Brightness Analysis] Timeout after ${ANALYSIS_TIMEOUT_MS}ms - no background applied`
         );
+
+        // Track timeout metrics
+        trackBrightnessMetrics({
+          requestId,
+          status: 'timeout',
+          duration: totalTime,
+          errorType: 'AbortError',
+          errorMessage: `Request timeout after ${ANALYSIS_TIMEOUT_MS}ms`,
+        });
       } else {
         console.error(
           `[Brightness Analysis] Failed after ${totalTime.toFixed(2)}ms:`,
           error.message
         );
+
+        // Track error metrics
+        trackBrightnessMetrics({
+          requestId,
+          status: 'error',
+          duration: totalTime,
+          errorType: error.name,
+          errorMessage: error.message,
+        });
       }
     } else {
       console.error(`[Brightness Analysis] Unknown error after ${totalTime.toFixed(2)}ms:`, error);
+
+      // Track unknown error metrics
+      trackBrightnessMetrics({
+        requestId,
+        status: 'error',
+        duration: totalTime,
+        errorType: 'UnknownError',
+        errorMessage: String(error),
+      });
     }
 
     return null; // No brightness data on error (graceful fallback)
