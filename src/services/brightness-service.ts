@@ -55,7 +55,43 @@ interface ImageAnalysisRequest {
 // Configuration
 const IMAGE_INSIGHTS_API = 'https://image-insights.gohk.uk';
 const ANALYSIS_ENDPOINT = '/v1/image/analysis/url';
-const ANALYSIS_TIMEOUT_MS = 1000; // 1 second maximum
+
+/**
+ * Brightness analysis timeout configuration
+ *
+ * **TIMEOUT RATIONALE: 2000ms (2 seconds)**
+ *
+ * Based on production monitoring and performance analysis:
+ *
+ * **Observed Performance Breakdown:**
+ * - Server processing time: ~530ms (Image Insights API analysis)
+ * - Network overhead (Cloudflare → Server → Cloudflare): ~434ms
+ * - Total round-trip time: ~964ms
+ *
+ * **Why 1000ms was insufficient:**
+ * - Requests completed in 964ms with only 36ms to spare
+ * - Network latency varies based on geographic distance and CDN routing
+ * - Intermittent timeouts occurred when network overhead exceeded 470ms
+ * - Connection establishment, DNS resolution, and TCP handshakes add variance
+ *
+ * **Why 2000ms is optimal:**
+ * - Provides 2x safety margin for network variance (1036ms buffer)
+ * - Accounts for occasional network congestion or routing delays
+ * - Still fast enough for TRMNL user experience expectations
+ * - Prevents unnecessary fallbacks to non-adaptive backgrounds
+ * - Balances reliability vs responsiveness for e-ink refresh cycles
+ *
+ * **Graceful degradation:**
+ * - If timeout occurs, photos still display normally without brightness data
+ * - Templates use default background instead of adaptive background
+ * - No impact on core photo display functionality
+ *
+ * **Performance targets:**
+ * - Expected: 800-1200ms (typical network conditions)
+ * - Maximum: 2000ms (timeout threshold)
+ * - Monitoring threshold: >1500ms indicates potential network issues
+ */
+const ANALYSIS_TIMEOUT_MS = 2000; // 2 seconds maximum (see extensive rationale above)
 const EDGE_MODE = 'left_right'; // Analyze left/right edges (10% each)
 
 /**
@@ -75,13 +111,13 @@ export interface BrightnessScores {
  * 3. Return raw scores for template layer to use
  *
  * **Error Handling:**
- * - 1-second timeout enforced
+ * - 2-second timeout enforced (increased from 1s due to network latency analysis)
  * - Returns null on any error (graceful fallback)
  * - Photo displays normally without brightness data
  *
  * **Performance:**
- * - Expected: 50-150ms (API latency)
- * - Maximum: 1000ms (timeout)
+ * - Expected: 800-1200ms (server ~530ms + network overhead ~434ms)
+ * - Maximum: 2000ms (timeout - allows for network variance)
  * - Logged for monitoring
  *
  * @param photoUrl - Google Photos CDN URL to analyze
