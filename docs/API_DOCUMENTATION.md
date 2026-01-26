@@ -345,14 +345,14 @@ Host: trmnl-google-photos.gohk.xyz
 
 All parameters are optional and provide default values for testing.
 
-| Parameter       | Type   | Default | Range         | Description                                 |
-| --------------- | ------ | ------- | ------------- | ------------------------------------------- |
-| `timeoutRate`   | float  | 0.25    | 0.0 - 1.0     | Timeout rate percentage (as decimal)        |
-| `totalAttempts` | int    | 20      | 1 - 1000      | Total API requests in the window            |
-| `timeouts`      | int    | 5       | 0 - totalAttempts | Number of timeout failures                  |
-| `errors`        | int    | 2       | 0 - totalAttempts | Number of error responses                   |
-| `success`       | int    | 13      | 0 - totalAttempts | Number of successful requests               |
-| `avgDuration`   | int    | 950     | 0 - 10000     | Average request duration in milliseconds    |
+| Parameter       | Type  | Default | Range             | Description                              |
+| --------------- | ----- | ------- | ----------------- | ---------------------------------------- |
+| `timeoutRate`   | float | 0.25    | 0.0 - 1.0         | Timeout rate percentage (as decimal)     |
+| `totalAttempts` | int   | 20      | 1 - 1000          | Total API requests in the window         |
+| `timeouts`      | int   | 5       | 0 - totalAttempts | Number of timeout failures               |
+| `errors`        | int   | 2       | 0 - totalAttempts | Number of error responses                |
+| `success`       | int   | 13      | 0 - totalAttempts | Number of successful requests            |
+| `avgDuration`   | int   | 950     | 0 - 10000         | Average request duration in milliseconds |
 
 **Requirements:**
 
