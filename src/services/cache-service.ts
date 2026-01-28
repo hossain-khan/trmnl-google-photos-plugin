@@ -10,6 +10,7 @@
  */
 
 import type { GooglePhoto } from '../types';
+import { obfuscateCacheKey } from '../lib/url-obfuscator';
 
 /**
  * Cached album data structure
@@ -67,16 +68,16 @@ export async function getCachedAlbum(
     const cached = await kv.get<CachedAlbumData>(key, 'json');
 
     if (cached) {
-      console.log(`Cache HIT for ${key} (${cached.photo_count} photos)`);
+      console.log(`Cache HIT for ${obfuscateCacheKey(key)} (${cached.photo_count} photos)`);
       return cached;
     }
 
-    console.log(`Cache MISS for ${key}`);
+    console.log(`Cache MISS for ${obfuscateCacheKey(key)}`);
     return null;
   } catch (error) {
     // Log error but don't throw - gracefully fallback to API fetch
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error(`Cache lookup error for ${key}:`, errorMessage);
+    console.error(`Cache lookup error for ${obfuscateCacheKey(key)}:`, errorMessage);
     return null;
   }
 }
@@ -114,11 +115,13 @@ export async function setCachedAlbum(
       expirationTtl: CACHE_TTL_SECONDS,
     });
 
-    console.log(`Cache STORED for ${key} (${photos.length} photos, TTL: ${CACHE_TTL_SECONDS}s)`);
+    console.log(
+      `Cache STORED for ${obfuscateCacheKey(key)} (${photos.length} photos, TTL: ${CACHE_TTL_SECONDS}s)`
+    );
   } catch (error) {
     // Log error but don't throw - cache storage failure shouldn't break the app
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error(`Cache storage error for ${key}:`, errorMessage);
+    console.error(`Cache storage error for ${obfuscateCacheKey(key)}:`, errorMessage);
   }
 }
 

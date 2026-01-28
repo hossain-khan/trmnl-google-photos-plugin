@@ -27,6 +27,7 @@
 import * as GooglePhotosAlbum from 'google-photos-album-image-url-fetch';
 import { writeFile } from 'fs/promises';
 import { resolve } from 'path';
+import { obfuscateUrl, obfuscatePhotoUid } from '../lib/url-obfuscator';
 
 // Configuration
 const EINK_WIDTH = 800; // Default TRMNL width
@@ -161,7 +162,7 @@ async function main(): Promise<void> {
     console.error(`❌ ${validation.error}`);
     process.exit(1);
   }
-  console.log(`✓ URL is valid: ${albumUrl}\n`);
+  console.log(`✓ URL is valid: ${obfuscateUrl(albumUrl)}\n`);
 
   try {
     // Fetch photos from album
@@ -186,7 +187,7 @@ async function main(): Promise<void> {
       process.exit(1);
     }
 
-    console.log(`✓ Selected photo: ${selectedPhoto.uid}`);
+    console.log(`✓ Selected photo: ${obfuscatePhotoUid(selectedPhoto.uid)}`);
     console.log(`  Original size: ${selectedPhoto.width}x${selectedPhoto.height}px\n`);
 
     // Optimize for e-ink
@@ -224,10 +225,10 @@ async function main(): Promise<void> {
     console.log('='.repeat(70));
     console.log('✅ SUCCESS');
     console.log('='.repeat(70));
-    console.log(`Album URL: ${albumUrl}`);
+    console.log(`Album URL: ${obfuscateUrl(albumUrl)}`);
     console.log(`Total photos: ${photos.length}`);
-    console.log(`Selected photo: ${selectedPhoto.uid}`);
-    console.log(`Optimized URL: ${optimizedUrl.substring(0, 80)}...`);
+    console.log(`Selected photo: ${obfuscatePhotoUid(selectedPhoto.uid)}`);
+    console.log(`Optimized URL: ${obfuscateUrl(optimizedUrl, 60)}`);
     console.log(`Output file: ${API_OUTPUT_FILE}`);
     console.log('='.repeat(70));
 
@@ -236,7 +237,9 @@ async function main(): Promise<void> {
       console.log('\n📋 Album contains these photos:');
       photos.slice(0, 5).forEach((photo, idx) => {
         const date = new Date(photo.albumAddDate).toLocaleDateString();
-        console.log(`  ${idx + 1}. ${photo.uid} (${photo.width}x${photo.height}px, added ${date})`);
+        console.log(
+          `  ${idx + 1}. ${obfuscatePhotoUid(photo.uid)} (${photo.width}x${photo.height}px, added ${date})`
+        );
       });
       if (photos.length > 5) {
         console.log(`  ... and ${photos.length - 5} more`);
