@@ -113,6 +113,7 @@ import {
   validateTimestamp,
   validatePhotoData,
 } from './security-validator';
+import { obfuscateAlbumId } from '../lib/url-obfuscator';
 
 // Privacy-first image brightness analysis service
 // Your photos are safe: zero storage, in-memory processing only, no data retention
@@ -139,13 +140,15 @@ export async function fetchAlbumPhotos(albumUrl: string, kv?: KVNamespace): Prom
   if (kv) {
     const cached = await getCachedAlbum(kv, albumId);
     if (cached && cached.photos) {
-      console.log(`Using cached photos for album ${albumId} (${cached.photo_count} photos)`);
+      console.log(
+        `Using cached photos for album ${obfuscateAlbumId(albumId)} (${cached.photo_count} photos)`
+      );
       return cached.photos;
     }
   }
 
   // Cache miss or not configured - fetch from Google Photos API
-  console.log(`Fetching photos from Google Photos API for album ${albumId}`);
+  console.log(`Fetching photos from Google Photos API for album ${obfuscateAlbumId(albumId)}`);
 
   try {
     const photos = await GooglePhotosAlbum.fetchImageUrls(albumUrl);

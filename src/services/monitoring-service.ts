@@ -10,6 +10,8 @@
  * - Privacy-first (no PII logging)
  */
 
+import { obfuscateUrl } from '../lib/url-obfuscator';
+
 /**
  * Log levels for different types of events
  */
@@ -108,8 +110,8 @@ export class Logger {
 
   /**
    * Sanitize data to remove PII
-   * - Truncates album URLs to prevent logging full URLs
-   * - Removes photo URLs
+   * - Obfuscates album URLs to prevent logging full URLs
+   * - Obfuscates photo URLs to prevent PII exposure
    * - Masks any potential user identifiers
    */
   private sanitizeData(data?: Record<string, unknown>): Record<string, unknown> {
@@ -118,14 +120,15 @@ export class Logger {
     const sanitized: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(data)) {
-      // Truncate album URLs for privacy (always truncate to 40 chars + "...")
+      // Obfuscate album URLs for privacy
       if (key === 'album_url' && typeof value === 'string') {
-        sanitized.album_url_preview = value.substring(0, 40) + '...';
+        sanitized.album_url_obfuscated = obfuscateUrl(value);
         continue;
       }
 
-      // Don't log photo URLs (privacy)
-      if (key === 'photo_url' || key === 'thumbnail_url') {
+      // Obfuscate photo URLs (privacy)
+      if ((key === 'photo_url' || key === 'thumbnail_url') && typeof value === 'string') {
+        sanitized[`${key}_obfuscated`] = obfuscateUrl(value);
         continue;
       }
 

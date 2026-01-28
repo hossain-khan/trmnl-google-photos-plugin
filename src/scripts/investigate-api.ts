@@ -19,6 +19,7 @@
 import axios, { AxiosResponse } from 'axios';
 import * as cheerio from 'cheerio';
 import { writeFile } from 'fs/promises';
+import { obfuscateUrl } from '../lib/url-obfuscator';
 
 // Configuration
 const USER_AGENT =
@@ -68,7 +69,7 @@ interface PhotoUrlAnalysis {
  */
 async function investigateAlbum(albumUrl: string): Promise<Findings> {
   console.log('📷 Google Photos API Investigation Tool\n');
-  console.log(`Investigating album: ${albumUrl}\n`);
+  console.log(`Investigating album: ${obfuscateUrl(albumUrl)}\n`);
 
   const findings: Findings = {
     timestamp: new Date().toISOString(),
@@ -217,9 +218,11 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
     console.log('\n' + '='.repeat(70));
     console.log('📊 INVESTIGATION SUMMARY');
     console.log('='.repeat(70));
-    console.log(`Album URL: ${albumUrl}`);
-    console.log(`Redirected to: ${findings.redirectedUrl}`);
-    console.log(`Album ID: ${findings.albumId || 'Not found'}`);
+    console.log(`Album URL: ${obfuscateUrl(albumUrl)}`);
+    console.log(`Redirected to: ${obfuscateUrl(findings.redirectedUrl)}`);
+    console.log(
+      `Album ID: ${findings.albumId ? findings.albumId.substring(0, 10) + '...***' : 'Not found'}`
+    );
     console.log(`Photo URLs found: ${findings.photoUrls.length}`);
     console.log(`API endpoints discovered: ${findings.apiEndpoints.length}`);
     console.log(`\nNext Steps:`);
@@ -233,7 +236,7 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
     if (findings.photoUrls.length > 0) {
       console.log('\n📸 Sample Photo URLs (first 5):');
       findings.photoUrls.slice(0, 5).forEach((url, idx) => {
-        console.log(`${idx + 1}. ${url.substring(0, 100)}...`);
+        console.log(`${idx + 1}. ${obfuscateUrl(url, 80)}`);
       });
     }
 
@@ -263,7 +266,7 @@ async function investigateAlbum(albumUrl: string): Promise<Findings> {
  */
 function analyzePhotoUrl(url: string): PhotoUrlAnalysis {
   console.log(`\n🔬 Analyzing photo URL structure:`);
-  console.log(`URL: ${url}`);
+  console.log(`URL: ${obfuscateUrl(url, 60)}`);
 
   // Google Photos URLs typically have parameters like =w2400-h1600
   const paramsMatch = url.match(/=([wh]\d+-?)+/g);
