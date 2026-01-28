@@ -55,13 +55,6 @@
   name: Show Photo Details
   description: "Display photo date, size, and count in the title bar"
   help_text: When enabled, shows photo details like date, size, and total count (e.g., '2 years ago • 12MP • 142 photos'). When disabled, only shows photo count for a cleaner look.
-- keyname: adaptive_background
-  field_type: boolean
-  default: false
-  optional: true
-  name: Adaptive Background
-  description: "Match background color to photo for seamless display"
-  help_text: When enabled, the background shade adapts to each photo based on edge brightness for a more immersive look. Adds ~100-200ms to loading time. Disable for default white background. Works best with fullbleed layouts.
 - keyname: enable_caching
   field_type: boolean
   default: true
