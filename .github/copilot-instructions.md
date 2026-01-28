@@ -338,8 +338,8 @@ Standard pattern for displaying photos across layouts:
 
 ```liquid
 <div class="flex flex--center-x flex--center-y" style="flex: 1;">
-  <img src="{{ photo.photo_url }}"
-       alt="{{ photo.caption }}"
+  <img src="{{ photo_url }}"
+       alt="{{ caption }}"
        class="image image--contain"
        style="max-width: 100%; max-height: 100%; object-fit: contain;">
 </div>
@@ -358,9 +358,9 @@ Standard pattern for displaying photos across layouts:
 For captions that may be very long:
 
 ```liquid
-{% if photo.caption %}
+{% if caption %}
 <div class="text--center">
-  <span class="description" data-clamp="2">{{ photo.caption }}</span>
+  <span class="description" data-clamp="2">{{ caption }}</span>
 </div>
 {% endif %}
 ```
@@ -377,7 +377,7 @@ For captions that may be very long:
 Always provide helpful error states for unconfigured plugins:
 
 ```liquid
-{% if photo.photo_url %}
+{% if photo_url %}
   <!-- Display photo -->
 {% else %}
   <div class="flex flex--col flex--center-x flex--center-y gap--medium h--full">
