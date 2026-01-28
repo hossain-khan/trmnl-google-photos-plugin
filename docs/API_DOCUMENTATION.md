@@ -84,10 +84,10 @@ Host: trmnl-google-photos.gohk.xyz
 
 **Query Parameters:**
 
-| Parameter             | Type   | Required | Description                                                                                          |
-| --------------------- | ------ | -------- | ---------------------------------------------------------------------------------------------------- |
-| `album_url`           | string | Yes*     | Google Photos shared album URL. Use 'demo', '0', or empty string for demo mode                      |
-| `enable_caching`      | string | No       | Enable/disable caching: 'true'/'false'/'1'/'0' (default true)                                        |
+| Parameter             | Type   | Required | Description                                                                                       |
+| --------------------- | ------ | -------- | ------------------------------------------------------------------------------------------------- |
+| `album_url`           | string | Yes\*    | Google Photos shared album URL. Use 'demo', '0', or empty string for demo mode                    |
+| `enable_caching`      | string | No       | Enable/disable caching: 'true'/'false'/'1'/'0' (default true)                                     |
 | `adaptive_background` | string | No       | Enable adaptive background color: 'true'/'false'/'1'/'0' (default false, adds ~100-200ms latency) |
 
 **\*Note**: `album_url` is technically required, but you can pass `demo`, `0`, or leave it empty to get demo photo data (useful for plugin marketplace previews).
@@ -101,8 +101,9 @@ Host: trmnl-google-photos.gohk.xyz
 **Demo Mode:**
 
 For testing or marketplace previews without configuring a Google Photos album, you can use demo mode by passing:
+
 - `album_url=demo` - Returns demo photo data
-- `album_url=0` - Returns demo photo data  
+- `album_url=0` - Returns demo photo data
 - `album_url=` (empty string) - Returns demo photo data
 
 Demo mode returns a static response with a sample photo from the project's GitHub Pages:
@@ -358,7 +359,7 @@ curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.ap
 
 Test endpoint for manually triggering Discord alert notifications. Useful for verifying Discord webhook configuration and alert formatting without waiting for real errors to occur.
 
-**Access Control**: Controlled by `ENABLE_TEST_API` environment variable (default: `true` in wrangler.toml).
+**Access Control**: Controlled by `ENABLE_TEST_API` environment variable (default: `"false"` in wrangler.toml - disabled by default for security).
 
 #### Request
 
@@ -465,9 +466,11 @@ Set `ENABLE_TEST_API` in `wrangler.toml`:
 
 ```toml
 [vars]
-ENABLE_TEST_API = "true"   # Enable test API (default)
-ENABLE_TEST_API = "false"  # Disable test API (returns 403)
+ENABLE_TEST_API = "true"   # Enable test API for development/testing
+ENABLE_TEST_API = "false"  # Disable test API (default - returns 403)
 ```
+
+**Security Note**: Test API is disabled by default (`"false"`) in production for security. Only enable when actively testing.
 
 ---
 
@@ -704,7 +707,7 @@ binding = "PHOTOS_CACHE"
 id = "737dfeaef9a142689b8896ed818fb615"
 ```
 
-See [README_CACHE.md](../src/services/README_CACHE.md) for detailed cache documentation.
+See [README_CACHE.md](./README_CACHE.md) for detailed cache documentation.
 
 ---
 

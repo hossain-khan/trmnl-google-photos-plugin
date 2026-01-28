@@ -9,6 +9,7 @@
 This is a TRMNL plugin that displays random photos from Google Photos shared albums without requiring OAuth authentication. Users simply paste their shared album link, and photos are automatically fetched and displayed on their TRMNL e-ink devices. The plugin leverages the TRMNL Framework v2 to create responsive, adaptive layouts that work across all TRMNL devices.
 
 **Important**: This repository contains **two plugin variants**:
+
 1. **Standard Layout** (`templates/`) - Photo display with metadata, captions, and album info
 2. **Canvas/Fullbleed Layout** (`templates-fullbleed/`) - Minimalist, distraction-free fullscreen photos with adaptive backgrounds
 

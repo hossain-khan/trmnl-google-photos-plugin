@@ -387,7 +387,7 @@ Potential improvements for future versions:
 
 ## Related Files
 
-- [cache-service.ts](./cache-service.ts) - Implementation
-- [photo-fetcher.ts](./photo-fetcher.ts) - Integration
-- [test-cache-service.js](../../scripts/test-cache-service.js) - Tests
+- [cache-service.ts](../src/services/cache-service.ts) - Implementation
+- [photo-fetcher.ts](../src/services/photo-fetcher.ts) - Integration
+- [test-cache-service.ts](../src/tests/test-cache-service.ts) - Tests
 - [Cloudflare KV Documentation](https://developers.cloudflare.com/kv/) - Setup guide
