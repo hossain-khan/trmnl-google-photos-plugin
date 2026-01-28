@@ -111,7 +111,7 @@ export class Logger {
   /**
    * Sanitize data to remove PII
    * - Obfuscates album URLs to prevent logging full URLs
-   * - Obfuscates photo URLs to prevent PII exposure
+   * - Removes photo URLs entirely (not logged for privacy)
    * - Masks any potential user identifiers
    */
   private sanitizeData(data?: Record<string, unknown>): Record<string, unknown> {
@@ -121,14 +121,16 @@ export class Logger {
 
     for (const [key, value] of Object.entries(data)) {
       // Obfuscate album URLs for privacy
+      // Note: Using 'album_url_preview' field name for backward compatibility with existing
+      // monitoring systems and tests. The value is now obfuscated using obfuscateUrl()
+      // instead of simple string truncation.
       if (key === 'album_url' && typeof value === 'string') {
-        sanitized.album_url_obfuscated = obfuscateUrl(value);
+        sanitized.album_url_preview = obfuscateUrl(value);
         continue;
       }
 
-      // Obfuscate photo URLs (privacy)
-      if ((key === 'photo_url' || key === 'thumbnail_url') && typeof value === 'string') {
-        sanitized[`${key}_obfuscated`] = obfuscateUrl(value);
+      // Don't log photo URLs (privacy) - these are not logged at all
+      if (key === 'photo_url' || key === 'thumbnail_url') {
         continue;
       }
 
