@@ -297,9 +297,9 @@ GROUP BY blob3
 
 For complete monitoring documentation, see:
 
-- [docs/MONITORING.md](../../docs/MONITORING.md) - Full monitoring guide
-- [docs/ARCHITECTURE.md](../../docs/ARCHITECTURE.md) - System architecture
-- [docs/API_DOCUMENTATION.md](../../docs/API_DOCUMENTATION.md) - API reference
+- [docs/MONITORING.md](./MONITORING.md) - Full monitoring guide
+- [docs/ARCHITECTURE.md](./ARCHITECTURE.md) - System architecture
+- [docs/API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - API reference
 
 ## Support
 

@@ -62,6 +62,35 @@ This plugin is built with privacy at its core:
 
 Your photos stay private. We simply help your TRMNL display them.
 
+## 🎨 Layout Variants
+
+This plugin comes in two variants to suit different display preferences:
+
+### Standard Layout (Main Plugin)
+
+The main plugin offers traditional layouts with photo metadata:
+
+- **Full Screen** - Photo with optional caption and metadata
+- **Half Horizontal** - Side-by-side photo and info
+- **Half Vertical** - Stacked photo and details
+- **Quadrant** - Compact photo-only display
+
+**Features**: Photo metadata, date stamps, album info, customizable titles
+
+### Canvas/Fullbleed Layout (Alternative)
+
+A minimalist variant for distraction-free photo viewing:
+
+- Fullscreen, edge-to-edge photo display
+- No captions or metadata overlays
+- Adaptive background colors (optional) that match photo edges
+- Clean, immersive presentation
+
+**Location**: Templates available in `templates-fullbleed/` directory  
+**Best For**: Users who want a pure photo experience without text overlays
+
+Both variants use the same backend API but offer different visual presentations. Choose based on whether you prefer photo metadata or a clean canvas.
+
 ## 📦 Installation
 
 1. Visit [TRMNL Recipes - Google Photos](https://usetrmnl.com/recipes/227153)
