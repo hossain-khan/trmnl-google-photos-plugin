@@ -84,17 +84,45 @@ Host: trmnl-google-photos.gohk.xyz
 
 **Query Parameters:**
 
-| Parameter             | Type   | Required | Description                                                                            |
-| --------------------- | ------ | -------- | -------------------------------------------------------------------------------------- |
-| `album_url`           | string | Yes      | Google Photos shared album URL                                                         |
-| `enable_caching`      | string | No       | Enable/disable caching: 'true'/'false'/'1'/'0' (default true)                          |
-| `adaptive_background` | string | No       | Enable adaptive background: 'true'/'false'/'1'/'0' (default false, ~100-200ms latency) |
+| Parameter             | Type   | Required | Description                                                                                          |
+| --------------------- | ------ | -------- | ---------------------------------------------------------------------------------------------------- |
+| `album_url`           | string | Yes*     | Google Photos shared album URL. Use 'demo', '0', or empty string for demo mode                      |
+| `enable_caching`      | string | No       | Enable/disable caching: 'true'/'false'/'1'/'0' (default true)                                        |
+| `adaptive_background` | string | No       | Enable adaptive background color: 'true'/'false'/'1'/'0' (default false, adds ~100-200ms latency) |
+
+**\*Note**: `album_url` is technically required, but you can pass `demo`, `0`, or leave it empty to get demo photo data (useful for plugin marketplace previews).
 
 **Supported Album URL Formats:**
 
 - Short URL: `https://photos.app.goo.gl/{shortcode}`
 - Full URL: `https://photos.google.com/share/{albumId}`
 - Full URL with params: `https://photos.google.com/share/{albumId}?key=value`
+
+**Demo Mode:**
+
+For testing or marketplace previews without configuring a Google Photos album, you can use demo mode by passing:
+- `album_url=demo` - Returns demo photo data
+- `album_url=0` - Returns demo photo data  
+- `album_url=` (empty string) - Returns demo photo data
+
+Demo mode returns a static response with a sample photo from the project's GitHub Pages:
+
+```json
+{
+  "photo_url": "https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/images/google-photos-demo-picture-small.jpg",
+  "thumbnail_url": "https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/images/google-photos-demo-picture-thumb.jpg",
+  "caption": null,
+  "timestamp": "2024-06-25T12:00:00.000Z",
+  "image_update_date": "2024-06-25T12:00:00.000Z",
+  "album_name": "TRMNL Demo Album - Google Photos",
+  "photo_count": 142,
+  "relative_date": "1 year ago",
+  "aspect_ratio": "4:3",
+  "megapixels": 12
+}
+```
+
+This feature allows the plugin to display properly in the TRMNL marketplace before users configure their own albums.
 
 #### Response
 
@@ -540,7 +568,7 @@ In `settings.yml`:
 
 ```yaml
 strategy: polling
-polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}
+polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}&adaptive_background={{ adaptive_background }}
 polling_verb: GET
 refresh_frequency: 3600 # 1 hour
 ```

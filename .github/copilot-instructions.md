@@ -8,12 +8,19 @@
 
 This is a TRMNL plugin that displays random photos from Google Photos shared albums without requiring OAuth authentication. Users simply paste their shared album link, and photos are automatically fetched and displayed on their TRMNL e-ink devices. The plugin leverages the TRMNL Framework v2 to create responsive, adaptive layouts that work across all TRMNL devices.
 
+**Important**: This repository contains **two plugin variants**:
+1. **Standard Layout** (`templates/`) - Photo display with metadata, captions, and album info
+2. **Canvas/Fullbleed Layout** (`templates-fullbleed/`) - Minimalist, distraction-free fullscreen photos with adaptive backgrounds
+
+Both variants share the same backend API but have different custom fields and visual presentations.
+
 ### Key Goals
 
 1. **Simplicity**: Match Apple Photos plugin UX (paste link → photos display)
 2. **No Authentication**: Avoid OAuth or Google account linking
 3. **Reliability**: 99%+ uptime for photo fetching
 4. **Performance**: Photo refresh in <3 seconds
+5. **Flexibility**: Multiple layout options for different use cases
 
 ### Current Status
 
@@ -62,11 +69,19 @@ trmnl-google-photos-plugin/
 │   ├── TESTING.md               # Testing strategy and guidelines
 │   ├── QUICKSTART.md            # Quick start guide
 │   └── DEPLOYMENT.md            # Deployment instructions
-├── templates/                    # Template layouts (uploaded to TRMNL)
-│   ├── full.liquid              # Full-screen layout
+├── templates/                    # Standard layout templates (main plugin)
+│   ├── full.liquid              # Full-screen layout with metadata
 │   ├── half_horizontal.liquid   # Half-size horizontal layout
 │   ├── half_vertical.liquid     # Half-size vertical layout
-│   └── quadrant.liquid          # Quarter-size layout
+│   ├── quadrant.liquid          # Quarter-size layout
+│   └── shared.liquid            # Shared template components
+├── templates-fullbleed/          # Canvas/fullbleed layout variant
+│   ├── full.liquid              # Fullscreen edge-to-edge photo
+│   ├── half_horizontal.liquid   # Half-size fullbleed
+│   ├── half_vertical.liquid     # Half-size fullbleed
+│   ├── quadrant.liquid          # Quarter-size fullbleed
+│   ├── shared.liquid            # Shared components with adaptive bg
+│   └── custom-fields.yml        # Custom fields for fullbleed variant
 ├── lib/                          # Core library code
 │   └── url-parser.js            # URL parser and validator
 ├── src/                          # Cloudflare Worker source
