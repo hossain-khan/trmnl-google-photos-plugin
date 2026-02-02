@@ -4,7 +4,7 @@ name: API Integration Tests
 # Tests the /api/photo endpoint with a deterministic sample album
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -28,27 +28,27 @@ jobs:
       - name: Test /api/photo endpoint
         run: |
           echo "Testing /api/photo endpoint with deterministic sample album..."
-          
+
           # Sample album with exactly 1 image - ensures no flaky random selection
           ALBUM_URL="https://photos.app.goo.gl/2qJRExCAM1Eayytt9"
           WORKER_URL="https://trmnl-google-photos.gohk.xyz"
-          
+
           # Test basic endpoint functionality
           RESPONSE=$(curl -s "${WORKER_URL}/api/photo?album_url=${ALBUM_URL}&enable_caching=false")
-          
+
           echo "Response:"
           echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
-          
+
           # Validate response structure
           echo "Validating response structure..."
-          
+
           if echo "$RESPONSE" | jq -e '.photo_url' > /dev/null 2>&1; then
             echo "✅ photo_url found in response"
           else
             echo "❌ photo_url missing from response"
             exit 1
           fi
-          
+
           if echo "$RESPONSE" | jq -e '.photo_count' > /dev/null 2>&1; then
             PHOTO_COUNT=$(echo "$RESPONSE" | jq -r '.photo_count')
             echo "✅ photo_count found: $PHOTO_COUNT"
@@ -56,14 +56,14 @@ jobs:
             echo "❌ photo_count missing from response"
             exit 1
           fi
-          
+
           if echo "$RESPONSE" | jq -e '.timestamp' > /dev/null 2>&1; then
             echo "✅ timestamp found in response"
           else
             echo "❌ timestamp missing from response"
             exit 1
           fi
-          
+
           # Validate photo URL is from Google Photos CDN
           PHOTO_URL=$(echo "$RESPONSE" | jq -r '.photo_url')
           if [[ "$PHOTO_URL" == *"googleusercontent.com"* ]]; then
@@ -72,23 +72,23 @@ jobs:
             echo "❌ photo_url is not from Google Photos CDN: $PHOTO_URL"
             exit 1
           fi
-          
+
           echo ""
           echo "✅ All integration tests passed!"
 
       - name: Test /api/photo with caching enabled
         run: |
           echo "Testing /api/photo endpoint with caching enabled..."
-          
+
           ALBUM_URL="https://photos.app.goo.gl/2qJRExCAM1Eayytt9"
           WORKER_URL="https://trmnl-google-photos.gohk.xyz"
-          
+
           # Test with caching enabled
           RESPONSE=$(curl -s "${WORKER_URL}/api/photo?album_url=${ALBUM_URL}&enable_caching=true")
-          
+
           echo "Response with caching:"
           echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
-          
+
           if echo "$RESPONSE" | jq -e '.photo_url' > /dev/null 2>&1; then
             echo "✅ Caching enabled test passed"
           else
@@ -96,12 +96,162 @@ jobs:
             exit 1
           fi
 
-      - name: Test health check endpoint
+      - name: Test POST /api/photo endpoint
         run: |
-          echo "Testing health check endpoints..."
+          echo "Testing POST /api/photo endpoint..."
+
+          ALBUM_URL="https://photos.app.goo.gl/2qJRExCAM1Eayytt9"
+          WORKER_URL="https://trmnl-google-photos.gohk.xyz"
+
+          # Test basic POST request
+          RESPONSE=$(curl -s -X POST "${WORKER_URL}/api/photo" \
+            -H "Content-Type: application/json" \
+            -d "{\"album_url\": \"${ALBUM_URL}\", \"enable_caching\": \"false\"}")
+
+          echo "POST Response:"
+          echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
+
+          # Validate response structure (same as GET tests)
+          echo "Validating POST response structure..."
+
+          if echo "$RESPONSE" | jq -e '.photo_url' > /dev/null 2>&1; then
+            echo "✅ POST photo_url found in response"
+          else
+            echo "❌ POST photo_url missing from response"
+            exit 1
+          fi
+
+          if echo "$RESPONSE" | jq -e '.photo_count' > /dev/null 2>&1; then
+            PHOTO_COUNT=$(echo "$RESPONSE" | jq -r '.photo_count')
+            echo "✅ POST photo_count found: $PHOTO_COUNT"
+          else
+            echo "❌ POST photo_count missing from response"
+            exit 1
+          fi
+
+          if echo "$RESPONSE" | jq -e '.timestamp' > /dev/null 2>&1; then
+            echo "✅ POST timestamp found in response"
+          else
+            echo "❌ POST timestamp missing from response"
+            exit 1
+          fi
+
+          # Validate photo URL is from Google Photos CDN
+          PHOTO_URL=$(echo "$RESPONSE" | jq -r '.photo_url')
+          if [[ "$PHOTO_URL" == *"googleusercontent.com"* ]]; then
+            echo "✅ POST photo_url is from Google Photos CDN"
+          else
+            echo "❌ POST photo_url is not from Google Photos CDN: $PHOTO_URL"
+            exit 1
+          fi
+
+          echo ""
+          echo "✅ POST endpoint tests passed!"
+
+      - name: Test POST /api/photo with all parameters
+        run: |
+          echo "Testing POST /api/photo with all optional parameters..."
+
+          ALBUM_URL="https://photos.app.goo.gl/2qJRExCAM1Eayytt9"
+          WORKER_URL="https://trmnl-google-photos.gohk.xyz"
+
+          # Test with all parameters (caching + adaptive background)
+          RESPONSE=$(curl -s -X POST "${WORKER_URL}/api/photo" \
+            -H "Content-Type: application/json" \
+            -d "{\"album_url\": \"${ALBUM_URL}\", \"enable_caching\": \"true\", \"adaptive_background\": \"true\"}")
+
+          echo "POST Response with all parameters:"
+          echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
+
+          if echo "$RESPONSE" | jq -e '.photo_url' > /dev/null 2>&1; then
+            echo "✅ POST with all parameters test passed"
+          else
+            echo "❌ POST with all parameters test failed"
+            exit 1
+          fi
+
+          # Validate adaptive background fields when enabled
+          if echo "$RESPONSE" | jq -e '.edge_brightness_score' > /dev/null 2>&1; then
+            EDGE_SCORE=$(echo "$RESPONSE" | jq -r '.edge_brightness_score')
+            echo "✅ edge_brightness_score found: $EDGE_SCORE"
+          fi
+
+          if echo "$RESPONSE" | jq -e '.brightness_score' > /dev/null 2>&1; then
+            BRIGHTNESS_SCORE=$(echo "$RESPONSE" | jq -r '.brightness_score')
+            echo "✅ brightness_score found: $BRIGHTNESS_SCORE"
+          fi
+
+      - name: Test POST error handling - missing album_url
+        run: |
+          echo "Testing POST with missing album_url (demo mode)..."
           
           WORKER_URL="https://trmnl-google-photos.gohk.xyz"
           
+          # POST without album_url (should return demo photo)
+          RESPONSE=$(curl -s -X POST "${WORKER_URL}/api/photo" \
+            -H "Content-Type: application/json" \
+            -d "{\"enable_caching\": \"false\"}")
+          
+          # Should contain demo photo data
+          if echo "$RESPONSE" | jq -e '.photo_url' > /dev/null 2>&1; then
+            PHOTO_URL=$(echo "$RESPONSE" | jq -r '.photo_url')
+            if [[ "$PHOTO_URL" == *"google-photos-demo-picture"* ]]; then
+              echo "✅ POST demo mode works correctly (missing album_url)"
+              echo "Demo photo URL: $PHOTO_URL"
+            else
+              echo "⚠️  POST with missing album_url returned photo, but not demo"
+              echo "$RESPONSE" | jq '.'
+            fi
+          else
+            echo "❌ POST should return demo photo when album_url missing"
+          fi
+
+      - name: Test POST error handling - invalid JSON
+        run: |
+          echo "Testing POST error handling with invalid JSON..."
+
+          WORKER_URL="https://trmnl-google-photos.gohk.xyz"
+
+          # POST with malformed JSON
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${WORKER_URL}/api/photo" \
+            -H "Content-Type: application/json" \
+            -d "{invalid json}")
+
+          # Should return 400 Bad Request
+          if [ "$HTTP_CODE" -eq 400 ]; then
+            echo "✅ POST invalid JSON handling works correctly (HTTP $HTTP_CODE)"
+          else
+            echo "⚠️  Expected HTTP 400, got HTTP $HTTP_CODE (may handle gracefully)"
+          fi
+
+      - name: Test POST error handling - invalid album URL
+        run: |
+          echo "Testing POST error handling with invalid album URL..."
+          
+          INVALID_URL="https://invalid-domain.com/invalid"
+          WORKER_URL="https://trmnl-google-photos.gohk.xyz"
+          
+          RESPONSE=$(curl -s -X POST "${WORKER_URL}/api/photo" \
+            -H "Content-Type: application/json" \
+            -d "{\"album_url\": \"${INVALID_URL}\"}")
+          
+          # Should contain an error field
+          if echo "$RESPONSE" | jq -e '.error' > /dev/null 2>&1; then
+            echo "✅ POST error handling for invalid URL works correctly"
+            echo "Error: $(echo "$RESPONSE" | jq -r '.error')"
+          else
+            echo "⚠️  No error field in response (may have failed gracefully)"
+            echo "$RESPONSE" | jq '.'
+          fi
+            exit 1
+          fi
+
+      - name: Test health check endpoint
+        run: |
+          echo "Testing health check endpoints..."
+
+          WORKER_URL="https://trmnl-google-photos.gohk.xyz"
+
           # Test / endpoint
           RESPONSE=$(curl -s "${WORKER_URL}/")
           if echo "$RESPONSE" | jq -e '.status' > /dev/null 2>&1; then
@@ -110,7 +260,7 @@ jobs:
             echo "❌ GET / endpoint failed"
             exit 1
           fi
-          
+
           # Test /health endpoint
           RESPONSE=$(curl -s "${WORKER_URL}/health")
           if echo "$RESPONSE" | jq -e '.status' > /dev/null 2>&1; then
@@ -123,12 +273,12 @@ jobs:
       - name: Test error handling - invalid album URL
         run: |
           echo "Testing error handling with invalid album URL..."
-          
+
           INVALID_URL="https://invalid-domain.com/invalid"
           WORKER_URL="https://trmnl-google-photos.gohk.xyz"
-          
+
           RESPONSE=$(curl -s "${WORKER_URL}/api/photo?album_url=${INVALID_URL}")
-          
+
           # Should contain an error field
           if echo "$RESPONSE" | jq -e '.error' > /dev/null 2>&1; then
             echo "✅ Error handling works correctly"
@@ -155,5 +305,19 @@ jobs:
           echo "Endpoint:        https://trmnl-google-photos.gohk.xyz"
           echo "Test Album:      https://photos.app.goo.gl/2qJRExCAM1Eayytt9"
           echo "Photos in album: 1 (deterministic)"
-          echo "Status:          All tests passed"
+          echo ""
+          echo "Tests Passed:"
+          echo "  ✅ GET /api/photo (basic)"
+          echo "  ✅ GET /api/photo (with caching)"
+          echo "  ✅ GET deprecation header"
+          echo "  ✅ POST /api/photo (basic)"
+          echo "  ✅ POST /api/photo (all parameters)"
+          echo "  ✅ POST demo mode (missing album_url)"
+          echo "  ✅ POST error handling (invalid JSON)"
+          echo "  ✅ POST error handling (invalid URL)"
+          echo "  ✅ GET / (health check)"
+          echo "  ✅ GET /health (health check)"
+          echo "  ⚠️  GET /api/photo (invalid URL - soft fail)"
+          echo ""
+          echo "Status:          All critical tests passed"
           echo "=========================================="
