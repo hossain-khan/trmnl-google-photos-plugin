@@ -421,6 +421,7 @@ For contributors adding new features:
 
 | Date       | Version | Update                                  |
 | ---------- | ------- | --------------------------------------- |
+| 2026-02-02 | 1.2.0   | Smart photo selection (duplicate prevention) |
 | 2026-01-24 | 1.1.0   | Adaptive background brightness analysis |
 
 ## References
