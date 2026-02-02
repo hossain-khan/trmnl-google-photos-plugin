@@ -69,9 +69,14 @@ Host: trmnl-google-photos.gohk.xyz
 
 ---
 
-### 3. GET `/api/photo` - TRMNL JSON API (Polling Strategy)
+### 3. GET `/api/photo` - TRMNL JSON API (Polling Strategy) ⚠️ DEPRECATED
 
-**Primary endpoint** for TRMNL devices. Fetches a random photo from a Google Photos shared album and returns JSON data.
+**⚠️ DEPRECATION NOTICE**: This GET endpoint exposes album URLs in server logs, browser history, and network monitoring. Please migrate to [POST `/api/photo`](#4-post-apiphoto---trmnl-json-api-recommended) for enhanced privacy. See [Issue #154](https://github.com/hossain-khan/trmnl-google-photos-plugin/issues/154) for migration guide.
+
+**Status**: Deprecated but functional (backward compatibility maintained)  
+**Replacement**: Use `POST /api/photo` with JSON body instead
+
+Fetches a random photo from a Google Photos shared album and returns JSON data.
 
 #### Request
 
@@ -355,7 +360,200 @@ curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.ap
 
 ---
 
-### 4. GET `/api/test/discord` - Test Discord Notification Endpoint
+### 4. POST `/api/photo` - TRMNL JSON API ✅ RECOMMENDED
+
+**✅ RECOMMENDED**: Enhanced privacy endpoint that accepts album URL in JSON body instead of query parameters. This prevents URL exposure in server logs, browser history, and network monitoring.
+
+**Primary endpoint** for new TRMNL plugin installations and privacy-conscious users.
+
+#### Request
+
+**Headers:**
+
+```http
+POST /api/photo HTTP/1.1
+Host: trmnl-google-photos.gohk.xyz
+Content-Type: application/json
+```
+
+**Request Body (JSON):**
+
+```json
+{
+  "album_url": "https://photos.app.goo.gl/ENK6C44K85QgVHPH8",
+  "enable_caching": "true",
+  "adaptive_background": "false"
+}
+```
+
+**Body Parameters:**
+
+| Parameter             | Type           | Required | Description                                                                                                  |
+| --------------------- | -------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
+| `album_url`           | string         | Yes\*    | Google Photos shared album URL. Use 'demo', '0', or empty string for demo mode                               |
+| `enable_caching`      | string/boolean | No       | Enable/disable caching: 'true'/'false'/'1'/'0'/true/false (default true)                                     |
+| `adaptive_background` | string/boolean | No       | Enable adaptive background color: 'true'/'false'/'1'/'0'/true/false (default false, adds ~100-200ms latency) |
+
+**\*Note**: `album_url` is technically required, but you can pass `demo`, `0`, or leave it empty to get demo photo data (useful for plugin marketplace previews).
+
+**Supported Album URL Formats:**
+
+- Short URL: `https://photos.app.goo.gl/{shortcode}`
+- Full URL: `https://photos.google.com/share/{albumId}`
+- Full URL with params: `https://photos.google.com/share/{albumId}?key=value`
+
+**Demo Mode:**
+
+For testing or marketplace previews without configuring a Google Photos album, you can use demo mode by passing:
+
+- `"album_url": "demo"` - Returns demo photo data
+- `"album_url": "0"` - Returns demo photo data
+- `"album_url": ""` (empty string) - Returns demo photo data
+
+Demo mode returns a static response with a sample photo from the project's GitHub Pages (same as GET endpoint).
+
+#### Response
+
+**Success (200 OK):**
+
+Identical response format to GET endpoint. Returns JSON with photo data that TRMNL merges into Liquid templates.
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "photo_url": "https://lh3.googleusercontent.com/...=w800-h480",
+  "thumbnail_url": "https://lh3.googleusercontent.com/...=w400-h300",
+  "caption": null,
+  "timestamp": "2026-01-19T09:00:00.000Z",
+  "image_update_date": "2023-01-07T18:13:24.232Z",
+  "album_name": "Google Photos Shared Album",
+  "photo_count": 142,
+  "relative_date": "4 months ago",
+  "aspect_ratio": "4:3",
+  "megapixels": 12.5
+}
+```
+
+**Response Fields:**
+
+Same as GET endpoint (see [GET `/api/photo` Response Fields](#response-fields)).
+
+**Error: Missing Body (400 Bad Request):**
+
+Returns when request body is missing or empty.
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "error": "Bad Request",
+  "message": "Invalid JSON in request body",
+  "example": {
+    "album_url": "https://photos.app.goo.gl/...",
+    "enable_caching": "true",
+    "adaptive_background": "false"
+  }
+}
+```
+
+**Error: Invalid JSON (400 Bad Request):**
+
+Returns when JSON parsing fails.
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "error": "Bad Request",
+  "message": "Invalid JSON in request body",
+  "example": {
+    "album_url": "https://photos.app.goo.gl/...",
+    "enable_caching": "true",
+    "adaptive_background": "false"
+  }
+}
+```
+
+**Other Errors:**
+
+Same error responses as GET endpoint for invalid URLs, album not found, etc.
+
+#### Response Headers
+
+**Standard Headers:**
+
+```http
+Content-Type: application/json
+Access-Control-Allow-Origin: https://hossain-khan.github.io, https://usetrmnl.com
+Access-Control-Allow-Methods: GET, POST, OPTIONS
+Access-Control-Max-Age: 86400
+```
+
+**Custom Monitoring Headers:**
+
+```http
+X-Cache-Status: HIT
+X-Response-Time: 67ms
+X-Request-ID: a1b2c3d4
+```
+
+Same monitoring headers as GET endpoint (see [GET `/api/photo` Response Headers](#response-headers)).
+
+#### Privacy Advantages Over GET
+
+**Why POST is More Secure:**
+
+1. **No URL Logging**: Album URLs sent in request body are not logged in server access logs
+2. **No Browser History**: URLs don't appear in browser history (only `/api/photo` without params)
+3. **No Network Monitoring**: Query parameters are visible in network traffic; POST body is not
+4. **No Referer Headers**: URLs don't leak via HTTP Referer headers to third parties
+
+**Example Privacy Comparison:**
+
+```bash
+# GET (exposes URL in logs/history)
+# Server log: GET /api/photo?album_url=https://photos.app.goo.gl/ABC123
+curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/ABC123"
+
+# POST (hides URL from logs/history)
+# Server log: POST /api/photo
+curl -X POST "https://trmnl-google-photos.gohk.xyz/api/photo" \
+  -H "Content-Type: application/json" \
+  -d '{"album_url": "https://photos.app.goo.gl/ABC123"}'
+```
+
+#### Backward Compatibility
+
+**Zero Breaking Changes:**
+
+- GET endpoint remains functional indefinitely
+- Response format identical between GET and POST
+- Existing TRMNL configurations continue to work
+- Migration is opt-in, not forced
+
+**Migration Path:**
+
+See [Migration Guide (Issue #154)](https://github.com/hossain-khan/trmnl-google-photos-plugin/issues/154) for timeline and instructions.
+
+#### Performance Characteristics
+
+Identical performance to GET endpoint:
+
+| Metric                                      | Value      |
+| ------------------------------------------- | ---------- |
+| Response Time (cached)                      | 67ms       |
+| Response Time (uncached)                    | 1-2s       |
+| Response Time (adaptive_background enabled) | +100-200ms |
+| JSON Size                                   | 300-500B   |
+| CPU Time                                    | <50ms      |
+
+---
+
+### 5. GET `/api/test/discord` - Test Discord Notification Endpoint
 
 Test endpoint for manually triggering Discord alert notifications. Useful for verifying Discord webhook configuration and alert formatting without waiting for real errors to occur.
 
@@ -476,10 +674,16 @@ ENABLE_TEST_API = "false"  # Disable test API (default - returns 403)
 
 ## Request Examples
 
-### Example 1: Basic Request (JSON API)
+### Example 1: Basic Request with POST (Recommended)
+
+**Using POST for enhanced privacy:**
 
 ```bash
-curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
+curl -X POST "https://trmnl-google-photos.gohk.xyz/api/photo" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "album_url": "https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
+  }'
 ```
 
 **Response:**
@@ -499,10 +703,25 @@ curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.ap
 }
 ```
 
-### Example 2: With Adaptive Background
+### Example 2: Basic Request with GET (Legacy)
+
+**⚠️ Deprecated - exposes URL in logs:**
 
 ```bash
-curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8&adaptive_background=true"
+curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
+```
+
+**Response:** Same as POST example above.
+
+### Example 3: With Adaptive Background (POST)
+
+```bash
+curl -X POST "https://trmnl-google-photos.gohk.xyz/api/photo" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "album_url": "https://photos.app.goo.gl/ENK6C44K85QgVHPH8",
+    "adaptive_background": "true"
+  }'
 ```
 
 **Response:**
@@ -524,17 +743,27 @@ curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.ap
 }
 ```
 
-### Example 3: With Different Album
+### Example 4: All Options (POST)
 
 ```bash
-curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.google.com/share/AF1QipMZN..."
+curl -X POST "https://trmnl-google-photos.gohk.xyz/api/photo" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "album_url": "https://photos.app.goo.gl/ENK6C44K85QgVHPH8",
+    "enable_caching": "true",
+    "adaptive_background": "false"
+  }'
 ```
 
-### Example 4: Testing Locally
+### Example 5: Testing Locally (POST)
 
 ```bash
 # Start local dev server first: npm run dev
-curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
+curl -X POST "http://localhost:8787/api/photo" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "album_url": "https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
+  }'
 ```
 
 ---
@@ -543,7 +772,7 @@ curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/ENK6C4
 
 ### How It Works
 
-1. **TRMNL Polls Worker**: TRMNL platform makes GET request to `/api/photo`
+1. **TRMNL Polls Worker**: TRMNL platform makes GET or POST request to `/api/photo`
 2. **Worker Returns JSON**: Worker fetches random photo and returns JSON data
 3. **TRMNL Renders Templates**: TRMNL merges JSON into Liquid templates (stored in Markup Editor)
 4. **Display on Device**: TRMNL sends rendered HTML to e-ink device
@@ -567,7 +796,26 @@ Templates in TRMNL Markup Editor access JSON fields directly:
 
 ### Polling Configuration
 
+**Recommended (POST - Enhanced Privacy):**
+
 In `settings.yml`:
+
+```yaml
+strategy: polling
+polling_url: https://trmnl-google-photos.gohk.xyz/api/photo
+polling_verb: POST
+polling_headers:
+  Content-Type: application/json
+polling_body: |
+  {
+    "album_url": "{{ shared_album_url }}",
+    "enable_caching": "{{ enable_caching }}",
+    "adaptive_background": "{{ adaptive_background }}"
+  }
+refresh_frequency: 3600 # 1 hour (cache lasts 24 hours)
+```
+
+**Legacy (GET - Deprecated):**
 
 ```yaml
 strategy: polling
