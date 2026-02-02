@@ -105,6 +105,7 @@ import * as GooglePhotosAlbum from 'google-photos-album-image-url-fetch';
 import type { GooglePhoto, PhotoData } from '../types';
 import { getCachedAlbum, setCachedAlbum } from './cache-service';
 import { extractAlbumId } from '../lib/url-parser';
+import { hashAlbumUrl } from '../lib/album-hasher';
 import {
   isValidPhotoUrl,
   sanitizeCaption,
@@ -181,18 +182,99 @@ export async function fetchAlbumPhotos(albumUrl: string, kv?: KVNamespace): Prom
 }
 
 /**
- * Select a random photo from an array of photos
+ * Select a random photo from an array of photos with duplicate prevention
+ * Uses privacy-preserving history tracking when KV is available
  *
  * @param photos - Array of photos to choose from
- * @returns A randomly selected photo
+ * @param albumUrl - Original album URL (used for hash generation)
+ * @param kv - Optional KV namespace for history tracking
+ * @returns A randomly selected photo (guaranteed non-duplicate when possible)
  */
-export function selectRandomPhoto(photos: GooglePhoto[]): GooglePhoto {
+export async function selectRandomPhoto(
+  photos: GooglePhoto[],
+  albumUrl?: string,
+  kv?: KVNamespace
+): Promise<GooglePhoto> {
   if (!photos || photos.length === 0) {
     throw new Error('No photos available to select from');
   }
 
-  const randomIndex = Math.floor(Math.random() * photos.length);
-  return photos[randomIndex];
+  // Fallback to simple random if KV unavailable, no URL provided, or single photo
+  if (!kv || !albumUrl || photos.length === 1) {
+    const randomIndex = Math.floor(Math.random() * photos.length);
+    return photos[randomIndex];
+  }
+
+  try {
+    // Generate privacy-preserving hash
+    const albumHash = await hashAlbumUrl(albumUrl);
+    const historyKey = `photo-history:${albumHash}`;
+
+    // Retrieve history (array of recently used indexes)
+    let history: number[] = [];
+    try {
+      const historyJson = await kv.get(historyKey);
+      if (historyJson) {
+        const parsed = JSON.parse(historyJson);
+        // Validate parsed data is an array of numbers
+        if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'number')) {
+          history = parsed;
+        }
+      }
+    } catch {
+      // Corrupted history JSON - reset to empty array (graceful recovery)
+      console.warn(
+        `[Photo Selection] Corrupted history for ${albumHash.substring(0, 8)}..., resetting`
+      );
+      history = [];
+    }
+
+    // Calculate adaptive window size
+    // Never exceed album size - 1 (must leave at least 1 option)
+    const maxHistory = Math.min(20, Math.max(photos.length - 1, 1));
+
+    // Filter history to only include valid indexes for current album size
+    // (handles case where album shrinks)
+    const validHistory = history.filter((idx) => idx >= 0 && idx < photos.length);
+    const recentHistory = validHistory.slice(-maxHistory);
+
+    // Find available indexes (not in recent history)
+    const availableIndexes = Array.from({ length: photos.length }, (_, i) => i).filter(
+      (i) => !recentHistory.includes(i)
+    );
+
+    // Select random from available pool
+    const selectedIndex =
+      availableIndexes.length > 0
+        ? availableIndexes[Math.floor(Math.random() * availableIndexes.length)]
+        : Math.floor(Math.random() * photos.length); // Fallback if history exhausted
+
+    // Update history with selected index
+    const newHistory = [...recentHistory, selectedIndex].slice(-maxHistory);
+
+    try {
+      await kv.put(historyKey, JSON.stringify(newHistory), {
+        expirationTtl: 604800, // 1 week (7 days)
+      });
+    } catch (error) {
+      // KV write failure - log warning but don't break the request
+      console.warn(`[Photo Selection] KV write failed for ${albumHash.substring(0, 8)}...:`, error);
+    }
+
+    console.log(
+      `[Photo Selection] Album: ${albumHash.substring(0, 8)}..., Selected: ${selectedIndex}, History size: ${newHistory.length}, Available: ${availableIndexes.length}`
+    );
+
+    return photos[selectedIndex];
+  } catch (error) {
+    // Any unexpected error - fall back to simple random
+    console.warn(
+      '[Photo Selection] Error in smart selection, falling back to simple random:',
+      error
+    );
+    const randomIndex = Math.floor(Math.random() * photos.length);
+    return photos[randomIndex];
+  }
 }
 
 /**
@@ -504,7 +586,7 @@ export async function convertToPhotoData(
  * Main function to fetch a random photo from an album
  *
  * @param albumUrl - The shared album URL
- * @param kv - Optional Cloudflare KV namespace for caching
+ * @param kv - Optional Cloudflare KV namespace for caching and history tracking
  * @param analyzeImage - Whether to analyze image brightness for adaptive background
  * @param requestId - Request ID for correlation with main request logs
  * @param webhookUrl - Optional Discord webhook URL for alerts
@@ -521,8 +603,8 @@ export async function fetchRandomPhoto(
   // Fetch all photos from the album (may use cache)
   const photos = await fetchAlbumPhotos(albumUrl, kv);
 
-  // Select a random photo
-  const selectedPhoto = selectRandomPhoto(photos);
+  // Select a random photo with duplicate prevention (when KV available)
+  const selectedPhoto = await selectRandomPhoto(photos, albumUrl, kv);
 
   // Convert to PhotoData format (with optional brightness analysis)
   return await convertToPhotoData(

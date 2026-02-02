@@ -202,26 +202,42 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 
 ### 6. KV Cache (Deployed)
 
-**Purpose**: Cache album photo lists to reduce Google Photos API calls
+**Purpose**: Cache album photo lists and track photo selection history
 
 **Technology**: Cloudflare KV (Key-Value Store)
 
-**Strategy**:
+**Cache Strategies**:
 
-- Key: `album:{albumId}`
-- Value: Array of photo URLs
-- TTL: 24 hours
-- Shared across all users with same album
+1. **Album Photo Cache**:
+   - Key: `album:{albumId}`
+   - Value: Array of photo URLs
+   - TTL: 24 hours
+   - Shared across all users with same album
+
+2. **Photo Selection History** (Smart Selection):
+   - Key: `photo-history:{SHA-256 hash of album URL}`
+   - Value: Array of recently shown photo indexes
+   - TTL: 1 week (7 days)
+   - Purpose: Prevent consecutive duplicate photos
+   - Privacy-preserving: Album URL is hashed, never stored in plaintext
+
+**Smart Photo Selection Algorithm**:
+
+- Uses a sliding window of recently shown photos (max 20)
+- For small albums, window adapts to `min(20, album_size - 1)`
+- Guarantees no consecutive duplicates when KV is available
+- Gracefully falls back to simple random when KV is unavailable
 
 **Benefits**:
 
 - Reduces API calls by 80%+
 - Faster response times (67ms average for cached albums)
 - Lower Google Photos API load
+- Prevents photo repetition for better user experience
 
 **Status**: ✅ Deployed and operational
 
-**Privacy**: Only album data cached, no user data
+**Privacy**: Only album data cached, no user data. Album URLs hashed with SHA-256.
 
 ---
 
@@ -252,11 +268,17 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
      * Return cached photo list (67ms response time)
    - Parse response
 
-4. Worker: Select Random Photo
-   - Generate random index
-   - Select photo from array
+4. Worker: Select Random Photo (Smart Selection)
+   - Generate privacy-preserving hash of album URL (SHA-256)
+   - Check KV for recent photo history (photo-history:{hash})
+   - Calculate adaptive window size: min(20, album_size - 1)
+   - Filter out recently shown indexes from available pool
+   - Select random photo from remaining options
+   - Update history with selected index (TTL: 1 week)
    - Optimize photo URL for e-ink (append size params)
    - Extract caption and metadata
+
+   Note: Falls back to simple random if KV unavailable
 
 5. Worker → TRMNL Platform
    Response: {
