@@ -749,7 +749,7 @@ Stateless workflow with Polling strategy:
 - **Runtime**: Cloudflare Workers
 - **Framework**: Hono (lightweight web framework)
 - **Language**: TypeScript
-- **Caching**: Cloudflare KV (optional, 1-hour TTL)
+- **Caching**: Cloudflare KV (optional, 24-hour TTL)
 - **Monitoring**: Cloudflare Workers Analytics
 - **Deployment**: Cloudflare Workers (wrangler CLI)
 - **Architecture**: Fully stateless - no databases, no user data storage

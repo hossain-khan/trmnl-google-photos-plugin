@@ -573,7 +573,7 @@ In `settings.yml`:
 strategy: polling
 polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}&adaptive_background={{ adaptive_background }}
 polling_verb: GET
-refresh_frequency: 3600 # 1 hour
+refresh_frequency: 3600 # 1 hour (cache lasts 24 hours)
 ```
 
 ---
@@ -688,7 +688,7 @@ The worker uses Cloudflare KV for album data caching:
 
 **Cache Behavior**:
 
-- TTL: 3600 seconds (1 hour)
+- TTL: 86400 seconds (24 hours)
 - Cache Hit: 67ms response time (average)
 - Cache Miss: 1-2s response time (fetches from Google Photos)
 - Shared: Multiple users share cache for same album

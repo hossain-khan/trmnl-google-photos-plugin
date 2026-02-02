@@ -375,7 +375,7 @@ View cache statistics in Cloudflare dashboard:
 
 - KV Namespace: `TRMNL_GOOGLE_PHOTOS_CACHE`
 - Metric: Hit ratio (target > 80%)
-- Expiration: 1 hour
+- Expiration: 24 hours
 
 ## Test Results Tracking
 

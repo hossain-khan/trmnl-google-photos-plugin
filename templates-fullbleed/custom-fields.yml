@@ -47,4 +47,4 @@
   optional: true
   name: Enable Performance Caching
   description: "Cache photo info for faster loading"
-  help_text: "When enabled, the plugin remembers your album's photos for 1 hour for instant loading. No actual photos are stored. Disable for always-fresh photos (slower)."
+  help_text: "When enabled, the plugin remembers your album's photos for 24 hours for instant loading. No actual photos are stored. Disable for always-fresh photos (slower)."
