@@ -4,7 +4,7 @@
  *
  * Cache Strategy:
  * - Key structure: `album:{albumId}`
- * - TTL: 1 hour (3600 seconds)
+ * - TTL: 24 hours (86400 seconds)
  * - Shared across all users with same album (no user-specific data)
  * - Gracefully handles cache misses and errors
  */
