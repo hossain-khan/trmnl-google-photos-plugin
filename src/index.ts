@@ -552,7 +552,9 @@ app.post('/api/photo', async (c) => {
 
     // Determine if adaptive background should be analyzed
     const analyzeImage =
-      adaptive_background === 'true' || adaptive_background === '1' || String(adaptive_background) === 'true';
+      adaptive_background === 'true' ||
+      adaptive_background === '1' ||
+      String(adaptive_background) === 'true';
 
     logger.info('Request preferences', {
       enable_caching,
