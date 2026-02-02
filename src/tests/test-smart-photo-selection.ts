@@ -216,9 +216,10 @@ describe('Smart Photo Selection', (): void => {
 
       assert.ok(stored, 'History should be stored');
 
-      const oneWeek = 604800 * 1000;
-      const expectedExpiration = Date.now() + oneWeek;
-      const tolerance = 5000;
+      // TTL is 1 week (7 days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds)
+      const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
+      const expectedExpiration = Date.now() + oneWeekMs;
+      const tolerance = 5000; // 5 seconds tolerance for test execution time
 
       assert.ok(
         stored.expiration > expectedExpiration - tolerance,

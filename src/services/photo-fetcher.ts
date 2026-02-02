@@ -230,7 +230,9 @@ export async function selectRandomPhoto(
     }
 
     // Calculate adaptive window size
-    // Never exceed album size - 1 (must leave at least 1 option)
+    // For albums with 2+ photos: window = min(20, photos.length - 1)
+    // This ensures at least 1 photo is always available for selection
+    // Note: Single-photo albums are handled earlier (early return)
     const maxHistory = Math.min(20, Math.max(photos.length - 1, 1));
 
     // Filter history to only include valid indexes for current album size
