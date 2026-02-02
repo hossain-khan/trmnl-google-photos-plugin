@@ -6,7 +6,7 @@ This service provides KV caching for Google Photos album data to improve perform
 
 The cache service:
 
-- Caches album photo lists in Cloudflare KV for 1 hour
+- Caches album photo lists in Cloudflare KV for 24 hours
 - Reduces Google Photos API calls by 80%+
 - Improves response times from ~1-2s to 67ms (average) for cached albums
 - Gracefully handles cache failures without breaking the application
@@ -27,7 +27,7 @@ Request → Check KV Cache → Cache Hit?
                               ↓ Yes: Return cached photos
                               ↓ No:  Fetch from Google Photos API
                                      ↓
-                                     Store in KV (1hr TTL)
+                                     Store in KV (24hr TTL)
                                      ↓
                                      Return photos
 ```
@@ -104,7 +104,7 @@ Store album data in KV cache.
 **Behavior:**
 
 - Skips caching if KV is undefined
-- Stores data with 1-hour TTL
+- Stores data with 24-hour TTL
 - Logs cache storage success
 - Catches and logs errors without throwing
 
@@ -181,7 +181,7 @@ Cache HIT for album:ABC123XYZ (142 photos)
 ```
 Cache MISS for album:ABC123XYZ
 Fetching photos from Google Photos API for album ABC123XYZ
-Cache STORED for album:ABC123XYZ (142 photos, TTL: 3600s)
+Cache STORED for album:ABC123XYZ (142 photos, TTL: 86400s)
 ```
 
 - Response time: 1-2s (API fetch + cache store)
@@ -251,7 +251,7 @@ Test with production KV namespace:
 
 1. Deploy worker with KV configured (already done)
 2. Make first request (cache miss)
-3. Make second request within 1 hour (cache hit)
+3. Make second request within 24 hours (cache hit)
 4. Check logs for cache hits/misses
 
 ### Manual Testing
@@ -260,7 +260,7 @@ Test with production KV namespace:
 # Test cache miss (first request to an album)
 curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
 
-# Test cache hit (within 1 hour, same album)
+# Test cache hit (within 24 hours, same album)
 curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
 ```
 
@@ -305,7 +305,7 @@ Multiple users with the same album URL share the same cache entry:
 
 ### Cache Invalidation
 
-Cache automatically expires after 1 hour. To force invalidation:
+Cache automatically expires after 24 hours. To force invalidation:
 
 ```bash
 # Delete specific album cache
@@ -350,7 +350,7 @@ npm run deploy
 **Causes:**
 
 1. Different users using different album URLs (expected)
-2. TTL expired between requests (expected if >1 hour apart)
+2. TTL expired between requests (expected if >24 hours apart)
 3. Cache keys not matching due to URL format variations
 
 **Solution:**

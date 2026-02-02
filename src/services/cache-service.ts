@@ -32,8 +32,8 @@ export interface CacheMetrics {
   error?: string;
 }
 
-// Cache TTL: 1 hour in seconds
-const CACHE_TTL_SECONDS = 3600;
+// Cache TTL: 24 hours in seconds
+const CACHE_TTL_SECONDS = 86400;
 
 /**
  * Generate cache key for an album
@@ -110,7 +110,7 @@ export async function setCachedAlbum(
   };
 
   try {
-    // Store with 1-hour TTL
+    // Store with 24-hour TTL
     await kv.put(key, JSON.stringify(cacheData), {
       expirationTtl: CACHE_TTL_SECONDS,
     });

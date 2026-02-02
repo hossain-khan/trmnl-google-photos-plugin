@@ -210,7 +210,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 
 - Key: `album:{albumId}`
 - Value: Array of photo URLs
-- TTL: 1 hour
+- TTL: 24 hours
 - Shared across all users with same album
 
 **Benefits**:
@@ -310,7 +310,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 | Data             | Location                 | Duration  | Purpose                  |
 | ---------------- | ------------------------ | --------- | ------------------------ |
 | Album URL        | TRMNL Platform           | Permanent | User's plugin settings   |
-| Album Photo List | Cloudflare KV (optional) | 1 hour    | Performance optimization |
+| Album Photo List | Cloudflare KV (optional) | 24 hours  | Performance optimization |
 | Request Logs     | Cloudflare Analytics     | 24 hours  | Monitoring & debugging   |
 | None             | Plugin Database          | N/A       | **We store nothing!**    |
 
@@ -388,7 +388,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐ │
 │  │   KV Namespace (PHOTOS_CACHE) - Deployed        │ │
-│  │   TTL: 1 hour                                    │ │
+│  │   TTL: 24 hours                                  │ │
 │  └──────────────────────────────────────────────────┘ │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐ │
@@ -500,7 +500,7 @@ Planned GitHub Actions workflow:
 ```yaml
 strategy: polling
 polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}
-refresh_frequency: 3600 # seconds (1 hour)
+refresh_frequency: 3600 # seconds (1 hour, cache lasts 24 hours)
 ```
 
 **Why Not Webhook?**
@@ -559,7 +559,7 @@ refresh_frequency: 3600 # seconds (1 hour)
 ### Optimization Strategies
 
 1. **KV Caching** (Phase 3)
-   - Cache album photo lists for 1 hour
+   - Cache album photo lists for 24 hours
    - Reduces Google Photos API calls by 80%+
    - Shared cache across all users
 

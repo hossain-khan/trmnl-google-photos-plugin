@@ -6,7 +6,7 @@ homepage: https://hossain-khan.github.io/trmnl-google-photos-plugin/
 description: Display random photos from your Google Photos shared albums on TRMNL
 markup_version: 1
 strategy: polling  # TRMNL polls Cloudflare Worker for JSON photo data
-refresh_frequency: 3600  # 1 hour (will fetch new random photo hourly)
+refresh_frequency: 3600  # 1 hour (will fetch new random photo hourly, cache lasts 24 hours)
 
 # Polling URL - TRMNL will call this endpoint with form field values
 polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}

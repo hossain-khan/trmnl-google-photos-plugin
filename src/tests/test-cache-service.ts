@@ -105,9 +105,9 @@ describe('Cache Service', (): void => {
   });
 
   describe('Cache Behavior', (): void => {
-    it('should use 1-hour TTL for cache entries', (): void => {
-      const CACHE_TTL_SECONDS = 3600;
-      assert.strictEqual(CACHE_TTL_SECONDS, 3600, 'TTL should be 1 hour (3600 seconds)');
+    it('should use 24-hour TTL for cache entries', (): void => {
+      const CACHE_TTL_SECONDS = 86400;
+      assert.strictEqual(CACHE_TTL_SECONDS, 86400, 'TTL should be 24 hours (86400 seconds)');
     });
 
     it('should handle KV undefined gracefully', (): void => {
