@@ -45,9 +45,9 @@ app.use(
       'http://localhost:8787',
       'http://localhost:3000',
     ],
-    allowMethods: ['GET', 'OPTIONS'],
+    allowMethods: ['GET', 'POST', 'OPTIONS'],
     allowHeaders: ['Content-Type'],
-    exposeHeaders: ['X-Cache-Status', 'X-Response-Time', 'X-Request-ID'], // Expose custom headers
+    exposeHeaders: ['X-Cache-Status', 'X-Response-Time', 'X-Request-ID', 'X-Deprecation-Notice'], // Expose custom headers
     maxAge: 86400, // 24 hours
   })
 );
@@ -339,6 +339,10 @@ app.get('/api/photo', async (c) => {
     c.header('X-Cache-Status', cacheHit ? 'HIT' : 'MISS');
     c.header('X-Response-Time', `${totalDuration}ms`);
     c.header('X-Request-ID', requestId);
+    c.header(
+      'X-Deprecation-Notice',
+      'GET method with query params exposes album URLs in logs. Please migrate to POST method. See: https://github.com/hossain-khan/trmnl-google-photos-plugin/issues/154'
+    );
 
     return c.json(response);
   } catch (error) {
@@ -369,6 +373,338 @@ app.get('/api/photo', async (c) => {
     sendAnalytics(c.env.ANALYTICS, {
       requestId,
       endpoint: '/api/photo',
+      totalDuration,
+      statusCode,
+      errorType,
+      cacheHit,
+    });
+
+    return c.json(
+      {
+        error: 'Internal Server Error',
+        message: errorMessage,
+        requestId,
+        timestamp: new Date().toISOString(),
+      },
+      500
+    );
+  }
+});
+
+/**
+ * POST /api/photo - TRMNL Polling Endpoint (JSON API) - RECOMMENDED
+ *
+ * Enhanced privacy version of GET /api/photo. Accepts album URL in JSON body instead of
+ * query parameters, preventing URL exposure in server logs, browser history, and network monitoring.
+ *
+ * Request Body (JSON):
+ * {
+ *   "album_url": "https://photos.app.goo.gl/...",
+ *   "enable_caching": "true",           // optional: 'true'/'false'/'1'/'0' (default: true)
+ *   "adaptive_background": "false"      // optional: 'true'/'false'/'1'/'0' (default: false)
+ * }
+ *
+ * Response (200 OK):
+ * {
+ *   "photo_url": "https://lh3.googleusercontent.com/...",
+ *   "caption": null,
+ *   "album_name": "Google Photos Album",
+ *   "photo_count": 142,
+ *   "timestamp": "2026-01-18T20:00:00.000Z"
+ * }
+ *
+ * Error Responses:
+ * - 400: Missing or invalid album_url in body
+ * - 404: Album not found or inaccessible
+ * - 500: Server error during photo fetch
+ */
+app.post('/api/photo', async (c) => {
+  const startTime = Date.now();
+  const requestId = crypto.randomUUID().substring(0, 8);
+  const logger = new Logger(requestId);
+
+  let statusCode = 200;
+  let errorType: string | undefined;
+  let cacheHit = false;
+
+  try {
+    logger.info('POST /api/photo request received');
+
+    // Parse JSON body
+    let requestBody: Partial<{
+      album_url: string;
+      enable_caching: string | boolean;
+      adaptive_background: string | boolean;
+    }>;
+    try {
+      requestBody = await c.req.json();
+    } catch (error) {
+      statusCode = 400;
+      errorType = 'invalid_json';
+      logger.warn('Invalid JSON in request body', {
+        error: error instanceof Error ? error.message : 'Unknown',
+      });
+
+      const errorContext: ErrorContext = {
+        requestId,
+        endpoint: 'POST /api/photo',
+        errorMessage: 'Invalid JSON in request body',
+        errorType,
+        severity: classifyErrorSeverity(statusCode, 'Invalid JSON'),
+        statusCode,
+      };
+      trackError(errorContext);
+
+      return c.json(
+        {
+          error: 'Bad Request',
+          message: 'Invalid JSON in request body',
+          example: {
+            album_url: 'https://photos.app.goo.gl/...',
+            enable_caching: 'true',
+            adaptive_background: 'false',
+          },
+        },
+        400
+      );
+    }
+
+    // Extract album_url from request body
+    const album_url = requestBody.album_url;
+    const enable_caching = requestBody.enable_caching?.toString();
+    const adaptive_background = requestBody.adaptive_background?.toString();
+
+    // Demo Data: If album_url is empty, 'demo', or '0', return demo photo data
+    if (
+      !album_url ||
+      album_url.trim() === '' ||
+      album_url.toLowerCase() === 'demo' ||
+      album_url === '0'
+    ) {
+      logger.info('Demo mode: Returning TRMNL demo photo data');
+
+      // Return demo photo data from the demo album
+      const demoPhotoData = {
+        photo_url:
+          'https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/images/google-photos-demo-picture-small.jpg',
+        thumbnail_url:
+          'https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/images/google-photos-demo-picture-thumb.jpg',
+        caption: null,
+        timestamp: '2024-06-25T12:00:00.000Z',
+        image_update_date: '2024-06-25T12:00:00.000Z',
+        album_name: 'TRMNL Demo Album - Google Photos',
+        photo_count: 142,
+        relative_date: '1 year ago',
+        aspect_ratio: '4:3',
+        megapixels: 12,
+      };
+
+      // Add response headers
+      c.header('X-Request-ID', requestId);
+      c.header('X-Response-Time', `${Date.now() - startTime}ms`);
+      c.header('X-Cache-Status', 'demo');
+
+      return c.json(demoPhotoData);
+    }
+
+    logger.info('Album URL provided via POST body');
+
+    // Parse and validate album URL
+    const parseStartTime = Date.now();
+    const urlValidation = parseAlbumUrl(album_url);
+    const parseDuration = Date.now() - parseStartTime;
+
+    logger.debug('URL parsing completed', {
+      parseDuration,
+      valid: urlValidation.valid,
+    });
+
+    if (!urlValidation.valid || !urlValidation.url) {
+      statusCode = 400;
+      errorType = 'invalid_url';
+      logger.warn('Invalid album URL format', { error: urlValidation.error });
+
+      // Track error
+      const errorContext: ErrorContext = {
+        requestId,
+        endpoint: 'POST /api/photo',
+        errorMessage: `Invalid album URL: ${urlValidation.error}`,
+        errorType,
+        severity: classifyErrorSeverity(statusCode, urlValidation.error || ''),
+        statusCode,
+      };
+      trackError(errorContext);
+
+      return c.json(
+        {
+          error: 'Bad Request',
+          message: `Invalid album URL: ${urlValidation.error}`,
+          validFormats: ['https://photos.app.goo.gl/...', 'https://photos.google.com/share/...'],
+        },
+        400
+      );
+    }
+
+    // Determine if caching should be used based on user preference
+    const useCaching =
+      enable_caching !== 'false' && enable_caching !== '0' && String(enable_caching) !== 'false';
+    const kvNamespace = useCaching ? c.env.PHOTOS_CACHE : undefined;
+
+    // Determine if adaptive background should be analyzed
+    const analyzeImage =
+      adaptive_background === 'true' ||
+      adaptive_background === '1' ||
+      String(adaptive_background) === 'true';
+
+    logger.info('Request preferences', {
+      enable_caching,
+      useCaching,
+      kvConfigured: !!c.env.PHOTOS_CACHE,
+      adaptive_background,
+      analyzeImage,
+      alertingEnabled: !!c.env.DISCORD_WEBHOOK_URL,
+    });
+
+    // Track skipped brightness analysis (user preference)
+    if (!analyzeImage) {
+      const skipMetrics: BrightnessMetrics = {
+        requestId,
+        status: 'skipped',
+      };
+      trackBrightnessMetrics(skipMetrics);
+
+      // Check and alert (will track skipped event but not trigger alerts)
+      await checkAndAlert(c.env.PHOTOS_CACHE, c.env.DISCORD_WEBHOOK_URL, skipMetrics);
+    }
+
+    // Fetch random photo from album (with optional caching and brightness analysis)
+    let photoData;
+    const fetchStartTime = Date.now();
+    try {
+      photoData = await fetchRandomPhoto(
+        urlValidation.url,
+        kvNamespace,
+        analyzeImage,
+        requestId,
+        c.env.DISCORD_WEBHOOK_URL
+      );
+      const fetchDuration = Date.now() - fetchStartTime;
+      cacheHit = fetchDuration < CACHE_HIT_THRESHOLD_MS; // Likely cached if <500ms
+
+      logger.info('Photo fetched successfully', {
+        uid: photoData.metadata?.uid,
+        count: photoData.photo_count,
+        fetchDuration,
+        cached: cacheHit,
+        brightnessAnalyzed: analyzeImage,
+        edgeBrightnessScore: photoData.edge_brightness_score,
+      });
+    } catch (error) {
+      const fetchDuration = Date.now() - fetchStartTime;
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch photos';
+      errorType = getErrorType(errorMessage);
+
+      logger.error('Photo fetch failed', {
+        error: errorMessage,
+        errorType,
+        fetchDuration,
+      });
+
+      // Return appropriate status code based on error
+      statusCode = errorMessage.includes('not found') ? 404 : 500;
+
+      // Track error
+      const errorContext: ErrorContext = {
+        requestId,
+        endpoint: 'POST /api/photo',
+        errorMessage,
+        errorType,
+        severity: classifyErrorSeverity(statusCode, errorMessage),
+        statusCode,
+        stack: error instanceof Error ? error.stack : undefined,
+      };
+      trackError(errorContext);
+
+      return c.json(
+        {
+          error: statusCode === 404 ? 'Not Found' : 'Internal Server Error',
+          message: errorMessage,
+          timestamp: new Date().toISOString(),
+        },
+        statusCode as 404 | 500
+      );
+    }
+
+    // Return JSON response (flat structure for TRMNL templates)
+    const response: Record<string, unknown> = {
+      photo_url: photoData.photo_url,
+      thumbnail_url: photoData.thumbnail_url,
+      edge_brightness_score: photoData.edge_brightness_score,
+      brightness_score: photoData.brightness_score,
+      caption: photoData.caption,
+      timestamp: photoData.timestamp,
+      image_update_date: photoData.image_update_date,
+      album_name: photoData.album_name,
+      photo_count: photoData.photo_count,
+      relative_date: photoData.relative_date,
+      aspect_ratio: photoData.aspect_ratio,
+      megapixels: photoData.megapixels,
+    };
+
+    const totalDuration = Date.now() - startTime;
+    logger.info('JSON response sent successfully', {
+      totalDuration,
+      responseSize: JSON.stringify(response).length,
+    });
+
+    // Track performance metrics
+    const metrics: PerformanceMetrics = {
+      requestId,
+      endpoint: 'POST /api/photo',
+      totalDuration,
+      photoFetchDuration: Date.now() - fetchStartTime,
+      cacheHit,
+      statusCode,
+    };
+    trackPerformance(metrics);
+
+    // Send to Analytics Engine (if configured - disabled by default on free tier)
+    sendAnalytics(c.env.ANALYTICS, metrics as unknown as Record<string, unknown>);
+
+    // Add custom headers for debugging and monitoring
+    c.header('X-Cache-Status', cacheHit ? 'HIT' : 'MISS');
+    c.header('X-Response-Time', `${totalDuration}ms`);
+    c.header('X-Request-ID', requestId);
+
+    return c.json(response);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const totalDuration = Date.now() - startTime;
+    statusCode = 500;
+    errorType = 'unhandled_error';
+
+    logger.error('Unhandled error in POST /api/photo endpoint', {
+      error: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+      totalDuration,
+    });
+
+    // Track critical error
+    const errorContext: ErrorContext = {
+      requestId,
+      endpoint: 'POST /api/photo',
+      errorMessage,
+      errorType,
+      severity: 'critical',
+      statusCode,
+      stack: error instanceof Error ? error.stack : undefined,
+    };
+    trackError(errorContext);
+
+    // Send to Analytics Engine (if configured - disabled by default on free tier)
+    sendAnalytics(c.env.ANALYTICS, {
+      requestId,
+      endpoint: 'POST /api/photo',
       totalDuration,
       statusCode,
       errorType,

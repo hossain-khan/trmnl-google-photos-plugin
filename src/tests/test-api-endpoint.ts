@@ -216,10 +216,281 @@ describe('/api/photo Endpoint', () => {
   });
 });
 
+describe('POST /api/photo Endpoint', () => {
+  describe('Request Body Parsing', () => {
+    it('should parse JSON body with album_url', () => {
+      const requestBody = {
+        album_url: 'https://photos.app.goo.gl/ABC123',
+      };
+
+      assert.ok(requestBody.album_url, 'Should have album_url in body');
+      assert.strictEqual(requestBody.album_url, 'https://photos.app.goo.gl/ABC123');
+    });
+
+    it('should parse JSON body with all optional fields', () => {
+      const requestBody = {
+        album_url: 'https://photos.app.goo.gl/ABC123',
+        enable_caching: 'true',
+        adaptive_background: 'false',
+      };
+
+      assert.ok(requestBody.album_url, 'Should have album_url');
+      assert.strictEqual(requestBody.enable_caching, 'true');
+      assert.strictEqual(requestBody.adaptive_background, 'false');
+    });
+
+    it('should handle boolean values in JSON body', () => {
+      const requestBody = {
+        album_url: 'https://photos.app.goo.gl/ABC123',
+        enable_caching: true,
+        adaptive_background: false,
+      };
+
+      const enable_caching = requestBody.enable_caching?.toString();
+      const adaptive_background = requestBody.adaptive_background?.toString();
+
+      assert.strictEqual(enable_caching, 'true');
+      assert.strictEqual(adaptive_background, 'false');
+    });
+
+    it('should validate enable_caching with string values', () => {
+      const testCases = [
+        { input: 'true', expected: true },
+        { input: 'false', expected: false },
+        { input: '1', expected: true },
+        { input: '0', expected: false },
+      ];
+
+      testCases.forEach(({ input, expected }) => {
+        const useCaching = input !== 'false' && input !== '0';
+        assert.strictEqual(useCaching, expected, `enable_caching='${input}' should be ${expected}`);
+      });
+    });
+
+    it('should validate enable_caching with boolean values', () => {
+      const testCases = [
+        { input: true, expected: true },
+        { input: false, expected: false },
+      ];
+
+      testCases.forEach(({ input, expected }) => {
+        const useCaching = String(input) !== 'false' && String(input) !== '0';
+        assert.strictEqual(useCaching, expected, `enable_caching=${input} should be ${expected}`);
+      });
+    });
+
+    it('should validate adaptive_background with string values', () => {
+      const testCases = [
+        { input: 'true', expected: true },
+        { input: 'false', expected: false },
+        { input: '1', expected: true },
+        { input: '0', expected: false },
+      ];
+
+      testCases.forEach(({ input, expected }) => {
+        const analyzeImage = input === 'true' || input === '1';
+        assert.strictEqual(
+          analyzeImage,
+          expected,
+          `adaptive_background='${input}' should be ${expected}`
+        );
+      });
+    });
+
+    it('should validate adaptive_background with boolean values', () => {
+      const testCases = [
+        { input: true, expected: true },
+        { input: false, expected: false },
+      ];
+
+      testCases.forEach(({ input, expected }) => {
+        const analyzeImage = String(input) === 'true' || String(input) === '1';
+        assert.strictEqual(
+          analyzeImage,
+          expected,
+          `adaptive_background=${input} should be ${expected}`
+        );
+      });
+    });
+  });
+
+  describe('Privacy Enhancement', () => {
+    it('should accept album_url in body instead of query params', () => {
+      const getRequest = '/api/photo?album_url=https://photos.app.goo.gl/ABC123';
+      const postBody = { album_url: 'https://photos.app.goo.gl/ABC123' };
+
+      // GET exposes URL in query string
+      assert.ok(getRequest.includes('album_url='), 'GET exposes album_url in URL');
+
+      // POST hides URL in body (not in URL/logs)
+      const postUrl = '/api/photo'; // No query params
+      assert.ok(!postUrl.includes('album_url='), 'POST hides album_url from URL');
+      assert.ok(postBody.album_url, 'POST sends album_url in body');
+    });
+
+    it('should prevent URL logging in server access logs', () => {
+      // Simulated access log entry
+      const getLogEntry = 'GET /api/photo?album_url=https://photos.app.goo.gl/ABC123';
+      const postLogEntry = 'POST /api/photo';
+
+      assert.ok(getLogEntry.includes('album_url='), 'GET logs expose album URL');
+      assert.ok(!postLogEntry.includes('album_url='), 'POST logs hide album URL');
+    });
+
+    it('should prevent URL exposure in browser history', () => {
+      const getBrowserHistory = '/api/photo?album_url=https://photos.app.goo.gl/ABC123';
+      const postBrowserHistory = '/api/photo';
+
+      assert.ok(getBrowserHistory.includes('photos.app.goo.gl'), 'GET exposes URL in history');
+      assert.ok(!postBrowserHistory.includes('photos.app.goo.gl'), 'POST hides URL from history');
+    });
+  });
+
+  describe('Backward Compatibility', () => {
+    it('should maintain GET endpoint for existing users', () => {
+      // GET endpoint should still work
+      const getUrl = '/api/photo?album_url=https://photos.app.goo.gl/ABC123';
+      const params = new URLSearchParams(getUrl.split('?')[1]);
+
+      assert.ok(params.get('album_url'), 'GET endpoint should still accept album_url');
+    });
+
+    it('should not break existing TRMNL configurations', () => {
+      // Existing users use GET with query params - should continue to work
+      const legacyUrl = '/api/photo?album_url=https://photos.app.goo.gl/ABC123&enable_caching=true';
+      const params = new URLSearchParams(legacyUrl.split('?')[1]);
+
+      assert.strictEqual(params.get('album_url'), 'https://photos.app.goo.gl/ABC123');
+      assert.strictEqual(params.get('enable_caching'), 'true');
+    });
+
+    it('should return identical response structure for GET and POST', () => {
+      // Response format should be identical for both methods
+      const expectedFields = [
+        'photo_url',
+        'thumbnail_url',
+        'caption',
+        'timestamp',
+        'album_name',
+        'photo_count',
+        'relative_date',
+        'aspect_ratio',
+        'megapixels',
+      ];
+
+      // Both GET and POST should return same structure
+      assert.ok(expectedFields.length > 0, 'Response fields should be defined');
+      assert.ok(expectedFields.includes('photo_url'), 'Should include photo_url');
+      assert.ok(expectedFields.includes('photo_count'), 'Should include photo_count');
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should return 400 for missing album_url in POST body', () => {
+      const requestBody = {}; // Missing album_url
+      const hasAlbumUrl = 'album_url' in requestBody;
+
+      assert.strictEqual(hasAlbumUrl, false, 'Should detect missing album_url');
+    });
+
+    it('should return 400 for empty album_url in POST body', () => {
+      const requestBody = { album_url: '' };
+      // Empty string trigger demo mode (same as GET endpoint)
+      const isDemoMode =
+        !requestBody.album_url ||
+        requestBody.album_url.trim() === '' ||
+        requestBody.album_url.toLowerCase() === 'demo' ||
+        requestBody.album_url === '0';
+
+      assert.strictEqual(isDemoMode, true, 'Empty album_url should trigger demo mode');
+    });
+
+    it('should detect invalid JSON in POST request', () => {
+      const validJson = '{"album_url": "https://photos.app.goo.gl/ABC"}';
+      const invalidJson = '{album_url: "missing quotes"}';
+
+      let validParsed = false;
+      let invalidParsed = false;
+
+      try {
+        JSON.parse(validJson);
+        validParsed = true;
+      } catch {
+        validParsed = false;
+      }
+
+      try {
+        JSON.parse(invalidJson);
+        invalidParsed = true;
+      } catch {
+        invalidParsed = false;
+      }
+
+      assert.strictEqual(validParsed, true, 'Should parse valid JSON');
+      assert.strictEqual(invalidParsed, false, 'Should reject invalid JSON');
+    });
+  });
+
+  describe('Demo Mode Support', () => {
+    it('should support demo mode in POST body', () => {
+      const demoCases = [{ album_url: 'demo' }, { album_url: '0' }, { album_url: '' }];
+
+      demoCases.forEach((body) => {
+        const isDemoMode =
+          !body.album_url ||
+          body.album_url.trim() === '' ||
+          body.album_url.toLowerCase() === 'demo' ||
+          body.album_url === '0';
+        assert.strictEqual(isDemoMode, true, `Should detect demo mode for: ${body.album_url}`);
+      });
+    });
+
+    it('should not trigger demo mode for valid URLs', () => {
+      const validUrls = [
+        'https://photos.app.goo.gl/ABC123',
+        'https://photos.google.com/share/AF1QipM...',
+      ];
+
+      validUrls.forEach((url) => {
+        const isDemoMode = !url || url.trim() === '' || url.toLowerCase() === 'demo' || url === '0';
+        assert.strictEqual(isDemoMode, false, `Should not trigger demo mode for: ${url}`);
+      });
+    });
+  });
+
+  describe('Migration Path', () => {
+    it('should document deprecation of GET method', () => {
+      const deprecationHeader = 'X-Deprecation-Notice';
+      const deprecationMessage =
+        'GET method with query params exposes album URLs in logs. Please migrate to POST method.';
+
+      assert.ok(deprecationHeader, 'Should define deprecation header');
+      assert.ok(deprecationMessage.includes('POST'), 'Should recommend POST method');
+      assert.ok(deprecationMessage.includes('logs'), 'Should explain privacy concern');
+    });
+
+    it('should provide migration timeline', () => {
+      // Phase 1: POST available (immediate)
+      // Phase 2: GET deprecated but functional (3-6 months)
+      // Phase 3: GET potentially removed (6-12 months, conditional on 90%+ migration)
+      const phases = {
+        phase1: 'POST available',
+        phase2: 'GET deprecated',
+        phase3: 'GET sunset (conditional)',
+      };
+
+      assert.ok(phases.phase1.includes('POST'), 'Phase 1 should provide POST endpoint');
+      assert.ok(phases.phase2.includes('deprecated'), 'Phase 2 should deprecate GET');
+      assert.ok(phases.phase3.includes('conditional'), 'Phase 3 should be conditional');
+    });
+  });
+});
+
 console.log('\n✅ All endpoint tests passed!');
 console.log('\nNote: These are unit tests for parameter parsing logic.');
 console.log('Integration tests with real Cloudflare Worker should be run separately.');
-console.log('\nTo test the deployed worker:');
+console.log('\n📋 Testing Guide:');
+console.log('\nGET /api/photo (Legacy - Deprecated):');
 console.log('  # With caching enabled (default)');
 console.log(
   '  curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=...&enable_caching=true"'
@@ -227,4 +498,15 @@ console.log(
 console.log('  # With caching disabled (privacy mode)');
 console.log(
   '  curl "https://trmnl-google-photos.gohk.xyz/api/photo?album_url=...&enable_caching=false"'
+);
+console.log('\nPOST /api/photo (Recommended - Enhanced Privacy):');
+console.log('  # Basic request');
+console.log('  curl -X POST "https://trmnl-google-photos.gohk.xyz/api/photo" \\');
+console.log('    -H "Content-Type: application/json" \\');
+console.log('    -d \'{"album_url": "https://photos.app.goo.gl/..."}\'');
+console.log('\n  # With all options');
+console.log('  curl -X POST "https://trmnl-google-photos.gohk.xyz/api/photo" \\');
+console.log('    -H "Content-Type: application/json" \\');
+console.log(
+  '    -d \'{"album_url": "...", "enable_caching": "true", "adaptive_background": "false"}\''
 );

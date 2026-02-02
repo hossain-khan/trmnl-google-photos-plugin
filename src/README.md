@@ -68,9 +68,12 @@ This will start the worker on `http://localhost:8787` with hot reload enabled.
 
 - `GET /` - Health check and service info
 - `GET /health` - Alternative health check endpoint
-- `GET /api/photo` - JSON API endpoint for TRMNL (Polling strategy)
+- `POST /api/photo` - JSON API endpoint for TRMNL (Polling strategy) - **RECOMMENDED**
+- `GET /api/photo` - Legacy JSON API endpoint (deprecated, use POST instead)
 
 ### Testing Locally
+
+**POST endpoint (recommended):**
 
 ```bash
 # Test root endpoint
@@ -79,7 +82,27 @@ curl http://localhost:8787/
 # Test health endpoint
 curl http://localhost:8787/health
 
-# Test /api/photo with valid album
+# Test POST /api/photo with valid album (recommended)
+curl -X POST "http://localhost:8787/api/photo" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "album_url": "https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
+  }'
+
+# Test with all options
+curl -X POST "http://localhost:8787/api/photo" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "album_url": "https://photos.app.goo.gl/ENK6C44K85QgVHPH8",
+    "enable_caching": "true",
+    "adaptive_background": "false"
+  }'
+```
+
+**GET endpoint (legacy - deprecated):**
+
+```bash
+# Legacy GET method (exposes URL in logs)
 curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
 ```
 

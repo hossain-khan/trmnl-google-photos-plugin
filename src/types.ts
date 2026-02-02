@@ -74,6 +74,16 @@ export interface GooglePhoto {
 }
 
 /**
+ * Photo API request body structure (for POST requests)
+ * Accepts same parameters as GET query params but in JSON body for enhanced privacy
+ */
+export interface PhotoRequestBody {
+  album_url: string;
+  enable_caching?: string | boolean; // 'true', 'false', '1', '0', true, false
+  adaptive_background?: string | boolean; // 'true', 'false', '1', '0', true, false
+}
+
+/**
  * Error response structure
  */
 export interface ErrorResponse {
