@@ -77,6 +77,24 @@ See [custom-fields.yml](custom-fields.yml) for plugin settings:
 
 ### Polling URL Example
 
+**Recommended (POST method - enhanced privacy):**
+
+```
+https://trmnl-google-photos.gohk.xyz/api/photo
+```
+
+With POST body (in TRMNL Markup Editor polling_body):
+
+```json
+{
+  "album_url": "{{ shared_album_url }}",
+  "enable_caching": "{{ enable_caching }}",
+  "adaptive_background": "{{ adaptive_background }}"
+}
+```
+
+**Legacy (GET method - deprecated):**
+
 ```
 https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}&adaptive_background={{ adaptive_background }}
 ```

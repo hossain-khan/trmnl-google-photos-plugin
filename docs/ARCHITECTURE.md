@@ -37,7 +37,8 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
    │  (E-ink)     │         │   (Hourly Poll)  │
    └──────────────┘         └──────────────────┘
                                     │
-                                    │ 2. GET /api/photo?album_url=...
+                                    │ 2. POST /api/photo (recommended)
+                                    │ or GET /api/photo (legacy)
                                     │ (Polling Strategy)
                                     ▼
                          ┌─────────────────────┐
@@ -114,7 +115,8 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 
 - `GET /` - Health check
 - `GET /health` - Alternative health check
-- `GET /api/photo` - **Main endpoint** (returns JSON photo data for TRMNL Polling strategy)
+- `POST /api/photo` - **Main endpoint (recommended)** - Returns JSON photo data for TRMNL Polling strategy
+- `GET /api/photo` - Legacy endpoint (deprecated, use POST for enhanced privacy)
 
 **Why Cloudflare Workers?**
 
@@ -518,6 +520,24 @@ Planned GitHub Actions workflow:
 - ✅ Can implement KV caching for performance
 
 **TRMNL Integration** (`settings.yml`):
+
+**Recommended (POST method - enhanced privacy):**
+
+```yaml
+strategy: polling
+polling_url: https://trmnl-google-photos.gohk.xyz/api/photo
+polling_verb: POST
+polling_headers:
+  Content-Type: application/json
+polling_body: |
+  {
+    "album_url": "{{ shared_album_url }}",
+    "enable_caching": "{{ enable_caching }}"
+  }
+refresh_frequency: 3600 # seconds (1 hour, cache lasts 24 hours)
+```
+
+**Legacy (GET method - deprecated):**
 
 ```yaml
 strategy: polling

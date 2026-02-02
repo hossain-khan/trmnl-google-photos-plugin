@@ -119,7 +119,7 @@
             <div style="background: #f7fafc; border-left: 4px solid #48bb78; padding: 1rem 1.25rem; border-radius: 8px; margin-top: 1.5rem;">
                 <p style="margin: 0 0 0.5rem 0;"><strong>📡 Current Status</strong> <span class="status-badge-inline">✓ Live</span></p>
                 <p style="margin: 0 0 0.5rem 0; font-size: 0.95rem;">JSON API is operational! Worker returns photo data as JSON. TRMNL platform renders templates stored in Markup Editor.</p>
-                <p style="margin: 0; font-size: 0.9rem; color: #718096;"><strong>Architecture:</strong> Polling strategy (GET /api/photo) - Worker returns JSON, not HTML. TRMNL handles all template rendering.</p>
+                <p style="margin: 0; font-size: 0.9rem; color: #718096;"><strong>Architecture:</strong> Polling strategy (POST /api/photo recommended, GET /api/photo legacy) - Worker returns JSON, not HTML. TRMNL handles all template rendering.</p>
             </div>
         </div>
 

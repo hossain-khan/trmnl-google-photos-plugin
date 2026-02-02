@@ -1,5 +1,16 @@
 # This file contains custom fields for the TRMNL Google Photos Shared Album Plugin
+# Polling Configuration: Uses POST method with JSON body for enhanced privacy
 # Dev Documentation: https://help.usetrmnl.com/en/articles/10513740-custom-plugin-form-builder
+#
+# NOTE: In settings.yml, configure polling as:
+# polling_url: https://trmnl-google-photos.gohk.xyz/api/photo
+# polling_verb: POST
+# polling_headers: Content-Type=application/json
+# polling_body: |
+#   {
+#     "album_url": "##{{ shared_album_url }}",
+#     "enable_caching": "##{{ enable_caching }}"
+#   }
 - keyname: author_bio
   name: About This Plugin
   field_type: author_bio
