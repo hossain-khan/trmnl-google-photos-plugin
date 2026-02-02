@@ -274,7 +274,7 @@ describe('POST /api/photo Endpoint', () => {
       ];
 
       testCases.forEach(({ input, expected }) => {
-        const useCaching = input !== 'false' && input !== '0' && input !== false;
+        const useCaching = String(input) !== 'false' && String(input) !== '0';
         assert.strictEqual(useCaching, expected, `enable_caching=${input} should be ${expected}`);
       });
     });
@@ -304,7 +304,7 @@ describe('POST /api/photo Endpoint', () => {
       ];
 
       testCases.forEach(({ input, expected }) => {
-        const analyzeImage = input === 'true' || input === '1' || input === true;
+        const analyzeImage = String(input) === 'true' || String(input) === '1';
         assert.strictEqual(
           analyzeImage,
           expected,
