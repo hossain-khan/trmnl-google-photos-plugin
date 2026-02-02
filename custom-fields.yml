@@ -8,9 +8,12 @@
 # polling_headers: Content-Type=application/json
 # polling_body: |
 #   {
-#     "album_url": "##{{ shared_album_url }}",
-#     "enable_caching": "##{{ enable_caching }}"
+#     "album_url": "{{ shared_album_url }}",
+#     "enable_caching": "{{ enable_caching }}"
 #   }
+#
+# Legacy GET method (deprecated):
+# polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url=##{{ shared_album_url }}&enable_caching=##{{ enable_caching }}
 - keyname: author_bio
   name: About This Plugin
   field_type: author_bio

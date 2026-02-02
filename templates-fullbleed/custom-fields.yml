@@ -9,9 +9,9 @@
 # polling_headers: Content-Type=application/json
 # polling_body: |
 #   {
-#     "album_url": "##{{ shared_album_url }}",
-#     "enable_caching": "##{{ enable_caching }}",
-#     "adaptive_background": "##{{ adaptive_background }}"
+#     "album_url": "{{ shared_album_url }}",
+#     "enable_caching": "{{ enable_caching }}",
+#     "adaptive_background": "{{ adaptive_background }}"
 #   }
 #
 # Legacy GET method (deprecated):
