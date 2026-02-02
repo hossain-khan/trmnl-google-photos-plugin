@@ -243,8 +243,6 @@ jobs:
             echo "⚠️  No error field in response (may have failed gracefully)"
             echo "$RESPONSE" | jq '.'
           fi
-            exit 1
-          fi
 
       - name: Test health check endpoint
         run: |
