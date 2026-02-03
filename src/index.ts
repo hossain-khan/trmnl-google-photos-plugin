@@ -546,15 +546,13 @@ app.post('/api/photo', async (c) => {
     }
 
     // Determine if caching should be used based on user preference
-    const useCaching =
-      enable_caching !== 'false' && enable_caching !== '0' && String(enable_caching) !== 'false';
+    // enable_caching can be: 'true', 'false', '1', '0', or undefined (defaults to true)
+    const useCaching = enable_caching !== 'false' && enable_caching !== '0';
     const kvNamespace = useCaching ? c.env.PHOTOS_CACHE : undefined;
 
     // Determine if adaptive background should be analyzed
-    const analyzeImage =
-      adaptive_background === 'true' ||
-      adaptive_background === '1' ||
-      String(adaptive_background) === 'true';
+    // adaptive_background can be: 'true', 'false', '1', '0', or undefined (defaults to false)
+    const analyzeImage = adaptive_background === 'true' || adaptive_background === '1';
 
     logger.info('Request preferences', {
       enable_caching,

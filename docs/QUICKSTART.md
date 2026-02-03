@@ -34,8 +34,13 @@ curl http://localhost:8787/
 #   "message": "TRMNL Google Photos Plugin is running"
 # }
 
-# Test the photo endpoint
-curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
+# Test the photo endpoint (POST - recommended)
+curl -X POST http://localhost:8787/api/photo \
+  -H "Content-Type: application/json" \
+  -d '{"album_url":"https://photos.app.goo.gl/ENK6C44K85QgVHPH8"}'
+
+# Or test with GET (deprecated)
+# curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/ENK6C44K85QgVHPH8"
 ```
 
 ## 🌐 Deploy to Cloudflare
@@ -74,7 +79,8 @@ curl "http://localhost:8787/api/photo?album_url=https://photos.app.goo.gl/ENK6C4
 
 - `GET /` - Service info and health check
 - `GET /health` - Alternative health check
-- `GET /api/photo` - JSON API endpoint for TRMNL (returns photo data)
+- `POST /api/photo` - JSON API endpoint for TRMNL (recommended) - Polling with privacy
+- `GET /api/photo` - Legacy JSON API endpoint (deprecated, use POST instead)
 
 ## 📖 Next Steps
 
