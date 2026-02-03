@@ -225,7 +225,7 @@ Content-Type: application/json
 
 ```http
 Content-Type: application/json
-Access-Control-Allow-Origin: https://hossain-khan.github.io, https://usetrmnl.com
+Access-Control-Allow-Origin: https://hossain-khan.github.io, https://trmnl.com
 Access-Control-Allow-Methods: GET, OPTIONS
 Access-Control-Max-Age: 86400
 ```
@@ -488,7 +488,7 @@ Same error responses as GET endpoint for invalid URLs, album not found, etc.
 
 ```http
 Content-Type: application/json
-Access-Control-Allow-Origin: https://hossain-khan.github.io, https://usetrmnl.com
+Access-Control-Allow-Origin: https://hossain-khan.github.io, https://trmnl.com
 Access-Control-Allow-Methods: GET, POST, OPTIONS
 Access-Control-Max-Age: 86400
 ```

@@ -41,7 +41,7 @@ app.use(
   cors({
     origin: [
       'https://hossain-khan.github.io',
-      'https://usetrmnl.com',
+      'https://trmnl.com',
       'http://localhost:8787',
       'http://localhost:3000',
     ],
@@ -140,7 +140,7 @@ app.get('/api/photo', async (c) => {
     // Demo Data: If album_url is empty, 'demo', or '0', return demo photo data
     // This allows the plugin to display a preview in the TRMNL marketplace without requiring
     // users to configure their own Google Photos album URL first.
-    // Reference: https://help.usetrmnl.com/en/articles/12772238-demo-data-for-publishing-plugins
+    // Reference: https://help.trmnl.com/en/articles/12772238-demo-data-for-publishing-plugins
     if (
       !album_url ||
       album_url.trim() === '' ||

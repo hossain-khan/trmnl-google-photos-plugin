@@ -130,7 +130,7 @@ Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
 ```typescript
 Allowed Origins:
 ✅ https://hossain-khan.github.io (GitHub Pages)
-✅ https://usetrmnl.com (TRMNL platform)
+✅ https://trmnl.com (TRMNL platform)
 ✅ http://localhost:8787 (Development)
 ✅ http://localhost:3000 (Development)
 
