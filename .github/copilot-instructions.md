@@ -165,7 +165,7 @@ trmnl-google-photos-plugin/
 **BYOD Devices** (18+): Kobo, Inkplate, Waveshare, M5Paper, Onyx Boox, and more  
 **Total Supported**: 27+ devices
 
-**Reference**: [Device Models API](https://usetrmnl.com/api/models) • [Photo Fetcher Docs](../src/services/photo-fetcher.ts)
+**Reference**: [Device Models API](https://trmnl.com/api/models) • [Photo Fetcher Docs](../src/services/photo-fetcher.ts)
 
 ### Responsive System
 

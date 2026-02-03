@@ -38,7 +38,7 @@ See how your photos look across different TRMNL layouts:
 </table>
 
 <p align="right">
-  <a href="https://usetrmnl.com/recipes/227153" target="_blank">
+  <a href="https://trmnl.com/recipes/227153" target="_blank">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="assets/trmnl-brand/trmnl-badge-show-it-on-dark.svg">
       <source media="(prefers-color-scheme: light)" srcset="assets/trmnl-brand/trmnl-badge-show-it-on-light.svg">
@@ -93,12 +93,12 @@ Both variants use the same backend API but offer different visual presentations.
 
 ## 📦 Installation
 
-1. Visit [TRMNL Recipes - Google Photos](https://usetrmnl.com/recipes/227153)
+1. Visit [TRMNL Recipes - Google Photos](https://trmnl.com/recipes/227153)
 2. Click **Install** to add the recipe to your TRMNL account
 3. Create a shared album in Google Photos (if you haven't already)
 4. Copy the shared album link from Google Photos
 5. Paste the link in the plugin settings
-6. Add to your [Playlist](https://usetrmnl.com/playlists)
+6. Add to your [Playlist](https://trmnl.com/playlists)
 
 That's it! Your photos will automatically refresh every hour with a new random photo from your album.
 
@@ -149,7 +149,7 @@ MIT License - see [LICENSE](LICENSE) for details
 
 - [`google-photos-album-image-url-fetch`](https://www.npmjs.com/package/google-photos-album-image-url-fetch) The core library that makes fetching Google Photos URLs possible (reverse-engineered API)
 - Inspired by the TRMNL Apple Photos plugin by [@zegl](https://github.com/zegl/trmnl-apple-photos)
-- Built for the amazing [TRMNL](https://usetrmnl.com) community
+- Built for the amazing [TRMNL](https://trmnl.com) community
 
 ---
 

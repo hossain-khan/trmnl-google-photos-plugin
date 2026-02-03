@@ -89,7 +89,7 @@ All submissions require code review. We'll review:
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [Prettier Documentation](https://prettier.io/docs/en/)
 - [ESLint Documentation](https://eslint.org/docs/latest/)
-- [TRMNL Framework](https://usetrmnl.com/docs)
+- [TRMNL Framework](https://trmnl.com/docs)
 
 ## ❓ Questions?
 

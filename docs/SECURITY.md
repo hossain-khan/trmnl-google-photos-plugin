@@ -248,7 +248,7 @@ Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
 ```typescript
 // Allowed origins (whitelist)
 ✅ https://hossain-khan.github.io (GitHub Pages)
-✅ https://usetrmnl.com (TRMNL platform)
+✅ https://trmnl.com (TRMNL platform)
 ✅ http://localhost:8787 (Development)
 ✅ http://localhost:3000 (Development)
 
@@ -429,7 +429,7 @@ For contributors adding new features:
 
 - [OWASP JSON Security Cheatsheet](https://cheatsheetseries.owasp.org/cheatsheets/AJAX_Security_Cheat_Sheet.html)
 - [Cloudflare Workers Security](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/)
-- [TRMNL Plugin Security Guidelines](https://docs.usetrmnl.com/security)
+- [TRMNL Plugin Security Guidelines](https://docs.trmnl.com/security)
 - [npm audit documentation](https://docs.npmjs.com/cli/v8/commands/npm-audit)
 
 ## License

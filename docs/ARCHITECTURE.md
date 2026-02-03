@@ -881,7 +881,7 @@ The entire system fits in a single Cloudflare Worker (~832KB, 144KB gzipped) and
 - [API Documentation](API_DOCUMENTATION.md) - Complete API reference
 - [Testing Strategy](TESTING.md) - Testing approach and guidelines
 - [Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)
-- [TRMNL Plugin Guide](https://usetrmnl.com/plugins)
+- [TRMNL Plugin Guide](https://trmnl.com/plugins)
 
 ---
 

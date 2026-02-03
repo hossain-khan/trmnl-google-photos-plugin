@@ -95,9 +95,9 @@
  *
  * REFERENCE:
  * ----------------------
- * - TRMNL Framework: https://usetrmnl.com/framework/responsive
- * - Device Models API: https://usetrmnl.com/api/models (source of this data)
- * - Breakpoint Guide: https://usetrmnl.com/framework/responsive#size-based-responsive
+ * - TRMNL Framework: https://trmnl.com/framework/responsive
+ * - Device Models API: https://trmnl.com/api/models (source of this data)
+ * - Breakpoint Guide: https://trmnl.com/framework/responsive#size-based-responsive
  * ====================================================================================
  */
 
