@@ -15,7 +15,7 @@
 #   }
 #
 # Legacy GET method (deprecated):
-# polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url=##{{ shared_album_url }}&enable_caching=##{{ enable_caching }}&adaptive_background=##{{ adaptive_background }}
+# polling_url: https://trmnl-google-photos.gohk.xyz/api/photo?album_url={{ shared_album_url }}&enable_caching={{ enable_caching }}&adaptive_background={{ adaptive_background }}
 
 - keyname: author_bio
   name: About This Plugin
