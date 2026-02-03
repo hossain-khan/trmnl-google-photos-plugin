@@ -1,24 +1,65 @@
-# Full-Bleed Templates
+# Google Photos Canvas — Fullscreen Photo Display
 
-Full-screen image display templates optimized for showcasing photos without metadata or UI clutter.
+A minimalist, distraction-free variant of the Google Photos plugin for TRMNL.
 
-> [!IMPORTANT]  
-> Must use polling url with `adaptive_background` parameter to enable background color adaptation.
+**Install from TRMNL Recipes**: [Google Photos Canvas (Recipe #230712)](https://trmnl.com/recipes/230712)
 
-## Purpose
+---
+
+## Overview
+
+Google Photos Canvas displays random photos from your Google Photos shared albums on TRMNL e-ink displays with a focus on **pure photo experience**:
+
+- 📸 **Fullscreen edge-to-edge** photos with no metadata
+- 🎨 **Adaptive backgrounds** that match photo brightness
+- 🔐 **Privacy-first** — No OAuth, no tracking
+- ⚡ **Same fast API** as the Standard variant
+
+**Same backend, different presentation.** Canvas and Standard share the identical Cloudflare Worker API but offer different visual experiences.
+
+## Canvas vs. Standard
+
+| Aspect           | Canvas                                             | Standard                                           |
+| ---------------- | -------------------------------------------------- | -------------------------------------------------- |
+| **Purpose**      | Photo-focused                                      | Info-rich                                          |
+| **Display**      | Edge-to-edge fullscreen                            | Centered with padding                              |
+| **Title Bar**    | Removed                                            | Shows custom name, date, count                     |
+| **Background**   | Adaptive to photo                                  | Static white                                       |
+| **Metadata**     | None                                               | Photo size, megapixels, album info                 |
+| **Best For**     | Immersive viewing                                  | Organized information display                      |
+| **Install Link** | [Recipe #230712](https://trmnl.com/recipes/230712) | [Recipe #227153](https://trmnl.com/recipes/227153) |
+
+---
+
+---
+
+## Installation
+
+1. Visit [Google Photos Canvas on TRMNL Recipes](https://trmnl.com/recipes/230712)
+2. Click **Install** to add the recipe to your TRMNL account
+3. Create a shared album in Google Photos
+4. Copy the shared album link
+5. Paste it in the Canvas plugin settings
+6. Add to your TRMNL playlist
+
+**First time?** See [main README](../README.md#-privacy-first) for privacy info and more details.
+
+---
+
+## Features
 
 These templates prioritize **image-first display**, removing titles, captions, metadata, and year overlays to create a seamless full-screen photo experience on TRMNL devices.
 
-### When to Use Full-Bleed Templates
+### Why Canvas?
 
-✅ **Use these templates if you want:**
+✅ **Use Canvas if you want:**
 
 - Full-screen centered images with minimal UI
 - Clean, distraction-free photo display
 - Adaptive background colors that blend with photo edges
 - Focus on the photo itself, not metadata
 
-❌ **Use the standard templates if you want:**
+✅ **Use Standard if you want:**
 
 - Photo metadata (date, size, photo count) in title bar
 - Photo captions and descriptions
