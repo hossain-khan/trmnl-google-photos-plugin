@@ -6,43 +6,58 @@ Display random photos from your Google Photos shared albums on TRMNL e-ink displ
 
 > "Your photos deserve to be displayed, not buried in the cloud."
 
-## 🖼️ Gallery
+## 🖼️ Choose Your Layout
 
-See how your photos look across different TRMNL layouts:
+### Standard Layout — Photo with Metadata
+
+Full control with customizable titles, photo counts, and album info:
 
 <table>
   <tr>
     <td width="50%" align="center">
-      <img src="https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/demo/demo-full.png" alt="Full Layout" width="100%"/>
-      <br/><strong>Full Layout</strong>
-      <br/>Full-screen photo display
+      <img src="https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/demo/demo-full.png" alt="Standard Full Layout" width="100%"/>
+      <br/><strong>Full Screen</strong>
     </td>
     <td width="50%" align="center">
-      <img src="https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/demo/demo-half-horizontal.png" alt="Half Horizontal Layout" width="100%"/>
+      <img src="https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/demo/demo-half-horizontal.png" alt="Standard Half Horizontal" width="100%"/>
       <br/><strong>Half Horizontal</strong>
-      <br/>Wide horizontal display
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" align="center">
-      <img src="https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/demo/demo-half-vertical.png" alt="Half Vertical Layout" width="100%"/>
-      <br/><strong>Half Vertical</strong>
-      <br/>Tall vertical display
-    </td>
-    <td width="50%" align="center">
-      <img src="https://hossain-khan.github.io/trmnl-google-photos-plugin/assets/demo/demo-quadrant.png" alt="Quadrant Layout" width="100%"/>
-      <br/><strong>Quadrant</strong>
-      <br/>Compact quarter display
     </td>
   </tr>
 </table>
 
-<p align="right">
+<p>
   <a href="https://trmnl.com/recipes/227153" target="_blank">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="assets/trmnl-brand/trmnl-badge-show-it-on-dark.svg">
       <source media="(prefers-color-scheme: light)" srcset="assets/trmnl-brand/trmnl-badge-show-it-on-light.svg">
-      <img alt="Show it on TRMNL" src="assets/trmnl-brand/trmnl-badge-show-it-on-dark.svg" height="40">
+      <img alt="Install Standard Recipe" src="assets/trmnl-brand/trmnl-badge-show-it-on-dark.svg" height="40">
+    </picture>
+  </a>
+</p>
+
+### Canvas Layout — Fullscreen & Distraction-Free
+
+Minimalist photo experience with adaptive background colors:
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="https://hossain-khan.github.io/trmnl-google-photos-plugin/templates-fullbleed/preview-compare/preview-cat-full.png" alt="Canvas Fullscreen" width="100%"/>
+      <br/><strong>Fullscreen Edge-to-Edge</strong>
+    </td>
+    <td width="50%" align="center">
+      <img src="https://hossain-khan.github.io/trmnl-google-photos-plugin/templates-fullbleed/preview-compare/preview-port-dog-full.png" alt="Canvas Adaptive Background" width="100%"/>
+      <br/><strong>Adaptive Backgrounds</strong>
+    </td>
+  </tr>
+</table>
+
+<p>
+  <a href="https://trmnl.com/recipes/230712" target="_blank">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="assets/trmnl-brand/trmnl-badge-show-it-on-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="assets/trmnl-brand/trmnl-badge-show-it-on-light.svg">
+      <img alt="Install Canvas Recipe" src="assets/trmnl-brand/trmnl-badge-show-it-on-dark.svg" height="40">
     </picture>
   </a>
 </p>
@@ -62,39 +77,39 @@ This plugin is built with privacy at its core:
 
 Your photos stay private. We simply help your TRMNL display them.
 
-## 🎨 Layout Variants
+## 🎨 Comparison: Which Layout is Right for You?
 
-This plugin comes in two variants to suit different display preferences:
+| Feature           | Standard                                           | Canvas                                             |
+| ----------------- | -------------------------------------------------- | -------------------------------------------------- |
+| **Layouts**       | Full, Half Horizontal, Half Vertical, Quadrant     | Full, Half Horizontal, Half Vertical, Quadrant     |
+| **Photo Display** | Centered with padding                              | Edge-to-edge fullscreen                            |
+| **Title Bar**     | ✅ Shows custom name, photo date, count            | ❌ Removed                                         |
+| **Metadata**      | ✅ Photo dimensions, megapixels, album info        | ❌ Removed                                         |
+| **Captions**      | ✅ Photo description (if available)                | ❌ Removed                                         |
+| **Background**    | Static white                                       | ✅ Adaptive to photo edges                         |
+| **Best For**      | Info-rich, organized displays                      | Photo-focused, immersive viewing                   |
+| **Install**       | [Recipe #227153](https://trmnl.com/recipes/227153) | [Recipe #230712](https://trmnl.com/recipes/230712) |
 
-### Standard Layout (Main Plugin)
+Both variants use the same backend API and support all four layout sizes. Choose based on whether you want photo metadata or a clean, distraction-free display.
 
-The main plugin offers traditional layouts with photo metadata:
-
-- **Full Screen** - Photo with optional caption and metadata
-- **Half Horizontal** - Side-by-side photo and info
-- **Half Vertical** - Stacked photo and details
-- **Quadrant** - Compact photo-only display
-
-**Features**: Photo metadata, date stamps, album info, customizable titles
-
-### Canvas/Fullbleed Layout (Alternative)
-
-A minimalist variant for distraction-free photo viewing:
-
-- Fullscreen, edge-to-edge photo display
-- No captions or metadata overlays
-- Adaptive background colors (optional) that match photo edges
-- Clean, immersive presentation
-
-**Location**: Templates available in `templates-fullbleed/` directory  
-**Best For**: Users who want a pure photo experience without text overlays
-
-Both variants use the same backend API but offer different visual presentations. Choose based on whether you prefer photo metadata or a clean canvas.
+**Want more details?** See [Canvas Layout Documentation](templates-fullbleed/README.md)
 
 ## 📦 Installation
 
-1. Visit [TRMNL Recipes - Google Photos](https://trmnl.com/recipes/227153)
+Choose which layout you prefer:
+
+### Standard Layout (with Metadata)
+
+1. Visit [TRMNL Recipes - Google Photos Standard](https://trmnl.com/recipes/227153)
 2. Click **Install** to add the recipe to your TRMNL account
+
+### Canvas Layout (Fullscreen & Distraction-Free)
+
+1. Visit [TRMNL Recipes - Google Photos Canvas](https://trmnl.com/recipes/230712)
+2. Click **Install** to add the recipe to your TRMNL account
+
+### Finish Setup
+
 3. Create a shared album in Google Photos (if you haven't already)
 4. Copy the shared album link from Google Photos
 5. Paste the link in the plugin settings
