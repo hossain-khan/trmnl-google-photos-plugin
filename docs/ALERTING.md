@@ -94,11 +94,23 @@ if (timeout_rate > 10% && last_alert > 1_hour_ago && samples >= 20) {
 
 ### Environment Variables
 
-**Required in `wrangler.toml`:**
+**⚠️ SECURITY WARNING:** The Discord webhook URL **MUST** be stored as an encrypted secret, NOT as a plain text environment variable in `wrangler.toml`. See the [Security Policy](./SECURITY.md) for detailed setup instructions.
 
-```toml
-[vars]
-DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"
+**Setup Method 1: Cloudflare Dashboard (Recommended)**
+
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. Navigate to **Workers & Pages** → `trmnl-google-photos`
+3. Go to **Settings** → **Variables and Secrets**
+4. Click **Add variable** → Select **Secret** type
+5. Variable name: `DISCORD_WEBHOOK_URL`
+6. Value: Paste your Discord webhook URL
+7. Click **Save**
+
+**Setup Method 2: Wrangler CLI**
+
+```bash
+npx wrangler secret put DISCORD_WEBHOOK_URL
+# Paste your webhook URL when prompted (input is hidden)
 ```
 
 **KV Namespace:**
@@ -115,13 +127,29 @@ DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"
 1. **Open Discord Server Settings**
 2. **Integrations** → **Webhooks** → **New Webhook**
 3. **Choose Channel** (e.g., `#alerts` or `#monitoring`)
-4. **Copy Webhook URL**
-5. **Add to `wrangler.toml`**:
+4. **Copy Webhook URL** (keep it secret!)
+5. **Store as encrypted secret** (see below)
 
-```toml
-[vars]
-DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1234567890/abcdefghijk..."
+**⚠️ SECURITY:** Never commit webhook URLs to git or store in `wrangler.toml` as plain text.
+
+**Option A: Cloudflare Dashboard (Easier)**
+
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. Workers & Pages → `trmnl-google-photos` → Settings
+3. Variables and Secrets → Add variable
+4. Select **Secret** type (NOT "Variable")
+5. Name: `DISCORD_WEBHOOK_URL`
+6. Value: Paste your webhook URL
+7. Click Save
+
+**Option B: Wrangler CLI**
+
+```bash
+npx wrangler secret put DISCORD_WEBHOOK_URL
+# Paste your webhook URL when prompted
 ```
+
+For detailed security guidance, see [SECURITY.md](./SECURITY.md#-secrets-management).
 
 ### 2. Deploy to Cloudflare
 
@@ -308,7 +336,7 @@ Check stored events in Cloudflare Dashboard:
    - Check: KV key `brightness:last_alert`
 
 4. **Webhook URL Missing**:
-   - `DISCORD_WEBHOOK_URL` not configured in `wrangler.toml`
+   - `DISCORD_WEBHOOK_URL` secret not configured
    - Check: `"alertingEnabled": false` in logs
 
 5. **KV Not Configured**:
@@ -429,12 +457,18 @@ npm run deploy
 
 To disable alerting but keep metrics tracking:
 
-1. **Remove Discord Webhook from `wrangler.toml`**:
+1. **Delete the Discord Webhook Secret**:
 
-```toml
-[vars]
-ENVIRONMENT = "production"
-# DISCORD_WEBHOOK_URL = "..." # Commented out
+**Via Cloudflare Dashboard:**
+
+- Workers & Pages → `trmnl-google-photos` → Settings
+- Variables and Secrets → Find `DISCORD_WEBHOOK_URL`
+- Click Delete
+
+**Via Wrangler CLI:**
+
+```bash
+npx wrangler secret delete DISCORD_WEBHOOK_URL
 ```
 
 2. **Redeploy**:

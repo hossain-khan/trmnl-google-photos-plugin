@@ -61,7 +61,7 @@ const scores = await analyzeImageBrightness('https://lh3.googleusercontent.com/t
 
 **Failure Cases:**
 
-- Network timeout (>1000ms) → Returns `null`
+- Network timeout (>2000ms) → Returns `null`
 - API error (500) → Returns `null`
 - Invalid URL → Throws error
 - Malformed response → Returns `null`
@@ -208,7 +208,7 @@ curl 'https://trmnl-google-photos.gohk.xyz/api/photo?album_url=https://photos.ap
 
 **Test 4: API Timeout Handling**
 
-If brightness analysis times out (>1000ms):
+If brightness analysis times out (>2000ms):
 
 - Should still return valid response
 - edge_brightness_score and brightness_score should be undefined
@@ -320,9 +320,9 @@ npm run test -- test-performance.ts
 Target metrics:
 
 - Photo fetch (with analysis): < 1500ms
-- Brightness analysis: < 1000ms
+- Brightness analysis: < 2000ms (2-second timeout)
 - Response serialization: < 50ms
-- Total API response: < 2000ms
+- Total API response: < 2500ms
 
 ### 8. Browser-Based Testing
 
