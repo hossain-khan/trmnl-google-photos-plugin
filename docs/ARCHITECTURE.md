@@ -58,7 +58,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
             └──────────────┘ └──────────────┘ └──────────────┘
                                     │
                           Optional: KV Cache
-                         (1-hour TTL, shared)
+                         (24-hour TTL, shared)
                                     │
                                     │ 6. Return JSON
                                     │ { photo_url, caption, ... }
@@ -90,11 +90,19 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 
 **TRMNL Platform**
 
-- Stores plugin configuration (album URL in custom form fields)
-- Polls plugin API endpoints (GET requests)
-- Passes form field values as URL parameters
+- Stores plugin configuration (album URL and custom settings in custom form fields)
+- Polls plugin API endpoints (POST recommended, GET legacy)
+- Passes form field values as JSON body or URL parameters
 - Renders Liquid templates with JSON data
 - Handles device-specific layout selection
+
+**Custom Form Fields** (configured via `custom-fields.yml`):
+
+- `shared_album_url` (URL) - Google Photos shared album link
+- `custom_title` (String) - Custom display name for the title bar (optional)
+- `show_year` (Boolean, default: true) - Show photo year in corner
+- `show_metadata` (Boolean, default: true) - Show photo details in title (date, size, count)
+- `enable_caching` (Boolean, default: true) - Enable 24-hour KV cache for performance
 
 **Key Insight**: Album URL stored by TRMNL, not by our plugin → Zero PII liability. Templates stored in TRMNL's Markup Editor, not rendered by our Worker.
 
@@ -189,9 +197,13 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
   "photo_count": 142,
   "relative_date": "4 months ago",
   "aspect_ratio": "4:3",
-  "megapixels": 12.5
+  "megapixels": 12.5,
+  "edge_brightness_score": 75,
+  "brightness_score": 82
 }
 ```
+
+**Note**: `edge_brightness_score` and `brightness_score` are only included when `adaptive_background=true` parameter is passed to the API.
 
 **Template Access Pattern**:
 
@@ -253,6 +265,8 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 
    Query Parameters:
    - album_url: Google Photos shared album URL (from form field)
+   - enable_caching: Enable/disable KV cache (optional, default: true)
+   - adaptive_background: Enable brightness analysis (optional, default: false)
    - (optional) device: Device type for photo optimization
 
 2. Worker: Validate Album URL
@@ -265,7 +279,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
    - Check KV cache for album:ABC123
    - If cache miss:
      * Fetch from Google Photos API
-     * Store in KV with 1-hour TTL
+     * Store in KV with 24-hour TTL
    - If cache hit:
      * Return cached photo list (67ms response time)
    - Parse response
@@ -295,7 +309,9 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
        "photo_count": 142,
        "relative_date": "4 months ago",
        "aspect_ratio": "4:3",
-       "megapixels": 12.5
+       "megapixels": 12.5,
+       "edge_brightness_score": 75,  // Optional: only when adaptive_background=true
+       "brightness_score": 82         // Optional: only when adaptive_background=true
      },
      headers: { "Content-Type": "application/json" }
    }
