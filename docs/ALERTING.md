@@ -460,6 +460,7 @@ To disable alerting but keep metrics tracking:
 1. **Delete the Discord Webhook Secret**:
 
 **Via Cloudflare Dashboard:**
+
 - Workers & Pages → `trmnl-google-photos` → Settings
 - Variables and Secrets → Find `DISCORD_WEBHOOK_URL`
 - Click Delete
