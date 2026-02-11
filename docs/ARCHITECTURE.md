@@ -361,7 +361,7 @@ The TRMNL Google Photos Plugin is a **stateless, privacy-first** system that dis
 - ✅ No user accounts
 - ✅ No authentication tokens
 - ✅ No album URLs stored by plugin
-- ✅ No photo history tracking
+- ✅ Photo history uses privacy-preserving hashing (SHA-256) - album URLs never stored in plaintext
 - ✅ No analytics on user behavior
 
 **Data Flow**:
