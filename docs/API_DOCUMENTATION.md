@@ -286,7 +286,7 @@ This separation allows:
 **Performance Impact:**
 
 - Adds ~100-200ms latency (brightness analysis time)
-- 1-second timeout with graceful fallback (no brightness scores if analysis fails)
+- 2-second timeout with graceful fallback (no brightness scores if analysis fails)
 - Analysis uses 400×300 thumbnail (6× smaller than full photo)
 - Default: OFF (opt-in via query parameter or custom field)
 
