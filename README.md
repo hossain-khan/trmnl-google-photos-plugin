@@ -1,4 +1,4 @@
-![Forks - Google Photos](https://trmnl-badges.gohk.xyz/badge/forks?recipe=227153&label=Google%20Photos) ![Forks - Google Photos](https://trmnl-badges.gohk.xyz/badge/forks?recipe=230712&label=Google%20Photos%20Canvas)
+![Forks - Google Photos](https://trmnl-badges.gohk.xyz/badge/forks?recipe=227153&label=Google%20Photos%20%7C%20Forks) ![Forks - Google Photos](https://trmnl-badges.gohk.xyz/badge/forks?recipe=230712&label=Google%20Photos%20Canvas%20%7C%20Forks)
 
 # 📷 Google Photos Shared Album for TRMNL
 
