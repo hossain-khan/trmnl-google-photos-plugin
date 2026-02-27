@@ -421,6 +421,7 @@ For contributors adding new features:
 
 | Date       | Version | Update                                         |
 | ---------- | ------- | ---------------------------------------------- |
+| 2026-02-27 | 1.4.0   | HTTP 200 error responses with error_type for TRMNL template injection |
 | 2026-02-02 | 1.3.0   | POST /api/photo endpoint (privacy enhancement) |
 | 2026-02-02 | 1.2.0   | Smart photo selection (duplicate prevention)   |
 | 2026-01-24 | 1.1.0   | Adaptive background brightness analysis        |
