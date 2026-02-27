@@ -9,11 +9,31 @@
          style="max-width: 100%; max-height: 100%; object-fit: contain;">
   </div>
   {% else %}
-  <!-- No Photo Available -->
+  <!-- Error State: show appropriate message based on error_type from API -->
+  {% if error_type == 'album_not_found' %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--medium h--full">
+    <div class="value value--large text--center">🔒</div>
+    <div class="title title--medium text--center">Album Unavailable</div>
+    <div class="description text--center">This album may have been deleted or made private. Please update your shared album URL in plugin settings.</div>
+  </div>
+  {% elsif error_type == 'invalid_url' %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--medium h--full">
+    <div class="value value--large text--center">⚠️</div>
+    <div class="title title--medium text--center">Invalid Album URL</div>
+    <div class="description text--center">The album URL appears invalid. Please check and update it in plugin settings.</div>
+  </div>
+  {% elsif error_type %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--medium h--full">
+    <div class="value value--large text--center">⚠️</div>
+    <div class="title title--medium text--center">Photos Unavailable</div>
+    <div class="description text--center">Unable to load photos. Will retry on next refresh.</div>
+  </div>
+  {% else %}
   <div class="flex flex--col flex--center-x flex--center-y gap--medium h--full">
     <div class="value value--large text--center">📷</div>
     <div class="title title--medium text--center">No Photos Available</div>
     <div class="description text--center">Please configure your Google Photos shared album URL in the plugin settings.</div>
   </div>
+  {% endif %}
   {% endif %}
 </div>
