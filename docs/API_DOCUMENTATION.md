@@ -30,7 +30,7 @@ Host: trmnl-google-photos.gohk.xyz
 {
   "status": "ok",
   "service": "trmnl-google-photos-plugin",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "environment": "production",
   "timestamp": "2026-01-18T20:48:00.000Z",
   "message": "TRMNL Google Photos Plugin is running"
@@ -58,7 +58,7 @@ Host: trmnl-google-photos.gohk.xyz
 {
   "status": "healthy",
   "service": "trmnl-google-photos-plugin",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "environment": "production",
   "timestamp": "2026-01-18T20:48:00.000Z",
   "uptime": "N/A"
