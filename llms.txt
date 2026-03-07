@@ -1,0 +1,45 @@
+# Google Photos Shared Album Plugin for TRMNL
+
+> A TRMNL plugin that displays random photos from Google Photos shared albums on e-ink devices — no OAuth, no user data storage. Paste a shared album link and your photos appear automatically.
+
+The plugin is available in two variants: **Standard Layout** (photo with metadata, captions, album info) and **Canvas Layout** (fullscreen edge-to-edge, adaptive backgrounds, distraction-free). Both use the same Cloudflare Worker JSON API and support all four TRMNL layout sizes (full, half horizontal, half vertical, quadrant).
+
+**Architecture**: Stateless polling — TRMNL sends the album URL with every request; the Cloudflare Worker fetches a random photo from the Google Photos shared album, caches album metadata in KV for 24 hours, and returns a JSON response that TRMNL merges into Liquid templates stored in the Markup Editor.
+
+**Live demo**: https://hossain-khan.github.io/trmnl-google-photos-plugin/  
+**API base URL**: https://trmnl-google-photos.gohk.xyz  
+**Standard recipe**: https://trmnl.com/recipes/227153  
+**Canvas recipe**: https://trmnl.com/recipes/230712
+
+## Documentation
+
+- [README](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/README.md): Project overview, layout comparison, installation, and legal notes
+- [Architecture](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/docs/ARCHITECTURE.md): System design, component diagram, data flow, and caching strategy
+- [API Documentation](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/docs/API_DOCUMENTATION.md): Complete API reference for the Cloudflare Worker endpoints
+- [Quick Start](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/docs/QUICKSTART.md): Setup and local development guide
+- [Deployment](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/docs/DEPLOYMENT.md): Cloudflare Worker deployment instructions
+- [Testing](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/docs/TESTING.md): Testing strategy, test cases, and how to run tests
+- [Security](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/docs/SECURITY.md): Security considerations and privacy design
+- [Canvas Layout README](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/templates-fullbleed/README.md): Canvas/fullbleed variant details and custom fields
+- [Contributing](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/CONTRIBUTING.md): Contribution guide and development workflow
+
+## Templates
+
+- [Standard Full Layout](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/templates/full.liquid): Full-screen layout with photo, caption, and metadata
+- [Standard Half Horizontal](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/templates/half_horizontal.liquid): Side-by-side photo and caption layout
+- [Standard Half Vertical](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/templates/half_vertical.liquid): Stacked photo and caption layout
+- [Standard Quadrant](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/templates/quadrant.liquid): Compact photo-only quarter-screen layout
+- [Canvas Full Layout](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/templates-fullbleed/full.liquid): Edge-to-edge fullscreen photo with adaptive background
+- [Canvas Half Horizontal](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/templates-fullbleed/half_horizontal.liquid): Fullbleed half-horizontal layout
+- [Canvas Half Vertical](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/templates-fullbleed/half_vertical.liquid): Fullbleed half-vertical layout
+- [Canvas Quadrant](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/templates-fullbleed/quadrant.liquid): Fullbleed quadrant layout
+
+## Source Code
+
+- [Cloudflare Worker entry point](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/src/index.ts): Main worker with Hono framework, routing, CORS, and request handling
+- [URL Parser](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/src/lib/url-parser.ts): Validates and normalizes Google Photos shared album URLs (42 test cases)
+- [Photo Fetcher](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/src/services/photo-fetcher.ts): Fetches photos from Google Photos, selects random photo, applies device-optimized sizing
+- [Cache Service](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/src/services/cache-service.ts): Cloudflare KV caching with 24-hour TTL for album metadata
+- [Security Validator](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/src/services/security-validator.ts): Input validation and sanitization for incoming requests
+- [Plugin Settings](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/settings.yml): TRMNL plugin configuration (polling strategy, refresh frequency, layouts)
+- [Custom Fields](https://github.com/hossain-khan/trmnl-google-photos-plugin/blob/main/custom-fields.yml): TRMNL custom form field definitions for plugin settings
