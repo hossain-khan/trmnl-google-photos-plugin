@@ -474,8 +474,13 @@ export function formatRelativeDate(isoDate: string): string {
     const diffMinutes = Math.floor(diffSeconds / 60);
     const diffHours = Math.floor(diffMinutes / 60);
     const diffDays = Math.floor(diffHours / 24);
-    const diffMonths = Math.floor(diffDays / 30);
-    const diffYears = Math.floor(diffDays / 365);
+    // Use calendar-based month/year diff so Feb 7 → Mar 7 is "1 month ago", not "28 days ago"
+    const calendarMonths =
+      (now.getFullYear() - date.getFullYear()) * 12 + (now.getMonth() - date.getMonth());
+    // Subtract 1 month if we haven't reached the same day-of-month yet (e.g. Mar 5 vs Feb 7 = 0 full months)
+    const dayAdjustment = now.getDate() >= date.getDate() ? 0 : -1;
+    const diffMonths = Math.max(0, calendarMonths + dayAdjustment);
+    const diffYears = Math.floor(diffMonths / 12);
 
     if (diffYears > 0) {
       return diffYears === 1 ? '1 year ago' : `${diffYears} years ago`;
