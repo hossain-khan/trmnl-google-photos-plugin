@@ -289,13 +289,16 @@ app.get('/api/photo', async (c) => {
       };
       trackError(errorContext);
 
+      // Return 200 with error fields so TRMNL injects error_type/error_message into templates
+      // (TRMNL only merges JSON variables on HTTP 200 responses)
       return c.json(
         {
-          error: statusCode === 404 ? 'Not Found' : 'Internal Server Error',
-          message: errorMessage,
+          photo_url: null,
+          error_type: errorType,
+          error_message: errorMessage,
           timestamp: new Date().toISOString(),
         },
-        statusCode as 404 | 500
+        200
       );
     }
 
@@ -535,13 +538,16 @@ app.post('/api/photo', async (c) => {
       };
       trackError(errorContext);
 
+      // Return 200 with error fields so TRMNL injects error_type/error_message into templates
+      // (TRMNL only merges JSON variables on HTTP 200 responses)
       return c.json(
         {
-          error: 'Bad Request',
-          message: `Invalid album URL: ${urlValidation.error}`,
-          validFormats: ['https://photos.app.goo.gl/...', 'https://photos.google.com/share/...'],
+          photo_url: null,
+          error_type: errorType,
+          error_message: `Invalid album URL: ${urlValidation.error}`,
+          timestamp: new Date().toISOString(),
         },
-        400
+        200
       );
     }
 
@@ -623,13 +629,16 @@ app.post('/api/photo', async (c) => {
       };
       trackError(errorContext);
 
+      // Return 200 with error fields so TRMNL injects error_type/error_message into templates
+      // (TRMNL only merges JSON variables on HTTP 200 responses)
       return c.json(
         {
-          error: statusCode === 404 ? 'Not Found' : 'Internal Server Error',
-          message: errorMessage,
+          photo_url: null,
+          error_type: errorType,
+          error_message: errorMessage,
           timestamp: new Date().toISOString(),
         },
-        statusCode as 404 | 500
+        200
       );
     }
 

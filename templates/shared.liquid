@@ -75,25 +75,89 @@ data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAQAAACQ9RH5AAAAAXNSR0IArs
 {% endcomment %}
 {% template error_state %}
 {% if size == 'full' %}
-<div class="flex flex--col flex--center-x flex--center-y gap--medium md:gap--large h--full">
-  <div class="value value--large md:value--xlarge lg:value--xxlarge text--center">📷</div>
-  <div class="title title--medium md:title--large lg:title--xlarge text--center">No Photos Available</div>
-  <div class="description md:title md:title--small lg:title lg:title--medium text--center">
-    Please configure your Google Photos shared album URL in the plugin settings.
+  {% if error_type == 'album_not_found' %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--medium md:gap--large h--full">
+    <div class="value value--large md:value--xlarge lg:value--xxlarge text--center">🔒</div>
+    <div class="title title--medium md:title--large lg:title--xlarge text--center">Album Unavailable</div>
+    <div class="description md:title md:title--small lg:title lg:title--medium text--center">
+      This album may have been deleted or made private. Please update your shared album URL in plugin settings.
+    </div>
   </div>
-</div>
+  {% elsif error_type == 'invalid_url' %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--medium md:gap--large h--full">
+    <div class="value value--large md:value--xlarge lg:value--xxlarge text--center">⚠️</div>
+    <div class="title title--medium md:title--large lg:title--xlarge text--center">Invalid Album URL</div>
+    <div class="description md:title md:title--small lg:title lg:title--medium text--center">
+      The album URL appears invalid. Please check and update it in plugin settings.
+    </div>
+  </div>
+  {% elsif error_type %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--medium md:gap--large h--full">
+    <div class="value value--large md:value--xlarge lg:value--xxlarge text--center">⚠️</div>
+    <div class="title title--medium md:title--large lg:title--xlarge text--center">Photos Unavailable</div>
+    <div class="description md:title md:title--small lg:title lg:title--medium text--center">
+      Unable to load photos. Will retry on next refresh.
+    </div>
+  </div>
+  {% else %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--medium md:gap--large h--full">
+    <div class="value value--large md:value--xlarge lg:value--xxlarge text--center">📷</div>
+    <div class="title title--medium md:title--large lg:title--xlarge text--center">No Photos Available</div>
+    <div class="description md:title md:title--small lg:title lg:title--medium text--center">
+      Please configure your Google Photos shared album URL in the plugin settings.
+    </div>
+  </div>
+  {% endif %}
 {% elsif size == 'half' %}
-<div class="flex flex--col flex--center-x flex--center-y gap--small md:gap--medium h--full">
-  <div class="value value--medium md:value--large lg:value--xlarge">📷</div>
-  <div class="title title--small md:title--medium lg:title--large text--center">No Photos</div>
-  <div class="description md:title md:title--small text--center">
-    Configure your shared album URL in settings
+  {% if error_type == 'album_not_found' %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--small md:gap--medium h--full">
+    <div class="value value--medium md:value--large lg:value--xlarge">🔒</div>
+    <div class="title title--small md:title--medium lg:title--large text--center">Album Unavailable</div>
+    <div class="description md:title md:title--small text--center">
+      Album deleted or made private. Update URL in settings.
+    </div>
   </div>
-</div>
+  {% elsif error_type == 'invalid_url' %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--small md:gap--medium h--full">
+    <div class="value value--medium md:value--large lg:value--xlarge">⚠️</div>
+    <div class="title title--small md:title--medium lg:title--large text--center">Invalid URL</div>
+    <div class="description md:title md:title--small text--center">
+      Check and update your album URL in settings.
+    </div>
+  </div>
+  {% elsif error_type %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--small md:gap--medium h--full">
+    <div class="value value--medium md:value--large lg:value--xlarge">⚠️</div>
+    <div class="title title--small md:title--medium lg:title--large text--center">Photos Unavailable</div>
+    <div class="description md:title md:title--small text--center">
+      Will retry on next refresh.
+    </div>
+  </div>
+  {% else %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--small md:gap--medium h--full">
+    <div class="value value--medium md:value--large lg:value--xlarge">📷</div>
+    <div class="title title--small md:title--medium lg:title--large text--center">No Photos</div>
+    <div class="description md:title md:title--small text--center">
+      Configure your shared album URL in settings
+    </div>
+  </div>
+  {% endif %}
 {% elsif size == 'quadrant' %}
-<div class="flex flex--col flex--center-x flex--center-y gap--xsmall h--full">
-  <div class="value value--small md:value--medium">📷</div>
-  <div class="description md:title md:title--small text--center">No Photos</div>
-</div>
+  {% if error_type == 'album_not_found' %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--xsmall h--full">
+    <div class="value value--small md:value--medium">🔒</div>
+    <div class="description md:title md:title--small text--center">Album Unavailable</div>
+  </div>
+  {% elsif error_type %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--xsmall h--full">
+    <div class="value value--small md:value--medium">⚠️</div>
+    <div class="description md:title md:title--small text--center">Photos Unavailable</div>
+  </div>
+  {% else %}
+  <div class="flex flex--col flex--center-x flex--center-y gap--xsmall h--full">
+    <div class="value value--small md:value--medium">📷</div>
+    <div class="description md:title md:title--small text--center">No Photos</div>
+  </div>
+  {% endif %}
 {% endif %}
 {% endtemplate %}
